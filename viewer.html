@@ -5,31 +5,23 @@
   <title>🎼 Partitura Interativa</title>
   <script src="https://cdn.jsdelivr.net/npm/abcjs@6.2.3/dist/abcjs-basic-min.js"></script>
   <style>
-    body { font-family: sans-serif; padding: 20px; }
+    body { font-family: sans-serif; padding: 20px; background: #f9f9f9; }
     .controls {
       margin: 15px 0;
       padding: 15px;
-      background: #f4f4f4;
+      background: #fff;
       border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
       display: flex;
       align-items: center;
-      gap: 15px;
-      flex-wrap: wrap;
+      gap: 20px;
     }
-    .controls button { cursor: pointer; padding: 8px 12px; }
-    #paper { margin-top: 20px; background: white; }
-    .transpose-control { display: flex; align-items: center; gap: 5px; }
+    button { cursor: pointer; padding: 8px 15px; border: 1px solid #ccc; border-radius: 4px; }
+    input[type="number"] { width: 60px; padding: 5px; }
+    #paper { background: white; padding: 20px; border-radius: 8px; }
   </style>
 </head>
 <body>
-
-<header>
-  <h1>🎼 Partitura Interativa</h1>
-</header>
-
-<nav>
-  <a href="musicas.html">← Voltar</a>
-</nav>
 
 <main>
   <div class="controls">
@@ -39,14 +31,14 @@
     </div>
 
     <label>
-      BPM:
-      <input type="number" id="tempo" value="100" min="40" max="240" step="5">
+      <strong>BPM (Q:):</strong>
+      <input type="number" id="tempo" value="100" min="40" max="240">
     </label>
 
-    <div class="transpose-control">
-      <span>Tom:</span>
+    <div>
+      <strong>Transpose:</strong>
       <button id="down">−</button>
-      <strong id="transposeValue">0</strong>
+      <span id="transposeValue" style="min-width: 20px; display: inline-block; text-align: center;">0</span>
       <button id="up">+</button>
     </div>
   </div>
@@ -55,70 +47,63 @@
 </main>
 
 <script>
-let abcRawText = ""; // Texto original do arquivo .abc
+let abcRawText = ""; 
 let visualObj = null;
 let synthControl = null;
 let transposeValue = 0;
 
-// 1. Carregar o arquivo
+// Carregar arquivo
 const params = new URLSearchParams(window.location.search);
-const file = params.get("file") || "exemplo.abc"; // Fallback para teste
+const file = params.get("file") || "exemplo.abc";
 
 fetch(file)
   .then(r => r.text())
   .then(text => {
     abcRawText = text;
-    renderScore();
-  })
-  .catch(err => {
-    document.getElementById("paper").innerHTML = "<p>Erro ao carregar a música.</p>";
+    processAndRender();
   });
 
-// 2. Função de Renderização (Crucial para o Transpose)
-function renderScore() {
-  // O transpose no ABCJS altera a visualização das notas
-  visualObj = ABCJS.renderAbc("paper", abcRawText, {
+function processAndRender() {
+  const bpm = document.getElementById("tempo").value;
+  
+  // 1. Modificar a string ABC para atualizar o campo Q: (Andamento)
+  // Removemos qualquer linha Q: existente e injetamos a nova
+  let modifiedAbc = abcRawText.replace(/^Q:.*\n?/gm, ""); 
+  modifiedAbc = modifiedAbc.replace(/(K:.*\n)/, `$1Q:${bpm}\n`);
+
+  // 2. Renderizar com visualTranspose E midiTranspose
+  // visualTranspose: muda as notas no papel
+  // midiTranspose: muda a nota que o sintetizador toca
+  visualObj = ABCJS.renderAbc("paper", modifiedAbc, {
     responsive: "resize",
-    visualTranspose: transposeValue, // Transpõe visualmente
-    format: {
-      gchordfont: "Verdana 12"
-    }
+    visualTranspose: transposeValue,
+    midiTranspose: transposeValue 
   })[0];
 
-  // Se estiver tocando, paramos para resetar o buffer de áudio com o novo tom/tempo
+  // Se o som estiver rolando, para ele para não bugar
   stop();
 }
 
-// 3. Função de Áudio (Crucial para o Tempo/BPM)
 async function play() {
-  if (!abcRawText) return;
+  if (!visualObj) return;
+  stop();
 
-  // Se o contexto de áudio do navegador estiver suspenso (comum em browsers modernos)
-  if (ABCJS.synth.supportsAudio()) {
-    stop(); // Para qualquer execução anterior
+  const bpm = parseInt(document.getElementById("tempo").value, 10);
+  synthControl = new ABCJS.synth.CreateSynth();
 
-    const bpm = parseInt(document.getElementById("tempo").value, 10);
-    
-    // Criamos o controlador de áudio
-    synthControl = new ABCJS.synth.CreateSynth();
-    
-    try {
-      await synthControl.init({
-        visualObj: visualObj, // Usa o objeto já transposto
-        options: {
-          millisecondsPerMeasure: visualObj.millisecondsPerMeasure(),
-          // O segredo do tempo está aqui:
-          qpm: bpm, 
-        }
-      });
+  try {
+    await synthControl.init({
+      visualObj: visualObj,
+      options: {
+        // Forçamos o QPM para garantir que o áudio ignore o padrão do arquivo e use o input
+        qpm: bpm 
+      }
+    });
 
-      await synthControl.prime();
-      synthControl.start();
-    } catch (error) {
-      console.warn("Erro no sintetizador:", error);
-    }
-  } else {
-    alert("Audio não suportado neste navegador.");
+    await synthControl.prime();
+    synthControl.start();
+  } catch (e) {
+    console.error("Erro no áudio:", e);
   }
 }
 
@@ -129,29 +114,22 @@ function stop() {
   }
 }
 
-// Eventos
-document.getElementById("play").onclick = play;
-document.getElementById("stop").onclick = stop;
+// Eventos de Transposição
+document.getElementById("up").onclick = () => { transposeValue++; updateUI(); };
+document.getElementById("down").onclick = () => { transposeValue--; updateUI(); };
 
-document.getElementById("up").onclick = () => {
-  transposeValue++;
-  updateTransposeDisplay();
+// Evento de Andamento (ao mudar o número, já atualiza o visual)
+document.getElementById("tempo").oninput = () => {
+  updateUI();
 };
 
-document.getElementById("down").onclick = () => {
-  transposeValue--;
-  updateTransposeDisplay();
-};
-
-function updateTransposeDisplay() {
+function updateUI() {
   document.getElementById("transposeValue").textContent = transposeValue;
-  renderScore(); // Re-renderiza a partitura com o novo tom
+  processAndRender();
 }
 
-// Listener opcional: se mudar o BPM enquanto toca, ele reinicia para aplicar
-document.getElementById("tempo").onchange = () => {
-    if (synthControl) play(); 
-};
+document.getElementById("play").onclick = play;
+document.getElementById("stop").onclick = stop;
 </script>
 
 </body>
