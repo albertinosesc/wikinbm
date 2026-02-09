@@ -64,66 +64,71 @@
 
 <script>
 let originalAbc = "";
-let currentTranspose = 0;
-let visualObj = null;
+let transposeValue = 0;
+let tempoValue = 100;
 let synth = null;
+let visualObj = null;
 
 const params = new URLSearchParams(window.location.search);
 const file = params.get("file");
 
 fetch(file)
-  .then(res => res.text())
+  .then(r => r.text())
   .then(abc => {
     originalAbc = abc;
     render();
   });
 
 function render() {
+  let abc = originalAbc;
+
+  // Remove Q existente
+  abc = abc.replace(/^Q:.*$/m, "");
+
+  // Insere novo andamento
+  abc = abc.replace(/(L:.*\n)/, `$1Q:1/4=${tempoValue}\n`);
+
   document.getElementById("paper").innerHTML = "";
 
-  const renderOptions = {
-    transpose: currentTranspose
-  };
-
-  visualObj = ABCJS.renderAbc("paper", originalAbc, renderOptions)[0];
+  visualObj = ABCJS.renderAbc("paper", abc, {
+    transpose: transposeValue
+  })[0];
 }
 
-document.getElementById("play").onclick = async () => {
-  if (!visualObj) return;
-
+async function play() {
   if (synth) synth.stop();
 
   synth = new ABCJS.synth.CreateSynth();
-
-  const tempo = parseInt(document.getElementById("tempo").value, 10);
-
-  await synth.init({
-    visualObj,
-    options: {
-      tempo: tempo
-    }
-  });
-
+  await synth.init({ visualObj });
   await synth.prime();
   synth.start();
-};
+}
 
-document.getElementById("stop").onclick = () => {
+function stop() {
   if (synth) synth.stop();
+}
+
+document.getElementById("play").onclick = play;
+document.getElementById("stop").onclick = stop;
+
+document.getElementById("tempo").onchange = e => {
+  tempoValue = parseInt(e.target.value, 10);
+  render();
 };
 
 document.getElementById("up").onclick = () => {
-  currentTranspose++;
-  document.getElementById("transposeValue").textContent = currentTranspose;
+  transposeValue++;
+  document.getElementById("transposeValue").textContent = transposeValue;
   render();
 };
 
 document.getElementById("down").onclick = () => {
-  currentTranspose--;
-  document.getElementById("transposeValue").textContent = currentTranspose;
+  transposeValue--;
+  document.getElementById("transposeValue").textContent = transposeValue;
   render();
 };
 </script>
+
 
 </body>
 </html>
