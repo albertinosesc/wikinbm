@@ -63,6 +63,8 @@ fetch(file)
     processAndRender();
   });
 
+
+
 function processAndRender() {
   const bpm = document.getElementById("tempo").value;
   
@@ -71,13 +73,10 @@ function processAndRender() {
   let modifiedAbc = abcRawText.replace(/^Q:.*\n?/gm, ""); 
   modifiedAbc = modifiedAbc.replace(/(K:.*\n)/, `$1Q:${bpm}\n`);
 
-  // 2. Renderizar com visualTranspose E midiTranspose
-  // visualTranspose: muda as notas no papel
-  // midiTranspose: muda a nota que o sintetizador toca
+  // 2. Renderizar apenas com visualTranspose (para a partitura)
   visualObj = ABCJS.renderAbc("paper", modifiedAbc, {
     responsive: "resize",
-    visualTranspose: transposeValue,
-    midiTranspose: transposeValue 
+    visualTranspose: transposeValue  // Apenas transposição visual
   })[0];
 
   // Se o som estiver rolando, para ele para não bugar
@@ -95,8 +94,9 @@ async function play() {
     await synthControl.init({
       visualObj: visualObj,
       options: {
-        // Forçamos o QPM para garantir que o áudio ignore o padrão do arquivo e use o input
-        qpm: bpm 
+        qpm: bpm,
+        // AQUI ESTÁ A CORREÇÃO: Adicionar transposição ao áudio
+        midiTranspose: transposeValue
       }
     });
 
@@ -106,6 +106,8 @@ async function play() {
     console.error("Erro no áudio:", e);
   }
 }
+
+
 
 function stop() {
   if (synthControl) {
