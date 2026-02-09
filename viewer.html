@@ -15,10 +15,9 @@
       background: #eee;
       border-radius: 6px;
     }
-    .controls button,
-    .controls input {
-      margin-right: 8px;
-      padding: 5px 10px;
+    .controls button {
+      padding: 6px 12px;
+      margin-right: 10px;
       font-size: 1em;
     }
   </style>
@@ -35,21 +34,13 @@
 
 <main>
 
+  <div class="controls" id="audio"></div>
+
   <div class="controls">
-    <button id="play">▶️ Tocar</button>
-    <button id="stop">⏹️ Parar</button>
-
-    <label>
-      BPM:
-      <input type="number" id="tempo" value="100" min="40" max="240">
-    </label>
-
-    <label>
-      Tom:
-      <button id="down">−</button>
-      <span id="transposeValue">0</span>
-      <button id="up">+</button>
-    </label>
+    <strong>Transposição:</strong>
+    <button id="down">−</button>
+    <span id="transposeValue">0</span>
+    <button id="up">+</button>
   </div>
 
   <div id="paper"></div>
@@ -58,9 +49,9 @@
 
 <script>
 let abcText = "";
-let visualObj = null;
-let synth = null;
 let transposeValue = 0;
+let visualObj;
+let synthControl;
 
 const params = new URLSearchParams(window.location.search);
 const file = params.get("file");
@@ -69,59 +60,39 @@ fetch(file)
   .then(r => r.text())
   .then(text => {
     abcText = text;
-    renderScore();
-  })
-  .catch(err => {
-    document.getElementById("paper").innerHTML =
-      "<p>Erro ao carregar a música.</p>";
+    render();
   });
 
-function renderScore() {
+function render() {
   document.getElementById("paper").innerHTML = "";
+  document.getElementById("audio").innerHTML = "";
 
   visualObj = ABCJS.renderAbc("paper", abcText, {
     responsive: "resize",
     transpose: transposeValue
-  })[0];
-}
-
-async function play() {
-  if (!visualObj) return;
-
-  if (synth) synth.stop();
-
-  synth = new ABCJS.synth.CreateSynth();
-
-  const bpm = parseInt(document.getElementById("tempo").value, 10);
-
-  await synth.init({
-    visualObj,
-    options: {
-      tempo: bpm
-    }
   });
 
-  await synth.prime();
-  synth.start();
-}
+  synthControl = new ABCJS.synth.SynthController();
+  synthControl.load("#audio", null, {
+    displayPlay: true,
+    displayStop: true,
+    displayProgress: true,
+    displayTempo: true   // 👈 CONTROLE DE ANDAMENTO FUNCIONA AQUI
+  });
 
-function stop() {
-  if (synth) synth.stop();
+  synthControl.setTune(visualObj[0], false);
 }
-
-document.getElementById("play").onclick = play;
-document.getElementById("stop").onclick = stop;
 
 document.getElementById("up").onclick = () => {
   transposeValue++;
   document.getElementById("transposeValue").textContent = transposeValue;
-  renderScore();
+  render();
 };
 
 document.getElementById("down").onclick = () => {
   transposeValue--;
   document.getElementById("transposeValue").textContent = transposeValue;
-  renderScore();
+  render();
 };
 </script>
 
