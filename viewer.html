@@ -3,24 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <title>🎼 Partitura Interativa</title>
-
-  <link rel="stylesheet" href="style.css">
-
   <script src="https://cdn.jsdelivr.net/npm/abcjs@6.2.3/dist/abcjs-basic-min.js"></script>
-
   <style>
+    body { font-family: sans-serif; padding: 20px; }
     .controls {
       margin: 15px 0;
-      padding: 10px;
-      background: #eee;
-      border-radius: 6px;
+      padding: 15px;
+      background: #f4f4f4;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
     }
-    .controls button,
-    .controls input {
-      margin-right: 8px;
-      padding: 5px 10px;
-      font-size: 1em;
-    }
+    .controls button { cursor: pointer; padding: 8px 12px; }
+    #paper { margin-top: 20px; background: white; }
+    .transpose-control { display: flex; align-items: center; gap: 5px; }
   </style>
 </head>
 <body>
@@ -34,94 +32,125 @@
 </nav>
 
 <main>
-
   <div class="controls">
-    <button id="play">▶️ Tocar</button>
-    <button id="stop">⏹️ Parar</button>
+    <div>
+      <button id="play">▶️ Tocar</button>
+      <button id="stop">⏹️ Parar</button>
+    </div>
 
     <label>
       BPM:
-      <input type="number" id="tempo" value="100" min="40" max="240">
+      <input type="number" id="tempo" value="100" min="40" max="240" step="5">
     </label>
 
-    <label>
-      Tom:
+    <div class="transpose-control">
+      <span>Tom:</span>
       <button id="down">−</button>
-      <span id="transposeValue">0</span>
+      <strong id="transposeValue">0</strong>
       <button id="up">+</button>
-    </label>
+    </div>
   </div>
 
   <div id="paper"></div>
-
 </main>
 
 <script>
-let abcText = "";
+let abcRawText = ""; // Texto original do arquivo .abc
 let visualObj = null;
-let synth = null;
+let synthControl = null;
 let transposeValue = 0;
 
+// 1. Carregar o arquivo
 const params = new URLSearchParams(window.location.search);
-const file = params.get("file");
+const file = params.get("file") || "exemplo.abc"; // Fallback para teste
 
 fetch(file)
   .then(r => r.text())
   .then(text => {
-    abcText = text;
+    abcRawText = text;
     renderScore();
   })
   .catch(err => {
-    document.getElementById("paper").innerHTML =
-      "<p>Erro ao carregar a música.</p>";
+    document.getElementById("paper").innerHTML = "<p>Erro ao carregar a música.</p>";
   });
 
+// 2. Função de Renderização (Crucial para o Transpose)
 function renderScore() {
-  document.getElementById("paper").innerHTML = "";
-
-  visualObj = ABCJS.renderAbc("paper", abcText, {
+  // O transpose no ABCJS altera a visualização das notas
+  visualObj = ABCJS.renderAbc("paper", abcRawText, {
     responsive: "resize",
-    transpose: transposeValue
+    visualTranspose: transposeValue, // Transpõe visualmente
+    format: {
+      gchordfont: "Verdana 12"
+    }
   })[0];
+
+  // Se estiver tocando, paramos para resetar o buffer de áudio com o novo tom/tempo
+  stop();
 }
 
+// 3. Função de Áudio (Crucial para o Tempo/BPM)
 async function play() {
-  if (!visualObj) return;
+  if (!abcRawText) return;
 
-  if (synth) synth.stop();
+  // Se o contexto de áudio do navegador estiver suspenso (comum em browsers modernos)
+  if (ABCJS.synth.supportsAudio()) {
+    stop(); // Para qualquer execução anterior
 
-  synth = new ABCJS.synth.CreateSynth();
+    const bpm = parseInt(document.getElementById("tempo").value, 10);
+    
+    // Criamos o controlador de áudio
+    synthControl = new ABCJS.synth.CreateSynth();
+    
+    try {
+      await synthControl.init({
+        visualObj: visualObj, // Usa o objeto já transposto
+        options: {
+          millisecondsPerMeasure: visualObj.millisecondsPerMeasure(),
+          // O segredo do tempo está aqui:
+          qpm: bpm, 
+        }
+      });
 
-  const bpm = parseInt(document.getElementById("tempo").value, 10);
-
-  await synth.init({
-    visualObj,
-    options: {
-      tempo: bpm
+      await synthControl.prime();
+      synthControl.start();
+    } catch (error) {
+      console.warn("Erro no sintetizador:", error);
     }
-  });
-
-  await synth.prime();
-  synth.start();
+  } else {
+    alert("Audio não suportado neste navegador.");
+  }
 }
 
 function stop() {
-  if (synth) synth.stop();
+  if (synthControl) {
+    synthControl.stop();
+    synthControl = null;
+  }
 }
 
+// Eventos
 document.getElementById("play").onclick = play;
 document.getElementById("stop").onclick = stop;
 
 document.getElementById("up").onclick = () => {
   transposeValue++;
-  document.getElementById("transposeValue").textContent = transposeValue;
-  renderScore();
+  updateTransposeDisplay();
 };
 
 document.getElementById("down").onclick = () => {
   transposeValue--;
+  updateTransposeDisplay();
+};
+
+function updateTransposeDisplay() {
   document.getElementById("transposeValue").textContent = transposeValue;
-  renderScore();
+  renderScore(); // Re-renderiza a partitura com o novo tom
+}
+
+// Listener opcional: se mudar o BPM enquanto toca, ele reinicia para aplicar
+document.getElementById("tempo").onchange = () => {
+    if (synthControl) play(); 
 };
 </script>
 
