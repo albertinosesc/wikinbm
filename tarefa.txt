@@ -1,0 +1,15 @@
+Temos
+
+- Partitura interativa
+- Playback confiável
+- Controle de andamento
+- Transposição
+- Ambiente online
+
+
+
+Colocar
+1️⃣ Loop de compassos
+2️⃣ Selecionar trecho para estudar
+3️⃣ Mostrar tom real após transposição
+4️⃣ Organização por nível pedagógico
