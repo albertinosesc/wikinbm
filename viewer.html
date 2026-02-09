@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>🎼 Partitura</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/abcjs@6.2.3/dist/abcjs-basic-min.js"></script>
+</head>
+<body>
+
+<header>
+  <h1>🎼 Partitura Interativa</h1>
+</header>
+
+<nav>
+  <a href="musicas.html">← Voltar</a>
+</nav>
+
+<main>
+  <div id="paper"></div>
+  <button id="play">▶️ Tocar</button>
+</main>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const file = params.get("file");
+
+fetch(file)
+  .then(res => res.text())
+  .then(abc => {
+    ABCJS.renderAbc("paper", abc);
+
+    const synth = new ABCJS.synth.CreateSynth();
+    const visualObj = ABCJS.renderAbc("paper", abc)[0];
+
+    document.getElementById("play").onclick = async () => {
+      await synth.init({ visualObj });
+      await synth.prime();
+      synth.start();
+    };
+  });
+</script>
+
+</body>
+</html>
