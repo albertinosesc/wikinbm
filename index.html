@@ -2,28 +2,38 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Partitura ABC</title>
-  <script src="https://cdn.jsdelivr.net/npm/abcjs@6.2.3/dist/abcjs-basic-min.js"></script>
+  <title>📚 Biblioteca Musical ABC</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h2>🎵 Exemplo de Partitura</h2>
+<header>
+  <h1>🎵 Biblioteca Musical ABC</h1>
+  <p>Partituras interativas em notação ABC</p>
+</header>
 
-<pre id="abc">
-X:1
-T:Asa Branca
-M:2/4
-L:1/8
-K:C
-G E C E | G A G E | C E G A | G4 |
-</pre>
+<nav>
+  <a href="index.html">Início</a>
+  <a href="musicas.html">Músicas</a>
+</nav>
 
-<div id="paper"></div>
+<main>
+  <h2>Bem-vindo</h2>
+  <p>
+    Este site reúne músicas em notação ABC com partitura,
+    áudio e recursos para estudo musical.
+  </p>
 
-<script>
-  const abc = document.getElementById("abc").textContent;
-  ABCJS.renderAbc("paper", abc);
-</script>
+  <ul>
+    <li>📖 Partitura automática</li>
+    <li>🔊 Reprodução sonora</li>
+    <li>🎼 Ideal para educação musical</li>
+  </ul>
+</main>
+
+<footer>
+  <p>© 2026 — Projeto Educacional Musical</p>
+</footer>
 
 </body>
 </html>
