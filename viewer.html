@@ -3,47 +3,63 @@
 <head>
   <meta charset="UTF-8">
   <title>🎼 Partitura Interativa</title>
+
+  <link rel="stylesheet" href="style.css">
+
   <script src="https://cdn.jsdelivr.net/npm/abcjs@6.2.3/dist/abcjs-basic-min.js"></script>
+
   <style>
-    body { font-family: sans-serif; padding: 20px; background: #f9f9f9; }
     .controls {
-      margin: 15px 0;
-      padding: 15px;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      display: flex;
-      align-items: center;
-      gap: 20px;
+      margin: 20px 0;
+      padding: 10px;
+      background: #eee;
+      border-radius: 6px;
     }
-    button { cursor: pointer; padding: 8px 15px; border: 1px solid #ccc; border-radius: 4px; }
-    input[type="number"] { width: 60px; padding: 5px; }
-    #paper { background: white; padding: 20px; border-radius: 8px; }
+
+    .controls label {
+      margin-right: 10px;
+      font-weight: bold;
+    }
+
+    .controls button,
+    .controls input {
+      margin-right: 10px;
+      padding: 5px 10px;
+      font-size: 1em;
+    }
   </style>
 </head>
 <body>
 
+<header>
+  <h1>🎼 Partitura Interativa</h1>
+</header>
+
+<nav>
+  <a href="musicas.html">← Voltar</a>
+</nav>
+
 <main>
+
   <div class="controls">
-    <div>
-      <button id="play">▶️ Tocar</button>
-      <button id="stop">⏹️ Parar</button>
-    </div>
+    <button id="play">▶️ Tocar</button>
+    <button id="stop">⏹️ Parar</button>
 
     <label>
-      <strong>BPM (Q:):</strong>
+      Andamento (BPM):
       <input type="number" id="tempo" value="100" min="40" max="240">
     </label>
 
-    <div>
-      <strong>Transpose:</strong>
+    <label>
+      Transposição:
       <button id="down">−</button>
-      <span id="transposeValue" style="min-width: 20px; display: inline-block; text-align: center;">0</span>
+      <span id="transposeValue">0</span>
       <button id="up">+</button>
-    </div>
+    </label>
   </div>
 
   <div id="paper"></div>
+
 </main>
 
 <script>
@@ -63,23 +79,19 @@ fetch(file)
     processAndRender();
   });
 
-
-
 function processAndRender() {
   const bpm = document.getElementById("tempo").value;
   
   // 1. Modificar a string ABC para atualizar o campo Q: (Andamento)
-  // Removemos qualquer linha Q: existente e injetamos a nova
   let modifiedAbc = abcRawText.replace(/^Q:.*\n?/gm, ""); 
   modifiedAbc = modifiedAbc.replace(/(K:.*\n)/, `$1Q:${bpm}\n`);
 
   // 2. Renderizar apenas com visualTranspose (para a partitura)
   visualObj = ABCJS.renderAbc("paper", modifiedAbc, {
     responsive: "resize",
-    visualTranspose: transposeValue  // Apenas transposição visual
+    visualTranspose: transposeValue
   })[0];
 
-  // Se o som estiver rolando, para ele para não bugar
   stop();
 }
 
@@ -95,7 +107,6 @@ async function play() {
       visualObj: visualObj,
       options: {
         qpm: bpm,
-        // AQUI ESTÁ A CORREÇÃO: Adicionar transposição ao áudio
         midiTranspose: transposeValue
       }
     });
@@ -107,8 +118,6 @@ async function play() {
   }
 }
 
-
-
 function stop() {
   if (synthControl) {
     synthControl.stop();
@@ -116,14 +125,10 @@ function stop() {
   }
 }
 
-// Eventos de Transposição
 document.getElementById("up").onclick = () => { transposeValue++; updateUI(); };
 document.getElementById("down").onclick = () => { transposeValue--; updateUI(); };
 
-// Evento de Andamento (ao mudar o número, já atualiza o visual)
-document.getElementById("tempo").oninput = () => {
-  updateUI();
-};
+document.getElementById("tempo").oninput = updateUI;
 
 function updateUI() {
   document.getElementById("transposeValue").textContent = transposeValue;
