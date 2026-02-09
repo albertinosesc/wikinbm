@@ -10,20 +10,14 @@
 
   <style>
     .controls {
-      margin: 20px 0;
+      margin: 15px 0;
       padding: 10px;
       background: #eee;
       border-radius: 6px;
     }
-
-    .controls label {
-      margin-right: 10px;
-      font-weight: bold;
-    }
-
     .controls button,
     .controls input {
-      margin-right: 10px;
+      margin-right: 8px;
       padding: 5px 10px;
       font-size: 1em;
     }
@@ -46,12 +40,12 @@
     <button id="stop">⏹️ Parar</button>
 
     <label>
-      Andamento (BPM):
+      BPM:
       <input type="number" id="tempo" value="100" min="40" max="240">
     </label>
 
     <label>
-      Transposição:
+      Tom:
       <button id="down">−</button>
       <span id="transposeValue">0</span>
       <button id="up">+</button>
@@ -63,65 +57,71 @@
 </main>
 
 <script>
-let originalAbc = "";
-let currentTranspose = 0;
+let abcText = "";
 let visualObj = null;
 let synth = null;
+let transposeValue = 0;
 
 const params = new URLSearchParams(window.location.search);
 const file = params.get("file");
 
 fetch(file)
-  .then(res => res.text())
-  .then(abc => {
-    originalAbc = abc;
-    render();
+  .then(r => r.text())
+  .then(text => {
+    abcText = text;
+    renderScore();
+  })
+  .catch(err => {
+    document.getElementById("paper").innerHTML =
+      "<p>Erro ao carregar a música.</p>";
   });
 
-function render() {
+function renderScore() {
   document.getElementById("paper").innerHTML = "";
 
-  const renderOptions = {
-    transpose: currentTranspose
-  };
-
-  visualObj = ABCJS.renderAbc("paper", originalAbc, renderOptions)[0];
+  visualObj = ABCJS.renderAbc("paper", abcText, {
+    responsive: "resize",
+    transpose: transposeValue
+  })[0];
 }
 
-document.getElementById("play").onclick = async () => {
+async function play() {
   if (!visualObj) return;
 
   if (synth) synth.stop();
 
   synth = new ABCJS.synth.CreateSynth();
 
-  const tempo = parseInt(document.getElementById("tempo").value, 10);
+  const bpm = parseInt(document.getElementById("tempo").value, 10);
 
   await synth.init({
     visualObj,
     options: {
-      tempo: tempo
+      tempo: bpm
     }
   });
 
   await synth.prime();
   synth.start();
-};
+}
 
-document.getElementById("stop").onclick = () => {
+function stop() {
   if (synth) synth.stop();
-};
+}
+
+document.getElementById("play").onclick = play;
+document.getElementById("stop").onclick = stop;
 
 document.getElementById("up").onclick = () => {
-  currentTranspose++;
-  document.getElementById("transposeValue").textContent = currentTranspose;
-  render();
+  transposeValue++;
+  document.getElementById("transposeValue").textContent = transposeValue;
+  renderScore();
 };
 
 document.getElementById("down").onclick = () => {
-  currentTranspose--;
-  document.getElementById("transposeValue").textContent = currentTranspose;
-  render();
+  transposeValue--;
+  document.getElementById("transposeValue").textContent = transposeValue;
+  renderScore();
 };
 </script>
 
