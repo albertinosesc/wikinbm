@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Partitura ABC</title>
+  <script src="https://cdn.jsdelivr.net/npm/abcjs@6.2.3/dist/abcjs-basic-min.js"></script>
+</head>
+<body>
+
+<h2>🎵 Exemplo de Partitura</h2>
+
+<pre id="abc">
+X:1
+T:Asa Branca
+M:2/4
+L:1/8
+K:C
+G E C E | G A G E | C E G A | G4 |
+</pre>
+
+<div id="paper"></div>
+
+<script>
+  const abc = document.getElementById("abc").textContent;
+  ABCJS.renderAbc("paper", abc);
+</script>
+
+</body>
+</html>
