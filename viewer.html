@@ -10,14 +10,21 @@
 
   <style>
     .controls {
-      margin: 15px 0;
+      margin: 20px 0;
       padding: 10px;
       background: #eee;
       border-radius: 6px;
     }
-    .controls button {
-      padding: 6px 12px;
+
+    .controls label {
       margin-right: 10px;
+      font-weight: bold;
+    }
+
+    .controls button,
+    .controls input {
+      margin-right: 10px;
+      padding: 5px 10px;
       font-size: 1em;
     }
   </style>
@@ -34,13 +41,21 @@
 
 <main>
 
-  <div class="controls" id="audio"></div>
-
   <div class="controls">
-    <strong>Transposição:</strong>
-    <button id="down">−</button>
-    <span id="transposeValue">0</span>
-    <button id="up">+</button>
+    <button id="play">▶️ Tocar</button>
+    <button id="stop">⏹️ Parar</button>
+
+    <label>
+      Andamento (BPM):
+      <input type="number" id="tempo" value="100" min="40" max="240">
+    </label>
+
+    <label>
+      Transposição:
+      <button id="down">−</button>
+      <span id="transposeValue">0</span>
+      <button id="up">+</button>
+    </label>
   </div>
 
   <div id="paper"></div>
@@ -48,50 +63,64 @@
 </main>
 
 <script>
-let abcText = "";
-let transposeValue = 0;
-let visualObj;
-let synthControl;
+let originalAbc = "";
+let currentTranspose = 0;
+let visualObj = null;
+let synth = null;
 
 const params = new URLSearchParams(window.location.search);
 const file = params.get("file");
 
 fetch(file)
-  .then(r => r.text())
-  .then(text => {
-    abcText = text;
+  .then(res => res.text())
+  .then(abc => {
+    originalAbc = abc;
     render();
   });
 
 function render() {
   document.getElementById("paper").innerHTML = "";
-  document.getElementById("audio").innerHTML = "";
 
-  visualObj = ABCJS.renderAbc("paper", abcText, {
-    responsive: "resize",
-    transpose: transposeValue
-  });
+  const renderOptions = {
+    transpose: currentTranspose
+  };
 
-  synthControl = new ABCJS.synth.SynthController();
-  synthControl.load("#audio", null, {
-    displayPlay: true,
-    displayStop: true,
-    displayProgress: true,
-    displayTempo: true   // 👈 CONTROLE DE ANDAMENTO FUNCIONA AQUI
-  });
-
-  synthControl.setTune(visualObj[0], false);
+  visualObj = ABCJS.renderAbc("paper", originalAbc, renderOptions)[0];
 }
 
+document.getElementById("play").onclick = async () => {
+  if (!visualObj) return;
+
+  if (synth) synth.stop();
+
+  synth = new ABCJS.synth.CreateSynth();
+
+  const tempo = parseInt(document.getElementById("tempo").value, 10);
+
+  await synth.init({
+    visualObj,
+    options: {
+      tempo: tempo
+    }
+  });
+
+  await synth.prime();
+  synth.start();
+};
+
+document.getElementById("stop").onclick = () => {
+  if (synth) synth.stop();
+};
+
 document.getElementById("up").onclick = () => {
-  transposeValue++;
-  document.getElementById("transposeValue").textContent = transposeValue;
+  currentTranspose++;
+  document.getElementById("transposeValue").textContent = currentTranspose;
   render();
 };
 
 document.getElementById("down").onclick = () => {
-  transposeValue--;
-  document.getElementById("transposeValue").textContent = transposeValue;
+  currentTranspose--;
+  document.getElementById("transposeValue").textContent = currentTranspose;
   render();
 };
 </script>
