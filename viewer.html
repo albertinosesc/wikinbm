@@ -10,20 +10,14 @@
 
   <style>
     .controls {
-      margin: 20px 0;
+      margin: 15px 0;
       padding: 10px;
       background: #eee;
       border-radius: 6px;
     }
-
-    .controls label {
-      margin-right: 10px;
-      font-weight: bold;
-    }
-
     .controls button,
     .controls input {
-      margin-right: 10px;
+      margin-right: 8px;
       padding: 5px 10px;
       font-size: 1em;
     }
@@ -46,12 +40,12 @@
     <button id="stop">⏹️ Parar</button>
 
     <label>
-      Andamento (BPM):
+      BPM:
       <input type="number" id="tempo" value="100" min="40" max="240">
     </label>
 
     <label>
-      Transposição:
+      Tom:
       <button id="down">−</button>
       <span id="transposeValue">0</span>
       <button id="up">+</button>
@@ -63,43 +57,50 @@
 </main>
 
 <script>
-let originalAbc = "";
-let transposeValue = 0;
-let tempoValue = 100;
-let synth = null;
+let abcText = "";
 let visualObj = null;
+let synth = null;
+let transposeValue = 0;
 
 const params = new URLSearchParams(window.location.search);
 const file = params.get("file");
 
 fetch(file)
   .then(r => r.text())
-  .then(abc => {
-    originalAbc = abc;
-    render();
+  .then(text => {
+    abcText = text;
+    renderScore();
+  })
+  .catch(err => {
+    document.getElementById("paper").innerHTML =
+      "<p>Erro ao carregar a música.</p>";
   });
 
-function render() {
-  let abc = originalAbc;
-
-  // Remove Q existente
-  abc = abc.replace(/^Q:.*$/m, "");
-
-  // Insere novo andamento
-  abc = abc.replace(/(L:.*\n)/, `$1Q:1/4=${tempoValue}\n`);
-
+function renderScore() {
   document.getElementById("paper").innerHTML = "";
 
-  visualObj = ABCJS.renderAbc("paper", abc, {
+  visualObj = ABCJS.renderAbc("paper", abcText, {
+    responsive: "resize",
     transpose: transposeValue
   })[0];
 }
 
 async function play() {
+  if (!visualObj) return;
+
   if (synth) synth.stop();
 
   synth = new ABCJS.synth.CreateSynth();
-  await synth.init({ visualObj });
+
+  const bpm = parseInt(document.getElementById("tempo").value, 10);
+
+  await synth.init({
+    visualObj,
+    options: {
+      tempo: bpm
+    }
+  });
+
   await synth.prime();
   synth.start();
 }
@@ -111,24 +112,18 @@ function stop() {
 document.getElementById("play").onclick = play;
 document.getElementById("stop").onclick = stop;
 
-document.getElementById("tempo").onchange = e => {
-  tempoValue = parseInt(e.target.value, 10);
-  render();
-};
-
 document.getElementById("up").onclick = () => {
   transposeValue++;
   document.getElementById("transposeValue").textContent = transposeValue;
-  render();
+  renderScore();
 };
 
 document.getElementById("down").onclick = () => {
   transposeValue--;
   document.getElementById("transposeValue").textContent = transposeValue;
-  render();
+  renderScore();
 };
 </script>
-
 
 </body>
 </html>
