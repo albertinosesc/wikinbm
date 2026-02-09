@@ -13,3 +13,21 @@ Colocar
 2️⃣ Selecionar trecho para estudar
 3️⃣ Mostrar tom real após transposição
 4️⃣ Organização por nível pedagógico
+
+
+site
+  index.html
+  musicas.html
+  viewer.html
+  style.css
+  musicas/
+    piano/
+      asa-branca.abc
+      ode-a-alegria.abc
+    melodia/
+      outras-musicas.abc
+
+
+
+
+
