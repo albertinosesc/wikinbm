@@ -21,12 +21,20 @@
       padding: 0;
     }
 
-    #paper {
-      width: 100%;
-      background: white;
-      padding: 10px;
-      box-sizing: border-box;
-    }
+  #paper {
+  width: 100%;
+  background: white;
+  padding: 1cm; /* Adiciona a margem interna de 1cm em todos os lados */
+  box-sizing: border-box; /* Garante que o padding não aumente o tamanho total da div */
+  margin-top: 20px;
+  border-radius: 8px;
+}
+
+@media print {
+  #paper {
+    padding: 0; /* Na impressão, deixamos a margem por conta da configuração da impressora */
+  }
+}
 
     /* Estilos dos controles */
     .controls {
@@ -70,10 +78,7 @@
     .btn-stop { background-color: #fff0f0 !important; border-color: #dc3545 !important; color: #dc3545; font-weight: bold; }
 
     /* 2. REGRAS PARA O PDF (IMPRESSÃO) */
-    @media print {
-      header, nav, .controls, footer {
-        display: none !important; /* Esconde tudo que não é partitura */
-      }
+  
       body, main, #paper {
         margin: 0;
         padding: 0;
@@ -149,15 +154,18 @@ function processAndRender() {
   let modifiedAbc = abcRawText.replace(/^Q:.*\n?/gm, ""); 
   modifiedAbc = modifiedAbc.replace(/(K:.*\n)/, `$1Q:${bpm}\n`);
 
-  // Ajuste para largura total: staffwidth definido conforme o container
   const paperDiv = document.getElementById("paper");
-  const larguraDisponivel = paperDiv.offsetWidth - 40; 
+  
+  // Calculamos a largura da div e subtraímos o equivalente a 2cm (margem esquerda + direita)
+  // 1cm é aproximadamente 38 pixels em telas padrão
+  const margemPixels = 76; 
+  const larguraReal = paperDiv.clientWidth - margemPixels;
 
   visualObj = ABCJS.renderAbc("paper", modifiedAbc, {
     responsive: "resize",
     visualTranspose: transposeValue,
-    staffwidth: larguraDisponivel, // Força a pauta a ocupar a largura
-    wrap: { minSpacing: 1.8, maxSpacing: 2.5 }, // Melhora o preenchimento horizontal
+    staffwidth: larguraReal, // Agora ele desenha respeitando a margem
+    wrap: { minSpacing: 1.8, maxSpacing: 2.5 },
     paddingtop: 0,
     paddingbottom: 30,
     paddingright: 0,
