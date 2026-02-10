@@ -2,14 +2,61 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>NBM -Biblioteca</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NBM - Biblioteca Musical</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* Estilos específicos para a área de upload */
+    .upload-container {
+      margin: 30px 0;
+      padding: 25px;
+      border: 2px dashed #444;
+      border-radius: 12px;
+      background: #f9f9f9;
+      text-align: center;
+      transition: background 0.3s ease;
+    }
+    .upload-container:hover {
+      background: #f0f0f0;
+    }
+    .file-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      align-items: center;
+      margin-top: 15px;
+    }
+    input[type="file"] {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background: white;
+      width: 80%;
+    }
+    .btn-enviar {
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      font-weight: bold;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .btn-enviar:hover {
+      background: #218838;
+    }
+    #statusMessage {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
 
 <header>
   <h1>NBM - Biblioteca Musical</h1>
-  <p>Partituras interativasC</p>
+  <p>Partituras Interativas e Gestão de Arquivos</p>
 </header>
 
 <nav>
@@ -18,21 +65,74 @@
 </nav>
 
 <main>
-  <h2>Bem-vindo!</h2>
-  <p>
-  
-  </p>
+  <section>
+    <h2>Bem-vindo, Prof. Albertino!</h2>
+    <p>Utilize o painel abaixo para adicionar novas partituras à biblioteca nos formatos <strong>ABC, MIDI ou XML</strong>.</p>
+  </section>
 
-  <ul>
-    <a href="musicas.html">Músicas</a>
+  <section class="upload-container">
+    <h3>📤 Enviar Nova Partitura</h3>
+    <form id="uploadForm">
+      <div class="file-controls">
+        <input type="file" id="fileInput" accept=".abc, .mid, .midi, .xml, .musicxml" required>
+        
+        <div>
+          <label for="category">Categoria:</label>
+          <select id="category" style="padding: 5px;">
+            <option value="piano">Piano</option>
+            <option value="melodia">Melodia</option>
+          </select>
+        </div>
 
-  
-  </ul>
+        <button type="submit" class="btn-enviar">Fazer Upload para o Sistema</button>
+      </div>
+    </form>
+    <div id="statusMessage"></div>
+  </section>
+
+  <hr>
+
+  <section style="text-align: center; margin-top: 20px;">
+    <a href="musicas.html" style="font-size: 1.2em; color: #444; text-decoration: none; font-weight: bold;">
+      📂 Acessar Biblioteca de Músicas →
+    </a>
+  </section>
 </main>
 
 <footer>
   <p>© 2026 — Prof: Albertino Moura Barbosa Filho</p>
 </footer>
+
+<script>
+  const uploadForm = document.getElementById('uploadForm');
+  const statusMessage = document.getElementById('statusMessage');
+
+  uploadForm.onsubmit = async (e) => {
+    e.preventDefault();
+    const fileInput = document.getElementById('fileInput');
+    const category = document.getElementById('category').value;
+    const file = fileInput.files[0];
+
+    if (!file) return;
+
+    statusMessage.textContent = "⏳ Processando arquivo: " + file.name + "...";
+    statusMessage.style.color = "blue";
+
+    // NOTA PARA O PROFESSOR:
+    // Para enviar ao Google Drive ou GitHub, precisaremos de um Token de Autenticação.
+    // Como esse é um processo sensível, o código abaixo simula a recepção.
+    
+    setTimeout(() => {
+      // Aqui entrará a função de fetch para a API do Google Drive futuramente.
+      console.log("Arquivo capturado:", file);
+      console.log("Destino pretendido:", category);
+      
+      statusMessage.textContent = "✅ Arquivo '" + file.name + "' recebido! (Integração com Drive pendente)";
+      statusMessage.style.color = "green";
+      uploadForm.reset();
+    }, 2000);
+  };
+</script>
 
 </body>
 </html>
