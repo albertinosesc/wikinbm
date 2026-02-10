@@ -5,19 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NBM - Biblioteca Musical</title>
   <link rel="stylesheet" href="style.css">
+  
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  
   <style>
-    /* Estilos específicos para a área de upload */
     .upload-container {
-      margin: 30px 0;
+      margin: 30px auto;
       padding: 25px;
       border: 2px dashed #444;
       border-radius: 12px;
       background: #f9f9f9;
+      max-width: 600px;
       text-align: center;
-      transition: background 0.3s ease;
-    }
-    .upload-container:hover {
-      background: #f0f0f0;
     }
     .file-controls {
       display: flex;
@@ -25,13 +24,6 @@
       gap: 15px;
       align-items: center;
       margin-top: 15px;
-    }
-    input[type="file"] {
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      background: white;
-      width: 80%;
     }
     .btn-enviar {
       background: #28a745;
@@ -41,14 +33,17 @@
       font-weight: bold;
       border-radius: 5px;
       cursor: pointer;
-      transition: 0.2s;
+      font-size: 1rem;
     }
-    .btn-enviar:hover {
-      background: #218838;
-    }
-    #statusMessage {
-      margin-top: 15px;
-      font-weight: bold;
+    .btn-enviar:hover { background: #218838; }
+    #statusMessage { margin-top: 15px; font-weight: bold; min-height: 1.2em; }
+    
+    input[type="file"] {
+      background: white;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      width: 100%;
     }
   </style>
 </head>
@@ -56,7 +51,7 @@
 
 <header>
   <h1>NBM - Biblioteca Musical</h1>
-  <p>Partituras Interativas e Gestão de Arquivos</p>
+  <p>Partituras Interativas — Prof. Albertino</p>
 </header>
 
 <nav>
@@ -65,36 +60,34 @@
 </nav>
 
 <main>
-  <section>
-    <h2>Bem-vindo, Prof. Albertino!</h2>
-    <p>Utilize o painel abaixo para adicionar novas partituras à biblioteca nos formatos <strong>ABC, MIDI ou XML</strong>.</p>
+  <section style="text-align: center;">
+    <h2>Bem-vindo!</h2>
+    <p>Adicione novas partituras (ABC, MIDI ou XML) diretamente ao seu Google Drive.</p>
   </section>
 
   <section class="upload-container">
-    <h3>📤 Enviar Nova Partitura</h3>
+    <h3>📤 Upload de Partitura</h3>
     <form id="uploadForm">
       <div class="file-controls">
         <input type="file" id="fileInput" accept=".abc, .mid, .midi, .xml, .musicxml" required>
         
         <div>
-          <label for="category">Categoria:</label>
-          <select id="category" style="padding: 5px;">
+          <label for="category">Destino Sugerido:</label>
+          <select id="category">
             <option value="piano">Piano</option>
             <option value="melodia">Melodia</option>
           </select>
         </div>
 
-        <button type="submit" class="btn-enviar">Fazer Upload para o Sistema</button>
+        <button type="submit" class="btn-enviar">Autenticar e Enviar</button>
       </div>
     </form>
     <div id="statusMessage"></div>
   </section>
 
-  <hr>
-
-  <section style="text-align: center; margin-top: 20px;">
-    <a href="musicas.html" style="font-size: 1.2em; color: #444; text-decoration: none; font-weight: bold;">
-      📂 Acessar Biblioteca de Músicas →
+  <section style="text-align: center; margin-top: 40px;">
+    <a href="musicas.html" style="font-size: 1.1em; font-weight: bold; color: #222;">
+      📂 Ver Músicas na Biblioteca →
     </a>
   </section>
 </main>
@@ -104,34 +97,87 @@
 </footer>
 
 <script>
+  // ==========================================
+  // CONFIGURAÇÃO DO GOOGLE (INSIRA SEU ID AQUI)
+  // ==========================================
+  const CLIENT_ID = 'COLE_AQUI_SEU_CLIENT_ID.apps.googleusercontent.com';
+  const SCOPES = 'https://www.googleapis.com/auth/drive.file';
+
+  let tokenClient;
+  let accessToken = null;
+
+  // Inicializa o cliente Google Identity Services
+  window.onload = () => {
+    tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: CLIENT_ID,
+      scope: SCOPES,
+      callback: '', // definido no momento do envio
+    });
+  };
+
   const uploadForm = document.getElementById('uploadForm');
   const statusMessage = document.getElementById('statusMessage');
 
-  uploadForm.onsubmit = async (e) => {
+  uploadForm.onsubmit = (e) => {
     e.preventDefault();
     const fileInput = document.getElementById('fileInput');
-    const category = document.getElementById('category').value;
     const file = fileInput.files[0];
 
     if (!file) return;
 
-    statusMessage.textContent = "⏳ Processando arquivo: " + file.name + "...";
+    statusMessage.textContent = "🔐 Iniciando autenticação...";
     statusMessage.style.color = "blue";
 
-    // NOTA PARA O PROFESSOR:
-    // Para enviar ao Google Drive ou GitHub, precisaremos de um Token de Autenticação.
-    // Como esse é um processo sensível, o código abaixo simula a recepção.
-    
-    setTimeout(() => {
-      // Aqui entrará a função de fetch para a API do Google Drive futuramente.
-      console.log("Arquivo capturado:", file);
-      console.log("Destino pretendido:", category);
+    // Define o que acontece após o login do usuário
+    tokenClient.callback = async (response) => {
+      if (response.error) {
+        statusMessage.textContent = "❌ Erro na autenticação ou acesso negado.";
+        statusMessage.style.color = "red";
+        return;
+      }
       
-      statusMessage.textContent = "✅ Arquivo '" + file.name + "' recebido! (Integração com Drive pendente)";
-      statusMessage.style.color = "green";
-      uploadForm.reset();
-    }, 2000);
+      accessToken = response.access_token;
+      await executarUpload(file);
+    };
+
+    // Solicita o Token de Acesso (abre a janelinha de login)
+    tokenClient.requestAccessToken({ prompt: 'consent' });
   };
+
+  async function executarUpload(file) {
+    statusMessage.textContent = "📤 Enviando '" + file.name + "' para o Drive...";
+    statusMessage.style.color = "orange";
+
+    const metadata = {
+      name: file.name,
+      mimeType: file.type
+    };
+
+    const formData = new FormData();
+    formData.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+    formData.append('file', file);
+
+    try {
+      const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+        method: 'POST',
+        headers: new Headers({ 'Authorization': 'Bearer ' + accessToken }),
+        body: formData
+      });
+
+      if (response.ok) {
+        statusMessage.textContent = "✅ Sucesso! Arquivo salvo no Google Drive.";
+        statusMessage.style.color = "green";
+        uploadForm.reset();
+      } else {
+        const errorData = await response.json();
+        console.error("Erro Google Drive:", errorData);
+        throw new Error();
+      }
+    } catch (error) {
+      statusMessage.textContent = "❌ Erro ao enviar. Verifique sua conexão.";
+      statusMessage.style.color = "red";
+    }
+  }
 </script>
 
 </body>
