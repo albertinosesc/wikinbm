@@ -34,6 +34,7 @@
       border-radius: 5px;
       cursor: pointer;
       font-size: 1rem;
+      transition: background 0.3s;
     }
     .btn-enviar:hover { background: #218838; }
     #statusMessage { margin-top: 15px; font-weight: bold; min-height: 1.2em; }
@@ -51,7 +52,7 @@
 
 <header>
   <h1>NBM - Biblioteca Musical</h1>
-  <p>Partituras Interativas — Prof. Albertino</p>
+  <p>Upload Direto para o Google Drive — Prof. Albertino</p>
 </header>
 
 <nav>
@@ -61,25 +62,17 @@
 
 <main>
   <section style="text-align: center;">
-    <h2>Bem-vindo!</h2>
-    <p>Adicione novas partituras (ABC, MIDI ou XML) diretamente ao seu Google Drive.</p>
+    <h2>Painel de Envio</h2>
+    <p>Os arquivos serão salvos na pasta: <strong>Biblioteca NBM</strong></p>
   </section>
 
   <section class="upload-container">
-    <h3>📤 Upload de Partitura</h3>
+    <h3>📤 Enviar Arquivo</h3>
     <form id="uploadForm">
       <div class="file-controls">
         <input type="file" id="fileInput" accept=".abc, .mid, .midi, .xml, .musicxml" required>
         
-        <div>
-          <label for="category">Destino Sugerido:</label>
-          <select id="category">
-            <option value="piano">Piano</option>
-            <option value="melodia">Melodia</option>
-          </select>
-        </div>
-
-        <button type="submit" class="btn-enviar">Autenticar e Enviar</button>
+        <button type="submit" class="btn-enviar">Autenticar e Salvar no Drive</button>
       </div>
     </form>
     <div id="statusMessage"></div>
@@ -98,40 +91,41 @@
 
 <script>
   // ==========================================
-  // CONFIGURAÇÃO DO GOOGLE (INSIRA SEU ID AQUI)
+  // CONFIGURAÇÕES GLOBAIS
   // ==========================================
   const CLIENT_ID = '551454830266-lq07qolf14h05rqjijvdq9ojvkpg527h.apps.googleusercontent.com';
+  const FOLDER_ID = '1tLbszhAPZb5MT2a5XuYPmT9YcANh_rIF'; // Sua pasta específica
   const SCOPES = 'https://www.googleapis.com/auth/drive.file';
 
   let tokenClient;
   let accessToken = null;
 
-  // Inicializa o cliente Google Identity Services
+  // 1. Inicializa o cliente Google logo no carregamento
   window.onload = () => {
     tokenClient = google.accounts.oauth2.initTokenClient({
       client_id: CLIENT_ID,
       scope: SCOPES,
-      callback: '', // definido no momento do envio
+      callback: '', // definido no submit
     });
   };
 
   const uploadForm = document.getElementById('uploadForm');
   const statusMessage = document.getElementById('statusMessage');
 
+  // 2. Lógica do Formulário
   uploadForm.onsubmit = (e) => {
     e.preventDefault();
-    const fileInput = document.getElementById('fileInput');
-    const file = fileInput.files[0];
+    const file = document.getElementById('fileInput').files[0];
 
     if (!file) return;
 
-    statusMessage.textContent = "🔐 Iniciando autenticação...";
+    statusMessage.textContent = "🔐 Abrindo autenticação Google...";
     statusMessage.style.color = "blue";
 
-    // Define o que acontece após o login do usuário
+    // Define o que ocorre após o login
     tokenClient.callback = async (response) => {
       if (response.error) {
-        statusMessage.textContent = "❌ Erro na autenticação ou acesso negado.";
+        statusMessage.textContent = "❌ Autenticação cancelada ou negada.";
         statusMessage.style.color = "red";
         return;
       }
@@ -140,17 +134,20 @@
       await executarUpload(file);
     };
 
-    // Solicita o Token de Acesso (abre a janelinha de login)
+    // Abre o pop-up de login do Google
     tokenClient.requestAccessToken({ prompt: 'consent' });
   };
 
+  // 3. Função de Upload Real
   async function executarUpload(file) {
-    statusMessage.textContent = "📤 Enviando '" + file.name + "' para o Drive...";
+    statusMessage.textContent = "📤 Enviando '" + file.name + "'...";
     statusMessage.style.color = "orange";
 
+    // Metadados incluindo a pasta pai (Parents)
     const metadata = {
       name: file.name,
-      mimeType: file.type
+      mimeType: file.type,
+      parents: [FOLDER_ID] 
     };
 
     const formData = new FormData();
@@ -165,16 +162,16 @@
       });
 
       if (response.ok) {
-        statusMessage.textContent = "✅ Sucesso! Arquivo salvo no Google Drive.";
+        statusMessage.textContent = "✅ Sucesso! Arquivo salvo na pasta do Drive.";
         statusMessage.style.color = "green";
         uploadForm.reset();
       } else {
         const errorData = await response.json();
-        console.error("Erro Google Drive:", errorData);
+        console.error("Erro API Drive:", errorData);
         throw new Error();
       }
     } catch (error) {
-      statusMessage.textContent = "❌ Erro ao enviar. Verifique sua conexão.";
+      statusMessage.textContent = "❌ Erro técnico ao enviar. Verifique o console.";
       statusMessage.style.color = "red";
     }
   }
