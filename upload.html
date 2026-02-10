@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload - NBM Biblioteca</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
+  
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      background-color: #f4f7f6;
+    }
+
+    header {
+      background: #2c3e50;
+      color: white;
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    nav {
+      background: #34495e;
+      padding: 0.8rem;
+      text-align: center;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 15px;
+      font-weight: 600;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .upload-area {
+      border: 2px dashed #bdc3c7;
+      padding: 30px;
+      border-radius: 10px;
+      text-align: center;
+      transition: border-color 0.3s;
+    }
+
+    .upload-area:hover {
+      border-color: #3498db;
+    }
+
+    .instructions {
+      font-size: 0.9rem;
+      color: #7f8c8d;
+      margin-bottom: 20px;
+    }
+
+    input[type="file"] {
+      display: block;
+      width: 100%;
+      margin: 20px 0;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    .btn-enviar {
+      background: #1abc9c;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-weight: bold;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 1.1rem;
+      transition: background 0.3s;
+    }
+
+    .btn-enviar:hover { background: #16a085; }
+    .btn-enviar:disabled { background: #bdc3c7; cursor: not-allowed; }
+
+    #statusMessage { 
+      margin-top: 20px; 
+      padding: 15px;
+      border-radius: 5px;
+      text-align: center;
+      font-weight: 600;
+      display: none; /* Escondido por padrão */
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>NBM - Biblioteca Musical</h1>
+</header>
+
+<nav>
+  <a href="index.html">Início</a>
+  <a href="musicas.html">Músicas</a>
+  <a href="upload.html">Fazer Upload</a>
+</nav>
+
+<main class="container">
+  <div class="upload-area">
+    <h2 style="color: #2c3e50;">📤 Enviar Partitura</h2>
+    <p class="instructions">Formatos aceitos: .abc, .mid, .xml, .musicxml</p>
+    
+    <form id="uploadForm">
+      <input type="file" id="fileInput" accept=".abc, .mid, .midi, .xml, .musicxml" required>
+      <button type="submit" class="btn-enviar" id="submitBtn">Enviar para o Drive</button>
+    </form>
+
+    <div id="statusMessage"></div>
+  </div>
+
+  <div style="margin-top: 20px; text-align: center;">
+    <a href="index.html" style="color: #3498db; text-decoration: none;">← Voltar para o Início</a>
+  </div>
+</main>
+
+<script>
+  // ==========================================
+  // CONFIGURAÇÕES (Sincronizadas com seu Projeto)
+  // ==========================================
+  const CLIENT_ID = '551454830266-lq07qolf14h05rqjijvdq9ojvkpg527h.apps.googleusercontent.com';
+  const FOLDER_ID = '1tLbszhAPZb5MT2a5XuYPmT9YcANh_rIF'; 
+  const SCOPES = 'https://www.googleapis.com/auth/drive.file';
+
+  let tokenClient;
+  let accessToken = null;
+
+  window.onload = () => {
+    tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: CLIENT_ID,
+      scope: SCOPES,
+      callback: '', 
+    });
+  };
+
+  const uploadForm = document.getElementById('uploadForm');
+  const statusMessage = document.getElementById('statusMessage');
+  const submitBtn = document.getElementById('submitBtn');
+
+  uploadForm.onsubmit = (e) => {
+    e.preventDefault();
+    const file = document.getElementById('fileInput').files[0];
+    if (!file) return;
+
+    if (accessToken) {
+      executarUpload(file);
+    } else {
+      mostrarStatus("🔐 Autenticando com Google...", "blue", "#eef");
+      
+      tokenClient.callback = async (response) => {
+        if (response.error) {
+          mostrarStatus("❌ Erro na autenticação ou permissão negada.", "red", "#f8d7da");
+          return;
+        }
+        accessToken = response.access_token;
+        await executarUpload(file);
+      };
+
+      tokenClient.requestAccessToken({ prompt: '' });
+    }
+  };
+
+  async function executarUpload(file) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Processando...";
+    mostrarStatus("📤 Enviando: " + file.name, "orange", "#fff3cd");
+
+    const metadata = {
+      name: file.name,
+      mimeType: file.type || 'application/octet-stream',
+      parents: [FOLDER_ID] 
+    };
+
+    const formData = new FormData();
+    formData.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+    formData.append('file', file);
+
+    try {
+      const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+        method: 'POST',
+        headers: new Headers({ 'Authorization': 'Bearer ' + accessToken }),
+        body: formData
+      });
+
+      if (response.ok) {
+        mostrarStatus("✅ Arquivo '" + file.name + "' salvo com sucesso!", "green", "#d4edda");
+        uploadForm.reset();
+      } else {
+        if(response.status === 401) accessToken = null;
+        throw new Error();
+      }
+    } catch (error) {
+      mostrarStatus("❌ Falha no upload. Verifique sua conexão.", "red", "#f8d7da");
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Enviar para o Drive";
+    }
+  }
+
+  function mostrarStatus(texto, cor, fundo) {
+    statusMessage.style.display = "block";
+    statusMessage.textContent = texto;
+    statusMessage.style.color = cor;
+    statusMessage.style.background = fundo;
+  }
+</script>
+
+</body>
+</html>
