@@ -2,73 +2,81 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>🎶 Acervo Musical NBM</title>
+  <title>Acervo Digital NBM</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    .search-box {
-      margin: 20px 0;
-      padding: 10px;
-      width: 100%;
-      max-width: 400px;
-      border: 2px solid #2c3e50;
-      border-radius: 8px;
-    }
-    .categoria-section { margin-bottom: 30px; }
-    .lista-musicas { list-style: none; padding: 0; }
-    .lista-musicas li { margin: 8px 0; }
-    .lista-musicas a { 
-      text-decoration: none; 
-      color: #3498db; 
-      font-weight: 500;
-    }
-    .lista-musicas a:hover { color: #e67e22; }
-    .hidden { display: none; }
+    .search-container { padding: 20px; background: #2c3e50; text-align: center; }
+    #busca { width: 80%; max-width: 500px; padding: 12px; border-radius: 20px; border: none; }
+    .categoria-bloco { margin: 20px; padding: 15px; background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .musica-link { display: block; padding: 8px; color: #3498db; text-decoration: none; border-bottom: 1px solid #f0f0f0; }
+    .musica-link:hover { background: #f9f9f9; color: #e67e22; }
+    .contador { color: #bdc3c7; font-size: 0.9rem; margin-top: 10px; }
   </style>
 </head>
 <body>
 
-<header>
-  <h1>🎶 Músicas Disponíveis</h1>
-</header>
+<nav><a href="index.html">Início</a></nav>
 
-<nav>
-  <a href="index.html">Início</a>
-  <a href="upload.html">Fazer Upload</a>
-</nav>
+<div class="search-container">
+  <h1 style="color: white;">🎶 Biblioteca ABC</h1>
+  <input type="text" id="busca" placeholder="Pesquisar entre 25.000 músicas...">
+  <div id="contagem" class="contador">Carregando acervo...</div>
+</div>
 
-<main class="container">
-  <input type="text" id="filtro" class="search-box" placeholder="🔎 Pesquisar música ou compositor...">
-
-  <div id="acervo">
-    <section class="categoria-section">
-      <h3>Piano</h3>
-      <ul class="lista-musicas">
-        <li><a href="viewer.html?file=musicas/asa-branca.abc">Asa Branca</a></li>
-        <li><a href="viewer.html?file=musicas/beto.abc">Beto</a></li>
-      </ul>
-    </section>
-
-    <section class="categoria-section">
-      <h3>Melodia</h3>
-      <ul class="lista-musicas">
-        <li><a href="viewer.html?file=musicas/melodia/1972 - Atirei o Pau no Gato.abc">1972 - Atirei o Pau no Gato</a></li>
-      </ul>
-    </section>
+<div id="lista-categorias">
   </div>
-</main>
 
 <script>
-  // Lógica de busca em tempo real
-  document.getElementById('filtro').addEventListener('input', function() {
-    let termo = this.value.toLowerCase();
-    let itens = document.querySelectorAll('.lista-musicas li');
-    
-    itens.forEach(item => {
-      let texto = item.textContent.toLowerCase();
-      item.classList.toggle('hidden', !texto.includes(termo));
-    });
-  });
-</script>
+  let acervoCompleto = [];
 
+  // Função para carregar o JSON
+  async function carregarAcervo() {
+    try {
+      const response = await fetch('musicas.json');
+      acervoCompleto = await response.json();
+      renderizarMusicas(acervoCompleto);
+      document.getElementById('contagem').innerText = `${acervoCompleto.length} músicas encontradas`;
+    } catch (e) {
+      console.error("Erro ao carregar JSON:", e);
+    }
+  }
+
+  function renderizarMusicas(dados) {
+    const container = document.getElementById('lista-categorias');
+    container.innerHTML = '';
+
+    // Agrupa por categoria
+    const categorias = [...new Set(dados.map(m => m.categoria))];
+
+    categorias.forEach(cat => {
+      const section = document.createElement('section');
+      section.className = 'categoria-bloco';
+      section.innerHTML = `<h3>${cat}</h3>`;
+      
+      const musicasDaCat = dados.filter(m => m.categoria === cat);
+      musicasDaCat.forEach(m => {
+        const link = document.createElement('a');
+        link.className = 'musica-link';
+        link.href = `viewer.html?file=${m.path}`;
+        link.innerHTML = `<strong>${m.titulo}</strong> - <small>${m.compositor}</small>`;
+        section.appendChild(link);
+      });
+      
+      container.appendChild(section);
+    });
+  }
+
+  // Busca em tempo real
+  document.getElementById('busca').addEventListener('input', (e) => {
+    const termo = e.target.value.toLowerCase();
+    const filtrados = acervoCompleto.filter(m => 
+      m.titulo.toLowerCase().includes(termo) || 
+      m.compositor.toLowerCase().includes(termo)
+    );
+    renderizarMusicas(filtrados);
+  });
+
+  window.onload = carregarAcervo;
+</script>
 </body>
 </html>
