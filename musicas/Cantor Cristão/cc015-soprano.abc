@@ -1,0 +1,31 @@
+X:1
+M:3/4
+L:1/8
+Q:1/4=120
+K:Ab
+V:1
+E2| \
+E4FG| \
+A2E2A2| \
+B2E2B2|
+c4c2| \
+d2F2d2| \
+c2A2c2| \
+c2B2F2|
+B4 S E2| \
+E4FG| \
+A2E2A2| \
+B2E2B2|
+c4c2| \
+e2d2B2| \
+A2G2A2| \
+c2c2B2|
+"^Fine" A4 || c3/2d/2| \
+e4c3/2d/2| \
+e4e3/2c/2|
+A2B2c2| \
+B4B3/2c/2| \
+d4B3/2c/2| \
+d4dB|
+e2e2d2| \
+c4 "^Do S. al Fine" |]

@@ -1,0 +1,13 @@
+X:1
+L:1/4
+Q:1/4=90.00
+M:4/4
+I:linebreak $
+K:C
+V:1 treble
+V:1
+ E2 E E | E2 E E | G2 F F | E2 E2 | c2 c c | B2 A G | G2 ^F2 | G2 G2 | E2 E E | E2 E E | G2 =F F | %11
+ E2 E2 | c2 c c | B2 A G | G2 ^F2 | G2 G2 || z4 | z4 | c2 ^A ^A | =A2 G2 | =F2 G2 | E2 G G | %22
+ A B c d | e2 d c | c2 B2 | c2 c2 || z4 | z4 | c2 ^A ^A | =A2 G2 | F2 G2 | E2 G G | A B c d | %33
+ e2 d c | c2 B2 | c2 c2 | z2 c c | e2 c2 | z2 G G | A4 | G4 |] %41
+
