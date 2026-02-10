@@ -8,7 +8,6 @@
   <link rel="stylesheet" href="style.css">
   
   <style>
-    /* Estilos específicos para a Home */
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
@@ -19,9 +18,8 @@
     header {
       background: #2c3e50;
       color: white;
-      padding: 2rem 1rem;
+      padding: 2.5rem 1rem;
       text-align: center;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
 
     nav {
@@ -38,86 +36,103 @@
       text-decoration: none;
       margin: 0 15px;
       font-weight: 600;
-      transition: color 0.3s;
     }
 
-    nav a:hover {
-      color: #1abc9c;
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
     }
 
-    .welcome-section {
+    /* Seção de Colaboração */
+    .colab-section {
+      background: #ffffff;
+      border-left: 5px solid #e67e22;
+      padding: 30px;
+      margin: 30px 0;
+      border-radius: 0 15px 15px 0;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
       text-align: center;
-      padding: 50px 20px;
     }
 
-    .welcome-section h2 {
-      font-size: 2.5rem;
-      color: #2c3e50;
-      margin-bottom: 10px;
+    .colab-section h2 {
+      color: #e67e22;
+      margin-top: 0;
     }
 
+    .colab-section p {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      color: #555;
+    }
+
+    /* Cards de Ação */
     .main-cards {
       display: flex;
       justify-content: center;
-      gap: 25px;
+      gap: 20px;
       flex-wrap: wrap;
-      padding: 20px;
-      max-width: 1000px;
-      margin: 0 auto;
+      margin-bottom: 50px;
     }
 
     .card {
       background: white;
-      border-radius: 15px;
-      padding: 30px;
-      width: 280px;
+      border-radius: 12px;
+      padding: 25px;
+      width: 250px;
       text-align: center;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-      transition: transform 0.3s, box-shadow 0.3s;
-      cursor: pointer;
-      border: 1px solid #eee;
-    }
-
-    .card:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 15px 30px rgba(0,0,0,0.1);
-    }
-
-    .card i {
-      font-size: 3rem;
-      display: block;
-      margin-bottom: 15px;
-    }
-
-    .card h3 {
-      margin: 10px 0;
-      color: #2c3e50;
-    }
-
-    .card p {
-      color: #666;
-      font-size: 0.95rem;
-      line-height: 1.5;
-    }
-
-    .btn-link {
-      display: inline-block;
-      margin-top: 15px;
-      padding: 10px 20px;
-      background: #3498db;
-      color: white;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
       text-decoration: none;
-      border-radius: 5px;
-      font-weight: bold;
+      color: inherit;
+      transition: transform 0.3s;
     }
 
-    .btn-link.alt { background: #1abc9c; }
+    .card:hover { transform: translateY(-5px); }
+    .card span { font-size: 2.5rem; display: block; margin-bottom: 10px; }
+    .card h3 { margin: 10px 0; color: #2c3e50; }
+
+    /* Fale Conosco */
+    .contact-section {
+      background: #2c3e50;
+      color: white;
+      padding: 40px;
+      border-radius: 15px;
+      margin-top: 50px;
+    }
+
+    .contact-form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .contact-form input, .contact-form textarea {
+      padding: 12px;
+      border-radius: 5px;
+      border: none;
+      font-size: 1rem;
+    }
+
+    .contact-form textarea { height: 100px; resize: vertical; }
+
+    .btn-submit {
+      background: #1abc9c;
+      color: white;
+      border: none;
+      padding: 12px;
+      font-weight: bold;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1.1rem;
+    }
+
+    .btn-submit:hover { background: #16a085; }
 
     footer {
       text-align: center;
       padding: 40px 0;
       color: #888;
-      font-size: 0.9rem;
     }
   </style>
 </head>
@@ -125,7 +140,7 @@
 
 <header>
   <h1>NBM - Biblioteca Musical</h1>
-  <p>Repositório Digital de Partituras — Prof. Albertino</p>
+  <p>Repositório Digital de Partituras — Prof. Albertino Moura</p>
 </header>
 
 <nav>
@@ -134,28 +149,44 @@
   <a href="upload.html">Fazer Upload</a>
 </nav>
 
-<main>
-  <section class="welcome-section">
-    <h2>Seja bem-vindo!</h2>
-    <p>Sua plataforma para organizar, enviar e visualizar partituras interativas.</p>
+<div class="container">
+  
+  <section class="colab-section">
+    <h2>"A música cresce quando é compartilhada!"</h2>
+    <p>
+      Nossa biblioteca é um espaço vivo e em constante construção. Se você tem partituras em formato 
+      <strong>Encore, Finale, Sibelius, MIDI ou XML</strong>, colabore enviando seus arquivos! 
+      Cada contribuição ajuda a criar um repertório mais rico para todos os nossos alunos e entusiastas.
+    </p>
+    <a href="upload.html" class="btn-submit" style="text-decoration: none; display: inline-block; width: auto; padding: 10px 25px;">Quero Colaborar</a>
   </section>
 
-  <section class="main-cards">
-    <div class="card" onclick="window.location.href='musicas.html'">
+  <div class="main-cards">
+    <a href="musicas.html" class="card">
       <span>📂</span>
-      <h3>Minha Biblioteca</h3>
-      <p>Explore sua coleção de partituras, pesquise por títulos e abra o visualizador interativo.</p>
-      <a href="musicas.html" class="btn-link">Ver Músicas</a>
-    </div>
-
-    <div class="card" onclick="window.location.href='upload.html'">
+      <h3>Ver Músicas</h3>
+      <p>Acesse o acervo completo da biblioteca.</p>
+    </a>
+    <a href="upload.html" class="card">
       <span>📤</span>
-      <h3>Enviar Arquivos</h3>
-      <p>Adicione novos arquivos ABC, MIDI ou XML diretamente para sua pasta no Google Drive.</p>
-      <a href="upload.html" class="btn-link alt">Fazer Upload</a>
-    </div>
+      <h3>Fazer Upload</h3>
+      <p>Envie novos arquivos para o Drive.</p>
+    </a>
+  </div>
+
+  <section class="contact-section">
+    <h3 style="margin-top: 0; text-align: center;">📩 Fale Conosco</h3>
+    <p style="text-align: center; color: #bdc3c7;">Dúvidas, sugestões ou problemas técnicos? Envie uma mensagem.</p>
+    
+    <form class="contact-form" action="mailto:albertinosesc@gmail.com" method="post" enctype="text/plain">
+      <input type="text" name="Nome" placeholder="Seu Nome completo" required>
+      <input type="email" name="Email" placeholder="Seu melhor E-mail" required>
+      <textarea name="Mensagem" placeholder="Como podemos te ajudar?" required></textarea>
+      <button type="submit" class="btn-submit">Enviar Mensagem</button>
+    </form>
   </section>
-</main>
+
+</div>
 
 <footer>
   <p>© 2026 — Prof: Albertino Moura Barbosa Filho</p>
