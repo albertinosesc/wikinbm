@@ -101,7 +101,7 @@
 <body>
 
 <header>
-  <h1>NBM - Biblioteca Musical</h1>
+  <h1>Biblioteca Musical</h1>
 </header>
 
 <nav>
@@ -111,14 +111,20 @@
 </nav>
 
 <main class="container">
-  <div class="upload-area">
-    <h2 style="color: #2c3e50;">📤 Enviar Partitura</h2>
-    <p class="instructions">Formatos aceitos: .abc, .mid, .xml, .musicxml</p>
-    
-    <form id="uploadForm">
-      <input type="file" id="fileInput" accept=".abc, .mid, .midi, .xml, .musicxml" required>
-      <button type="submit" class="btn-enviar" id="submitBtn">Enviar para o Drive</button>
-    </form>
+<div class="upload-area">
+  <h2 style="color: #2c3e50;">📤 Enviar Partitura</h2>
+  <p class="instructions">
+    <strong>Formatos aceitos:</strong> .abc, .mid, .xml, .musicxml, .enc (Encore), .mus/.musx (Finale), .sib (Sibelius), .gp/.gpx (Guitar Pro)
+  </p>
+  
+  <form id="uploadForm">
+    <input type="file" id="fileInput" 
+      accept=".abc, .mid, .midi, .xml, .musicxml, .enc, .mus, .musx, .sib, .gp, .gp3, .gp4, .gp5, .gpx" 
+      required>
+    <button type="submit" class="btn-enviar" id="submitBtn">Enviar</button>
+  </form>
+
+
 
     <div id="statusMessage"></div>
   </div>
