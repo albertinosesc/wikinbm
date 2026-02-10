@@ -2,81 +2,297 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Acervo Digital NBM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acervo Musical - NBM</title>
   <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
+  
   <style>
-    .search-container { padding: 20px; background: #2c3e50; text-align: center; }
-    #busca { width: 80%; max-width: 500px; padding: 12px; border-radius: 20px; border: none; }
-    .categoria-bloco { margin: 20px; padding: 15px; background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    .musica-link { display: block; padding: 8px; color: #3498db; text-decoration: none; border-bottom: 1px solid #f0f0f0; }
-    .musica-link:hover { background: #f9f9f9; color: #e67e22; }
-    .contador { color: #bdc3c7; font-size: 0.9rem; margin-top: 10px; }
+    :root {
+      --primary: #2c3e50;
+      --secondary: #34495e;
+      --accent: #e67e22;
+      --light: #f4f7f6;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background-color: var(--light);
+      margin: 0;
+      color: #333;
+    }
+
+    header {
+      background: var(--primary);
+      color: white;
+      padding: 2rem 1rem;
+      text-align: center;
+    }
+
+    nav {
+      background: var(--secondary);
+      padding: 0.8rem;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 15px;
+      font-weight: 600;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 20px auto;
+      padding: 0 20px;
+    }
+
+    /* Barra de Busca */
+    .search-container {
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    #busca {
+      width: 100%;
+      padding: 15px 25px;
+      font-size: 1.1rem;
+      border: 2px solid #ddd;
+      border-radius: 30px;
+      outline: none;
+      transition: border-color 0.3s;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    #busca:focus {
+      border-color: var(--accent);
+    }
+
+    /* Sistema de Categorias (Accordion) */
+    .categoria-bloco {
+      margin-bottom: 10px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .categoria-header {
+      background: white;
+      padding: 15px 20px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      border-bottom: 1px solid #eee;
+      user-select: none;
+    }
+
+    .categoria-header:hover {
+      background: #f9f9f9;
+    }
+
+    .categoria-header .info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .badge-count {
+      background: var(--secondary);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+    }
+
+    .seta {
+      transition: transform 0.3s;
+      color: var(--accent);
+    }
+
+    /* Filhos (Músicas) */
+    .musicas-container {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+      background: #fff;
+    }
+
+    .musica-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 25px;
+      text-decoration: none;
+      color: #444;
+      border-bottom: 1px solid #f1f1f1;
+      transition: background 0.2s;
+    }
+
+    .musica-item:hover {
+      background: #fff5ed;
+      color: var(--accent);
+    }
+
+    .musica-item .autor {
+      font-size: 0.85rem;
+      color: #888;
+    }
+
+    /* Estado Ativo */
+    .categoria-bloco.aberto .musicas-container {
+      max-height: 2000px; /* Limite alto para suportar muitas músicas */
+      overflow-y: auto;
+    }
+
+    .categoria-bloco.aberto .seta {
+      transform: rotate(180deg);
+    }
+
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #666;
+    }
+
+    footer {
+      text-align: center;
+      padding: 40px 0;
+      color: #888;
+    }
   </style>
 </head>
 <body>
 
-<nav><a href="index.html">Início</a></nav>
+<header>
+  <h1>🎶 Acervo Musical NBM</h1>
+  <p>Encontre sua partitura em notação ABC</p>
+</header>
 
-<div class="search-container">
-  <h1 style="color: white;">🎶 Biblioteca ABC</h1>
-  <input type="text" id="busca" placeholder="Pesquisar entre 25.000 músicas...">
-  <div id="contagem" class="contador">Carregando acervo...</div>
-</div>
+<nav>
+  <a href="index.html">Início</a>
+  <a href="musicas.html">Músicas</a>
+  <a href="upload.html">Fazer Upload</a>
+</nav>
 
-<div id="lista-categorias">
+<div class="container">
+  
+  <div class="search-container">
+    <input type="text" id="busca" placeholder="Digite o nome da música ou autor...">
+    <p id="stats" style="margin-top:10px; font-size: 0.9rem; color: #666;"></p>
   </div>
 
-<script>
-  let acervoCompleto = [];
+  <div id="lista-categorias">
+    <div class="loading">Carregando acervo musical...</div>
+  </div>
 
-  // Função para carregar o JSON
-  async function carregarAcervo() {
+</div>
+
+<footer>
+  <p>© 2026 — Prof. Albertino Moura Barbosa Filho</p>
+</footer>
+
+<script>
+  let acervo = [];
+
+  // 1. Carrega os dados do JSON
+  async function carregarDados() {
     try {
+      // Simulação de carregamento do arquivo musicas.json
       const response = await fetch('musicas.json');
-      acervoCompleto = await response.json();
-      renderizarMusicas(acervoCompleto);
-      document.getElementById('contagem').innerText = `${acervoCompleto.length} músicas encontradas`;
-    } catch (e) {
-      console.error("Erro ao carregar JSON:", e);
+      acervo = await response.json();
+      renderizar(acervo);
+    } catch (erro) {
+      document.getElementById('lista-categorias').innerHTML = 
+        '<p style="text-align:center; color:red;">Erro ao carregar o arquivo musicas.json. Verifique se ele existe.</p>';
     }
   }
 
-  function renderizarMusicas(dados) {
+  // 2. Renderiza as categorias e músicas (Pai e Filho)
+  function renderizar(dados) {
     const container = document.getElementById('lista-categorias');
+    const stats = document.getElementById('stats');
     container.innerHTML = '';
+    
+    stats.innerText = `${dados.length} músicas disponíveis`;
 
     // Agrupa por categoria
-    const categorias = [...new Set(dados.map(m => m.categoria))];
+    const categorias = dados.reduce((acc, obj) => {
+      acc[obj.categoria] = acc[obj.categoria] || [];
+      acc[obj.categoria].push(obj);
+      return acc;
+    }, {});
 
-    categorias.forEach(cat => {
-      const section = document.createElement('section');
-      section.className = 'categoria-bloco';
-      section.innerHTML = `<h3>${cat}</h3>`;
-      
-      const musicasDaCat = dados.filter(m => m.categoria === cat);
-      musicasDaCat.forEach(m => {
-        const link = document.createElement('a');
-        link.className = 'musica-link';
-        link.href = `viewer.html?file=${m.path}`;
-        link.innerHTML = `<strong>${m.titulo}</strong> - <small>${m.compositor}</small>`;
-        section.appendChild(link);
+    // Cria os elementos HTML
+    for (let cat in categorias) {
+      const bloco = document.createElement('div');
+      bloco.className = 'categoria-bloco';
+
+      const header = document.createElement('div');
+      header.className = 'categoria-header';
+      header.innerHTML = `
+        <div class="info">
+          <span>${cat}</span>
+          <span class="badge-count">${categorias[cat].length}</span>
+        </div>
+        <span class="seta">▼</span>
+      `;
+
+      const corpo = document.createElement('div');
+      corpo.className = 'musicas-container';
+
+      categorias[cat].forEach(m => {
+        const item = document.createElement('a');
+        item.className = 'musica-item';
+        // Redireciona para o viewer com o caminho do arquivo
+        item.href = `viewer.html?file=${encodeURIComponent(m.path)}`;
+        item.innerHTML = `
+          <span>${m.titulo}</span>
+          <span class="autor">${m.compositor || ''}</span>
+        `;
+        corpo.appendChild(item);
       });
-      
-      container.appendChild(section);
-    });
+
+      // Evento de abrir/fechar
+      header.addEventListener('click', () => {
+        const estaAberto = bloco.classList.contains('aberto');
+        // Fecha todos antes de abrir um novo (opcional - estilo acordeão puro)
+        // document.querySelectorAll('.categoria-bloco').forEach(b => b.classList.remove('aberto'));
+        
+        if (!estaAberto) bloco.classList.add('aberto');
+        else bloco.classList.remove('aberto');
+      });
+
+      bloco.appendChild(header);
+      bloco.appendChild(corpo);
+      container.appendChild(bloco);
+    }
   }
 
-  // Busca em tempo real
-  document.getElementById('busca').addEventListener('input', (e) => {
+  // 3. Sistema de Busca
+  document.getElementById('busca').addEventListener('input', function(e) {
     const termo = e.target.value.toLowerCase();
-    const filtrados = acervoCompleto.filter(m => 
+    const filtrados = acervo.filter(m => 
       m.titulo.toLowerCase().includes(termo) || 
-      m.compositor.toLowerCase().includes(termo)
+      (m.compositor && m.compositor.toLowerCase().includes(termo)) ||
+      m.categoria.toLowerCase().includes(termo)
     );
-    renderizarMusicas(filtrados);
+    renderizar(filtrados);
+
+    // Se estiver buscando, abre as categorias automaticamente
+    if (termo.length > 0) {
+      document.querySelectorAll('.categoria-bloco').forEach(b => b.classList.add('aberto'));
+    }
   });
 
-  window.onload = carregarAcervo;
+  // Iniciar
+  window.onload = carregarDados;
 </script>
+
 </body>
 </html>
