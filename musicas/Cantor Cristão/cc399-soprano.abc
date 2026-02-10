@@ -1,0 +1,11 @@
+X:1
+L:1/8
+M:9/8
+I:linebreak $
+K:Ab
+V:1
+EAB |c3 c3 cBA |B3 B3 EGB |d3-d2 d dcB | %4
+c6 EAB |c3 c3 cBA |B3 B3 EGA |B3-B2 B BAG | %8
+A6 || ABc || [M:12/8] d6-d2d FAd |c3 c6 EAc | %13
+B6-B2 B BAB |c6-c3 ABc |d6-d2d FAd |c3 c6 EAc | %17
+e6-e2d c2B | A6- A3 |] %20

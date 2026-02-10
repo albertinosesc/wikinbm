@@ -1,0 +1,12 @@
+X:1
+L:1/8
+Q:1/4=112
+M:6/8
+K:G
+V:1
+D | D2 D DGA | B3 G2B | d2 d d2A | %4
+B3- B2 D | D2 D DGA | B3 G2B | A2 G F2 E | %8
+D3- D2 D | DFA c2 e | d3 B2 D | DFA c2 e | d3- d2 B | %13
+B2 B Bdc | B3 G2 D | EFG G2 F | G3- G2 || %17
+d | d2 A B2 c | c3 B2 e | e2 B c2 d | %21
+c3- c2 c | c2 A B2 c | d3 G2 c | B2 G A2 G | G3- G2 |] %26

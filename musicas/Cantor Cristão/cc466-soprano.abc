@@ -1,0 +1,14 @@
+X:1
+L:1/4
+Q:1/4=115
+M:4/4
+K:Gmaj
+V:1
+%%MIDI program 52
+D | [DB] [^DB] [EB] [_EB] | ([DB] [^DB]) [EB] [_EB] | %3
+[DB] G [DF] [DG] | c3 D | c c c c | c2 c c | %7
+c [FA] [EG] [FA] | [GB]3 d | d [GB] [^Ge] [GB] | [Bd]2 [Ac] [Gc] | %11
+[Fc] [FA] [Fd] [FA] | [GB]3 B | [B^D-] [F^D] [EG] A | B2 B, B | [B^D-] [F^D] [EG] A | %16
+B2 [Fc=d]3 || D | B3 B | d c z D | A ^G A =e | d3 c | %22
+e B c c | d A B B | B A z e | d2 G2 | B/2 A3 z/2 | %27
+G4- | G3 |] %28
