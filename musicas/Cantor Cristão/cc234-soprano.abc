@@ -1,0 +1,12 @@
+X:1
+L:1/8
+Q:1/4=105
+M:3/4
+I:linebreak $
+K:D
+V:1
+F3/2G/ |A3B F3/2B/ |A4 A3/2d/ |c3B A3/2G/ | %4
+F4 F3/2G/ |A3B F3/2B/ |A4 A3/2d/ |c3A B3/2c/ | %8
+d4 || [M:12/8] FGA |B6-B2d dcB |A6-A3 ABF | %12
+ A6- A2 A ABF | A6- A3 FGA |B6-B2d dcB | %16
+A6-A3 d2d |e3-e2 e d3 c3 | d6-d3 |] %19

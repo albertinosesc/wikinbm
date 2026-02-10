@@ -1,0 +1,15 @@
+X:1
+L:1/8
+Q:1/4=100
+M:3/4
+I:linebreak $
+K:D
+V:1
+A | ^GAd3 A |cB3 B2 |c3 BGB | %4
+A3-A2 A | ^GAd3 A |cB3 B2 |c3 AGE | D4 zF | %9
+FBB3 d |dc3 c2 |d3 BF^G |A4 zA | %13
+ ^GAd3 A |cB3 B2 |c3 ABc |d6 || %17
+A3 BAB |(A2 d2 c2) | B3 cBc | (B2 e2 d2) | %21
+c3 cBc |(d2 A2) B2 |c3 BGB |A6 |A3 BAB | %26
+(A2 d2 c2) | B3 cBc | (B2 e2 d2) |c3 cBc | %30
+(d2 A2) B2 |c3 ABc |d3-d2 |] %33
