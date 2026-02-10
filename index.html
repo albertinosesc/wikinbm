@@ -174,17 +174,30 @@
     </a>
   </div>
 
-  <section class="contact-section">
-    <h3 style="margin-top: 0; text-align: center;">📩 Fale Conosco</h3>
-    <p style="text-align: center; color: #bdc3c7;">Dúvidas, sugestões ou problemas técnicos? Envie uma mensagem.</p>
+ <section class="contact-section">
+    <h3 style="margin-top: 0;">📩 Envie uma mensagem</h3>
+    <p style="color: #bdc3c7;">Dúvidas, sugestões ou pedidos de partituras.</p>
     
-    <form class="contact-form" action="mailto:albertinosesc@gmail.com" method="post" enctype="text/plain">
-      <input type="text" name="Nome" placeholder="Seu Nome completo" required>
-      <input type="email" name="Email" placeholder="Seu melhor E-mail" required>
-      <textarea name="Mensagem" placeholder="Como podemos te ajudar?" required></textarea>
-      <button type="submit" class="btn-submit">Enviar Mensagem</button>
+    <form class="contact-form" onsubmit="enviarEmail(event)">
+      <textarea id="msgTexto" placeholder="Escreva aqui sua mensagem..." required></textarea>
+      <button type="submit" class="btn-submit">Enviar Mensagem Agora</button>
     </form>
   </section>
+
+  <script>
+    function enviarEmail(event) {
+      event.preventDefault();
+      const mensagem = document.getElementById('msgTexto').value;
+      const destinatario = 'albertinosesc@gmail.com';
+      const assunto = 'Mensagem da Biblioteca NBM';
+      
+      // Abre o programa de e-mail com o texto preenchido
+      window.location.href = `mailto:${destinatario}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(mensagem)}`;
+      
+      // Limpa o campo após o clique
+      document.getElementById('msgTexto').value = '';
+    }
+  </script>
 
 </div>
 
