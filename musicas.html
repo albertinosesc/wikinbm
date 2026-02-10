@@ -2,105 +2,71 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Acervo ABC - NBM</title>
+  <title>🎶 Acervo Musical NBM</title>
   <link rel="stylesheet" href="style.css">
-  
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/abcjs/6.2.2/abcjs-basic-min.js"></script>
-
   <style>
-    .search-container {
-      background: #2c3e50;
-      padding: 30px;
-      color: white;
-      text-align: center;
-    }
-    .search-bar {
+    .search-box {
+      margin: 20px 0;
+      padding: 10px;
       width: 100%;
-      max-width: 600px;
-      padding: 15px;
-      border-radius: 25px;
-      border: none;
-      font-size: 1.1rem;
-    }
-    .results-area {
-      display: grid;
-      grid-template-columns: 300px 1fr;
-      gap: 20px;
-      padding: 20px;
-    }
-    #listaMusicas {
-      background: white;
-      height: 70vh;
-      overflow-y: auto;
+      max-width: 400px;
+      border: 2px solid #2c3e50;
       border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
-    .item-musica {
-      padding: 12px;
-      border-bottom: 1px solid #eee;
-      cursor: pointer;
-      transition: 0.2s;
+    .categoria-section { margin-bottom: 30px; }
+    .lista-musicas { list-style: none; padding: 0; }
+    .lista-musicas li { margin: 8px 0; }
+    .lista-musicas a { 
+      text-decoration: none; 
+      color: #3498db; 
+      font-weight: 500;
     }
-    .item-musica:hover { background: #e8f4f8; }
-    
-    /* Onde a partitura vai aparecer */
-    #viewer {
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      min-height: 70vh;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    .no-selection {
-      color: #888;
-      text-align: center;
-      margin-top: 100px;
-    }
+    .lista-musicas a:hover { color: #e67e22; }
+    .hidden { display: none; }
   </style>
 </head>
 <body>
 
+<header>
+  <h1>🎶 Músicas Disponíveis</h1>
+</header>
+
 <nav>
   <a href="index.html">Início</a>
-  <a href="musicas.html">Músicas</a>
   <a href="upload.html">Fazer Upload</a>
 </nav>
 
-<div class="search-container">
-  <h2>Pesquisar no Acervo Musical</h2>
-  <input type="text" id="inputBusca" class="search-bar" placeholder="Ex: Asa Branca, Bach, Choro...">
-</div>
+<main class="container">
+  <input type="text" id="filtro" class="search-box" placeholder="🔎 Pesquisar música ou compositor...">
 
-<div class="results-area">
-  <div id="listaMusicas">
-    <div class="item-musica" onclick="carregarPartitura('L:1/4\nM:4/4\nK:C\nC D E F|G A B c|')">
-      <strong>Exemplo de Escala</strong><br><small>Prof. Albertino</small>
-    </div>
-  </div>
+  <div id="acervo">
+    <section class="categoria-section">
+      <h3>Piano</h3>
+      <ul class="lista-musicas">
+        <li><a href="viewer.html?file=musicas/asa-branca.abc">Asa Branca</a></li>
+        <li><a href="viewer.html?file=musicas/beto.abc">Beto</a></li>
+      </ul>
+    </section>
 
-  <div id="viewer">
-    <div id="paper" class="partitura-renderizada">
-      <p class="no-selection">Selecione uma música ao lado para visualizar a partitura.</p>
-    </div>
+    <section class="categoria-section">
+      <h3>Melodia</h3>
+      <ul class="lista-musicas">
+        <li><a href="viewer.html?file=musicas/melodia/1972 - Atirei o Pau no Gato.abc">1972 - Atirei o Pau no Gato</a></li>
+      </ul>
+    </section>
   </div>
-</div>
+</main>
 
 <script>
-  // Função que transforma o texto ABC em desenho de partitura
-  function carregarPartitura(conteudoABC) {
-    document.getElementById('paper').innerHTML = ""; // Limpa o aviso
-    ABCJS.renderAbc("paper", conteudoABC, { 
-      responsive: "resize",
-      add_classes: true 
+  // Lógica de busca em tempo real
+  document.getElementById('filtro').addEventListener('input', function() {
+    let termo = this.value.toLowerCase();
+    let itens = document.querySelectorAll('.lista-musicas li');
+    
+    itens.forEach(item => {
+      let texto = item.textContent.toLowerCase();
+      item.classList.toggle('hidden', !texto.includes(termo));
     });
-  }
-
-  // Lógica de busca rápida (Exemplo simples)
-  document.getElementById('inputBusca').addEventListener('input', function(e) {
-    const termo = e.target.value.toLowerCase();
-    // Aqui faremos o filtro na sua lista de 25.000 músicas
-    console.log("Buscando por:", termo);
   });
 </script>
 
