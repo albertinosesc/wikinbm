@@ -1,0 +1,11 @@
+X:1
+L:1/8
+M:6/8
+Q:1/8=114
+I:linebreak $
+K:Fmaj
+V:1 treble
+ A | A2 A/A/ c2 A/A/ | B2 B/B/ d2 d | c>BA c2 c/A/ | G3- G2 G | A2 A/A/ B>AB | %6
+ c2 c/c/ !fermata!d2 d |$ c>BA A2 A/G/ | F3- F2 S "^Estribilho" c | c2 G/G/ G^FG | AAF A2 c | c2 G/G/ GFG | %12
+ A3- A2 F |$ A>GA B>AB | c>=Bc !fermata!d2 d | c>BA A>AG | "^Fine" F3- F2 "^D.S. al Fine" "^Estribilho" c | c2 G/G/ G^FG | AAF A2 c | c2 G/G/ GFG | %12
+ A3- A2 F |$ A>GA B>AB | c>=Bc !fermata!d2 d | c>BA A>AG | "^Fine" F3- F2 "^D.S. al Fine" z |] %17
