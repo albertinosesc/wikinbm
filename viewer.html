@@ -1,106 +1,134 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>🎼 Partitura Interativa</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎼 Partitura Interativa</title>
 
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/abcjs@6.2.3/dist/abcjs-basic-min.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/abcjs@6.2.3/dist/abcjs-basic-min.js"></script>
 
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      background-color: #f0f0f0; /* Fundo leve para destacar o papel */
-    }
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            background-color: #f0f0f0;
+            font-family: sans-serif;
+        }
 
-    main {
-      width: 100%;
-      padding: 0;
-    }
+        header {
+            padding: 10px 1cm;
+            background: #fff;
+            border-bottom: 1px solid #ccc;
+        }
 
-    /* O segredo está em usar margens laterais no container e padding no papel */
-    #paper-container {
-      padding: 0 1cm; /* Margem de 1cm nas laterais */
-      width: 100%;
-      box-sizing: border-box;
-    }
+        nav {
+            padding: 10px 1cm;
+        }
 
-    #paper {
-      width: 100%;
-      background: white;
-      padding: 20px; /* Respiro interno para as notas não encostarem na borda branca */
-      box-sizing: border-box;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
+        main {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-    .controls {
-      margin: 10px 1cm; /* Mantém os controles alinhados com a partitura */
-      padding: 15px;
-      background: #f4f4f4;
-      border-radius: 8px;
-    }
+        /* Container que garante o respiro de 1cm nas laterais da tela */
+        .page-wrapper {
+            width: 100%;
+            padding: 0 1cm;
+            box-sizing: border-box;
+        }
 
-    .control-group {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 10px;
-    }
+        .controls {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f4f4f4;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            width: 100%;
+            box-sizing: border-box;
+        }
 
-    .controls button {
-      cursor: pointer;
-      padding: 8px 12px;
-      border: 1px solid #ccc;
-      background: white;
-      border-radius: 4px;
-    }
+        .control-group {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+        }
 
-    .btn-play { background-color: #e7f3ff !important; border-color: #007bff !important; color: #007bff; font-weight: bold; }
-    .btn-stop { background-color: #fff0f0 !important; border-color: #dc3545 !important; color: #dc3545; font-weight: bold; }
+        .controls label { font-weight: bold; font-size: 14px; }
 
-    @media print {
-      .controls, header, nav { display: none !important; }
-      #paper-container { padding: 0; }
-      #paper { box-shadow: none; padding: 0; }
-    }
-  </style>
+        .controls button {
+            cursor: pointer;
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            background: white;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .btn-play { background-color: #e7f3ff !important; border-color: #007bff !important; color: #007bff; }
+        .btn-stop { background-color: #fff0f0 !important; border-color: #dc3545 !important; color: #dc3545; }
+
+        /* Estilo do Papel da Partitura */
+        #paper {
+            width: 100%;
+            background: white;
+            padding: 20px; 
+            box-sizing: border-box;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+        }
+
+        /* Força o SVG a ser responsivo e ocupar a largura do div */
+        #paper svg {
+            width: 100% !important;
+            height: auto;
+        }
+
+        @media print {
+            .controls, header, nav { display: none !important; }
+            .page-wrapper { padding: 0; }
+            #paper { box-shadow: none; padding: 0; }
+        }
+    </style>
 </head>
 <body>
 
-<header style="padding: 10px 1cm;">
-  <h1>🎼 Partitura Interativa</h1>
+<header>
+    <h1>🎼 Partitura Interativa</h1>
 </header>
 
-<nav style="padding: 0 1cm;">
-  <a href="musicas.html" style="text-decoration: none; font-weight: bold;">← Voltar</a>
+<nav>
+    <a href="musicas.html" style="text-decoration: none; color: #007bff;">← Voltar ao Acervo</a>
 </nav>
 
-<main>
-  <div class="controls">
-    <div class="control-group">
-      <label>BPM:</label>
-      <input type="number" id="tempo" value="100" min="40" max="240" style="width: 50px;">
-      
-      <label>Tom:</label>
-      <button id="down">−</button>
-      <span id="transposeValue" style="font-weight: bold;">0</span>
-      <button id="up">+</button>
+<main class="page-wrapper">
+    <div class="controls">
+        <div class="control-group">
+            <label>BPM:</label>
+            <input type="number" id="tempo" value="100" min="40" max="240" style="width: 55px; padding: 5px;">
+            
+            <label>Tom:</label>
+            <button id="down">−</button>
+            <span id="transposeValue" style="min-width: 20px; text-align: center;">0</span>
+            <button id="up">+</button>
 
-      <button class="btn-play" id="play-all">Play</button>
-      <button id="play-chords">Acordes</button>
-      <button id="play-melodies">M1+M2</button>
-      <button id="play-v1">Melodia 1</button>
-      <button id="play-v2">Melodia 2</button>
-      <button class="btn-stop" id="stop">Parar</button>
+            <div style="border-left: 1px solid #ccc; height: 25px; margin: 0 10px;"></div>
+
+            <button class="btn-play" id="play-all">Play</button>
+            <button id="play-chords">Acordes</button>
+            <button id="play-melodies">M1+M2</button>
+            <button id="play-v1">M1</button>
+            <button id="play-v2">M2</button>
+            <button class="btn-stop" id="stop">Parar</button>
+        </div>
     </div>
-  </div>
 
-  <div id="paper-container">
     <div id="paper"></div>
-  </div>
 </main>
 
 <script>
@@ -110,73 +138,112 @@ let synthControl = null;
 let transposeValue = 0;
 let audioContext = null;
 
+// 1. Captura o arquivo da URL
 const params = new URLSearchParams(window.location.search);
 const file = params.get("file") || "exemplo.abc";
 
 fetch(file)
-  .then(r => r.text())
-  .then(text => {
-    abcRawText = text;
-    processAndRender();
-  });
+    .then(r => {
+        if (!r.ok) throw new Error("Não foi possível carregar o arquivo ABC.");
+        return r.text();
+    })
+    .then(text => {
+        abcRawText = text;
+        processAndRender();
+    })
+    .catch(err => {
+        document.getElementById("paper").innerHTML = `<p style="color:red; padding:20px;">${err.message}</p>`;
+    });
 
 function processAndRender() {
-  const bpm = document.getElementById("tempo").value;
-  let modifiedAbc = abcRawText.replace(/^Q:.*\n?/gm, ""); 
-  modifiedAbc = modifiedAbc.replace(/(K:.*\n)/, `$1Q:${bpm}\n`);
+    if (!abcRawText) return;
 
-  // Pegamos a largura do container (que já tem o desconto de 1cm de cada lado via CSS)
-  const container = document.getElementById("paper-container");
-  
-  // Subtraímos um pouco mais para garantir que as notas não toquem a borda do papel branco
-  const larguraDisponivel = container.offsetWidth - 80;
+    const bpm = document.getElementById("tempo").value;
+    
+    // Atualiza o campo Q: (tempo) no texto ABC
+    let modifiedAbc = abcRawText.replace(/^Q:.*\n?/gm, ""); 
+    modifiedAbc = modifiedAbc.replace(/(K:.*\n)/, `$1Q:${bpm}\n`);
 
-  visualObj = ABCJS.renderAbc("paper", modifiedAbc, {
-    responsive: "resize",
-    visualTranspose: transposeValue,
-    staffwidth: larguraDisponivel, // Define a largura da pauta
-    paddingleft: 0,
-    paddingright: 0,
-    add_classes: true
-  })[0];
+    // Calcula a largura disponível dentro do div #paper (subtraindo o padding interno de 20px de cada lado)
+    const paperElement = document.getElementById("paper");
+    const larguraDisponivel = paperElement.clientWidth - 40;
 
-  stop();
+    // Renderização com justificação horizontal completa
+    visualObj = ABCJS.renderAbc("paper", modifiedAbc, {
+        responsive: "resize",
+        visualTranspose: transposeValue,
+        staffwidth: larguraDisponivel,
+        wrap: {
+            minSpacing: 1.5,
+            maxSpacing: 2.5,
+            preferredMeasuresPerLine: 4
+        },
+        format: {
+            justify: 1 // FORÇA as pautas a ocuparem 100% da largura (justify)
+        },
+        paddingleft: 0,
+        paddingright: 0,
+        add_classes: true
+    })[0];
+
+    stop();
 }
 
-// Funções de Áudio
+// Lógica de Áudio
 async function play(options = {}) {
-  if (!visualObj) return;
-  stop();
-  if (!audioContext) {
-    window.AudioContext = window.AudioContext || window.webkitAudioContext;
-    audioContext = new AudioContext();
-  }
-  const bpm = parseInt(document.getElementById("tempo").value, 10);
-  synthControl = new ABCJS.synth.CreateSynth();
-  try {
-    await audioContext.resume();
-    await synthControl.init({
-      visualObj: visualObj,
-      audioContext: audioContext,
-      millisecondsPerMeasure: visualObj.millisecondsPerMeasure(),
-      options: { qpm: bpm, midiTranspose: transposeValue, ...options }
-    });
-    await synthControl.prime();
-    await synthControl.start();
-  } catch (e) { console.error(e); }
+    if (!visualObj) return;
+    stop();
+
+    if (!audioContext) {
+        window.AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioContext = new AudioContext();
+    }
+
+    const bpm = parseInt(document.getElementById("tempo").value, 10);
+    synthControl = new ABCJS.synth.CreateSynth();
+
+    try {
+        await audioContext.resume();
+        await synthControl.init({
+            visualObj: visualObj,
+            audioContext: audioContext,
+            millisecondsPerMeasure: visualObj.millisecondsPerMeasure(),
+            options: { 
+                qpm: bpm, 
+                midiTranspose: transposeValue, 
+                ...options 
+            }
+        });
+
+        await synthControl.prime();
+        await synthControl.start();
+    } catch (e) {
+        console.error("Erro ao iniciar áudio:", e);
+    }
 }
 
-function stop() { if (synthControl) { synthControl.stop(); synthControl = null; } }
+function stop() {
+    if (synthControl) {
+        synthControl.stop();
+        synthControl = null;
+    }
+}
 
+// Listeners de Interface
 document.getElementById("up").onclick = () => { transposeValue++; updateUI(); };
 document.getElementById("down").onclick = () => { transposeValue--; updateUI(); };
-document.getElementById("tempo").oninput = updateUI;
+document.getElementById("tempo").oninput = () => {
+    // Debounce simples para não renderizar a cada digitação rápida
+    clearTimeout(window.renderTimeout);
+    window.renderTimeout = setTimeout(processAndRender, 500);
+};
 
 function updateUI() {
-  document.getElementById("transposeValue").textContent = transposeValue;
-  processAndRender();
+    document.getElementById("transposeValue").textContent = transposeValue;
+    processAndRender();
 }
 
+// Botões de áudio
 document.getElementById("play-all").onclick = () => play({});
 document.getElementById("play-chords").onclick = () => play({ voicesOff: true });
 document.getElementById("play-melodies").onclick = () => play({ chordsOff: true });
@@ -184,7 +251,12 @@ document.getElementById("play-v1").onclick = () => play({ chordsOff: true, voice
 document.getElementById("play-v2").onclick = () => play({ chordsOff: true, voicesOff: [0] });
 document.getElementById("stop").onclick = stop;
 
-window.onresize = processAndRender;
+// Ajusta a partitura se a janela mudar de tamanho
+window.onresize = () => {
+    clearTimeout(window.resizeTimeout);
+    window.resizeTimeout = setTimeout(processAndRender, 300);
+};
+
 </script>
 </body>
 </html>
