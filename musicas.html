@@ -1,298 +1,102 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Acervo Musical - NBM</title>
-  <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
-  
-  <style>
-    :root {
-      --primary: #2c3e50;
-      --secondary: #34495e;
-      --accent: #e67e22;
-      --light: #f4f7f6;
-    }
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-DP3HN6DMXQ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-DP3HN6DMXQ');
+    </script>
 
-    body {
-      font-family: 'Segoe UI', Tahoma, sans-serif;
-      background-color: var(--light);
-      margin: 0;
-      color: #333;
-    }
-
-    header {
-      background: var(--primary);
-      color: white;
-      padding: 2rem 1rem;
-      text-align: center;
-    }
-
-    nav {
-      background: var(--secondary);
-      padding: 0.8rem;
-      text-align: center;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-    }
-
-    nav a {
-      color: white;
-      text-decoration: none;
-      margin: 0 15px;
-      font-weight: 600;
-    }
-
-    .container {
-      max-width: 900px;
-      margin: 20px auto;
-      padding: 0 20px;
-    }
-
-    /* Barra de Busca */
-    .search-container {
-      margin-bottom: 30px;
-      text-align: center;
-    }
-
-    #busca {
-      width: 100%;
-      padding: 15px 25px;
-      font-size: 1.1rem;
-      border: 2px solid #ddd;
-      border-radius: 30px;
-      outline: none;
-      transition: border-color 0.3s;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-    }
-
-    #busca:focus {
-      border-color: var(--accent);
-    }
-
-    /* Sistema de Categorias (Accordion) */
-    .categoria-bloco {
-      margin-bottom: 10px;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-
-    .categoria-header {
-      background: white;
-      padding: 15px 20px;
-      cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-weight: 600;
-      border-bottom: 1px solid #eee;
-      user-select: none;
-    }
-
-    .categoria-header:hover {
-      background: #f9f9f9;
-    }
-
-    .categoria-header .info {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .badge-count {
-      background: var(--secondary);
-      color: white;
-      padding: 2px 8px;
-      border-radius: 12px;
-      font-size: 0.8rem;
-    }
-
-    .seta {
-      transition: transform 0.3s;
-      color: var(--accent);
-    }
-
-    /* Filhos (Músicas) */
-    .musicas-container {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s ease-out;
-      background: #fff;
-    }
-
-    .musica-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 25px;
-      text-decoration: none;
-      color: #444;
-      border-bottom: 1px solid #f1f1f1;
-      transition: background 0.2s;
-    }
-
-    .musica-item:hover {
-      background: #fff5ed;
-      color: var(--accent);
-    }
-
-    .musica-item .autor {
-      font-size: 0.85rem;
-      color: #888;
-    }
-
-    /* Estado Ativo */
-    .categoria-bloco.aberto .musicas-container {
-      max-height: 2000px; /* Limite alto para suportar muitas músicas */
-      overflow-y: auto;
-    }
-
-    .categoria-bloco.aberto .seta {
-      transform: rotate(180deg);
-    }
-
-    .loading {
-      text-align: center;
-      padding: 20px;
-      color: #666;
-    }
-
-    footer {
-      text-align: center;
-      padding: 40px 0;
-      color: #888;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acervo Musical NBM</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        :root { --primary: #2c3e50; --accent: #e67e22; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; }
+        nav { background: var(--primary); padding: 1rem; text-align: center; }
+        nav a { color: white; text-decoration: none; margin: 0 15px; font-weight: bold; }
+        
+        .container { max-width: 800px; margin: 20px auto; padding: 20px; }
+        .search-box { width: 100%; padding: 15px; border-radius: 25px; border: 2px solid #ddd; font-size: 1.1rem; outline: none; margin-bottom: 20px; }
+        
+        /* Acordeão Pai e Filho */
+        .categoria-pai { background: white; margin-bottom: 10px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow: hidden; }
+        .header-pai { padding: 15px 20px; cursor: pointer; display: flex; justify-content: space-between; font-weight: bold; background: #fff; transition: 0.3s; }
+        .header-pai:hover { background: #f9f9f9; }
+        .filhos-container { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; background: #fafafa; }
+        .musica-item { display: block; padding: 12px 30px; color: #3498db; text-decoration: none; border-top: 1px solid #eee; font-size: 0.95rem; }
+        .musica-item:hover { background: #fff5ed; color: var(--accent); }
+        
+        .aberto .filhos-container { max-height: 2000px; overflow-y: auto; }
+        .aberto .seta { transform: rotate(180deg); }
+        .seta { transition: 0.3s; color: var(--accent); }
+    </style>
 </head>
 <body>
 
-<header>
-  <h1>🎶 Acervo Musical NBM</h1>
-  <p>Encontre sua partitura em notação ABC</p>
-</header>
-
 <nav>
-  <a href="index.html">Início</a>
-  <a href="musicas.html">Músicas</a>
-  <a href="upload.html">Fazer Upload</a>
+    <a href="index.html">Início</a>
+    <a href="musicas.html">Músicas</a>
+    <a href="upload.html">Upload</a>
 </nav>
 
 <div class="container">
-  
-  <div class="search-container">
-    <input type="text" id="busca" placeholder="Digite o nome da música ou autor...">
-    <p id="stats" style="margin-top:10px; font-size: 0.9rem; color: #666;"></p>
-  </div>
-
-  <div id="lista-categorias">
-    <div class="loading">Carregando acervo musical...</div>
-  </div>
-
+    <input type="text" id="inputBusca" class="search-box" placeholder="Pesquisar entre 25.000 músicas...">
+    <div id="lista-acervo"></div>
 </div>
 
-<footer>
-  <p>© 2026 — Prof. Albertino Moura Barbosa Filho</p>
-</footer>
-
 <script>
-  let acervo = [];
+    let acervo = [];
 
-  // 1. Carrega os dados do JSON
-  async function carregarDados() {
-    try {
-      // Simulação de carregamento do arquivo musicas.json
-      const response = await fetch('musicas.json');
-      acervo = await response.json();
-      renderizar(acervo);
-    } catch (erro) {
-      document.getElementById('lista-categorias').innerHTML = 
-        '<p style="text-align:center; color:red;">Erro ao carregar o arquivo musicas.json. Verifique se ele existe.</p>';
+    async function carregarAcervo() {
+        try {
+            const response = await fetch('musicas.json');
+            acervo = await response.json();
+            renderizar(acervo);
+        } catch (e) { console.error("Erro ao ler musicas.json"); }
     }
-  }
 
-  // 2. Renderiza as categorias e músicas (Pai e Filho)
-  function renderizar(dados) {
-    const container = document.getElementById('lista-categorias');
-    const stats = document.getElementById('stats');
-    container.innerHTML = '';
-    
-    stats.innerText = `${dados.length} músicas disponíveis`;
-
-    // Agrupa por categoria
-    const categorias = dados.reduce((acc, obj) => {
-      acc[obj.categoria] = acc[obj.categoria] || [];
-      acc[obj.categoria].push(obj);
-      return acc;
-    }, {});
-
-    // Cria os elementos HTML
-    for (let cat in categorias) {
-      const bloco = document.createElement('div');
-      bloco.className = 'categoria-bloco';
-
-      const header = document.createElement('div');
-      header.className = 'categoria-header';
-      header.innerHTML = `
-        <div class="info">
-          <span>${cat}</span>
-          <span class="badge-count">${categorias[cat].length}</span>
-        </div>
-        <span class="seta">▼</span>
-      `;
-
-      const corpo = document.createElement('div');
-      corpo.className = 'musicas-container';
-
-      categorias[cat].forEach(m => {
-        const item = document.createElement('a');
-        item.className = 'musica-item';
-        // Redireciona para o viewer com o caminho do arquivo
-        item.href = `viewer.html?file=${encodeURIComponent(m.path)}`;
-        item.innerHTML = `
-          <span>${m.titulo}</span>
-          <span class="autor">${m.compositor || ''}</span>
-        `;
-        corpo.appendChild(item);
-      });
-
-      // Evento de abrir/fechar
-      header.addEventListener('click', () => {
-        const estaAberto = bloco.classList.contains('aberto');
-        // Fecha todos antes de abrir um novo (opcional - estilo acordeão puro)
-        // document.querySelectorAll('.categoria-bloco').forEach(b => b.classList.remove('aberto'));
+    function renderizar(dados) {
+        const lista = document.getElementById('lista-acervo');
+        lista.innerHTML = '';
         
-        if (!estaAberto) bloco.classList.add('aberto');
-        else bloco.classList.remove('aberto');
-      });
+        const categorias = dados.reduce((acc, m) => {
+            acc[m.categoria] = acc[m.categoria] || [];
+            acc[m.categoria].push(m);
+            return acc;
+        }, {});
 
-      bloco.appendChild(header);
-      bloco.appendChild(corpo);
-      container.appendChild(bloco);
+        for (let cat in categorias) {
+            const divPai = document.createElement('div');
+            divPai.className = 'categoria-pai';
+            divPai.innerHTML = `
+                <div class="header-pai" onclick="this.parentElement.classList.toggle('aberto')">
+                    <span>${cat} (${categorias[cat].length})</span>
+                    <span class="seta">▼</span>
+                </div>
+                <div class="filhos-container">
+                    ${categorias[cat].map(m => `
+                        <a href="viewer.html?file=${encodeURIComponent(m.path)}" class="musica-item">
+                            ${m.titulo} <small style="color:#999">— ${m.compositor}</small>
+                        </a>
+                    `).join('')}
+                </div>
+            `;
+            lista.appendChild(divPai);
+        }
     }
-  }
 
-  // 3. Sistema de Busca
-  document.getElementById('busca').addEventListener('input', function(e) {
-    const termo = e.target.value.toLowerCase();
-    const filtrados = acervo.filter(m => 
-      m.titulo.toLowerCase().includes(termo) || 
-      (m.compositor && m.compositor.toLowerCase().includes(termo)) ||
-      m.categoria.toLowerCase().includes(termo)
-    );
-    renderizar(filtrados);
+    document.getElementById('inputBusca').addEventListener('input', (e) => {
+        const termo = e.target.value.toLowerCase();
+        const filtrados = acervo.filter(m => m.titulo.toLowerCase().includes(termo) || m.compositor.toLowerCase().includes(termo));
+        renderizar(filtrados);
+        if(termo) document.querySelectorAll('.categoria-pai').forEach(el => el.classList.add('aberto'));
+    });
 
-    // Se estiver buscando, abre as categorias automaticamente
-    if (termo.length > 0) {
-      document.querySelectorAll('.categoria-bloco').forEach(b => b.classList.add('aberto'));
-    }
-  });
-
-  // Iniciar
-  window.onload = carregarDados;
+    window.onload = carregarAcervo;
 </script>
-
 </body>
 </html>
