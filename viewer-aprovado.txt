@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>🎼 Partitura Interativa</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/abcjs@6.2.3/dist/abcjs-basic-min.js"></script>
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-DP3HN6DMXQ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-DP3HN6DMXQ');
+  </script>
+
+  <style>
+    .controls {
+      margin: 20px 0;
+      padding: 15px;
+      background: #f4f4f4;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .control-group {
+      margin-bottom: 15px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .audio-modes {
+      border-top: 1px solid #ddd;
+      padding-top: 15px;
+      margin-top: 10px;
+    }
+
+    .controls label {
+      font-weight: bold;
+    }
+
+    .controls button {
+      cursor: pointer;
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      background: white;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    .controls button:hover {
+      background: #e9e9e9;
+    }
+
+    .btn-play { background-color: #e7f3ff !important; border-color: #007bff !important; color: #007bff; font-weight: bold; }
+    .btn-stop { background-color: #fff0f0 !important; border-color: #dc3545 !important; color: #dc3545; font-weight: bold; }
+    
+    #paper {
+      background: white;
+      padding: 10px;
+      margin-top: 20px;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🎼 Partitura Interativa</h1>
+</header>
+
+<nav>
+  <a href="musicas.html" style="text-decoration: none; font-weight: bold;">← Voltar para o Acervo</a>
+</nav>
+
+<main>
+
+  <div class="controls">
+    <div class="control-group">
+      <label>Andamento (BPM):</label>
+      <input type="number" id="tempo" value="100" min="40" max="240" style="width: 60px; padding: 5px;">
+
+      <label style="margin-left:20px;">Transposição:</label>
+      <button id="down">−</button>
+      <span id="transposeValue" style="font-size: 1.2em; min-width: 20px; text-align: center;">0</span>
+      <button id="up">+</button>
+    </div>
+
+    <div class="control-group audio-modes">
+      <label>Tocar:</label>
+      <button class="btn-play" id="play-all">Play</button>
+      <button id="play-chords">Só Acordes</button>
+      <button id="play-melodies">M1 + M2</button>
+      <button id="play-v1">Melodia 1</button>
+      <button id="play-v2">Melodia 2</button>
+      <button class="btn-stop" id="stop">⏹️ Parar</button>
+    </div>
+  </div>
+
+  <div id="paper"></div>
+
+</main>
+
+<script>
+let abcRawText = ""; 
+let visualObj = null;
+let synthControl = null;
+let transposeValue = 0;
+let audioContext = null;
+
+// 1. Carregar arquivo via URL
+const params = new URLSearchParams(window.location.search);
+const file = params.get("file") || "exemplo.abc";
+
+fetch(file)
+  .then(r => {
+    if(!r.ok) throw new Error("Arquivo não encontrado");
+    return r.text();
+  })
+  .then(text => {
+    abcRawText = text;
+    processAndRender();
+  })
+  .catch(err => {
+    document.getElementById("paper").innerHTML = "<p style='color:red'>Erro ao carregar partitura: " + err.message + "</p>";
+  });
+
+function processAndRender() {
+  const bpm = document.getElementById("tempo").value;
+  
+  // Limpa campo Q: antigo e insere o novo para garantir o andamento visual
+  let modifiedAbc = abcRawText.replace(/^Q:.*\n?/gm, ""); 
+  modifiedAbc = modifiedAbc.replace(/(K:.*\n)/, `$1Q:${bpm}\n`);
+
+  // Renderização da partitura
+  visualObj = ABCJS.renderAbc("paper", modifiedAbc, {
+    responsive: "resize",
+    visualTranspose: transposeValue
+  })[0];
+
+  stop();
+}
+
+async function play(options = {}) {
+  if (!visualObj) return;
+  stop();
+
+  // Inicializa o contexto de áudio (necessário após interação do usuário)
+  if (!audioContext) {
+    window.AudioContext = window.AudioContext || window.webkitAudioContext;
+    audioContext = new AudioContext();
+  }
+
+  const bpm = parseInt(document.getElementById("tempo").value, 10);
+  synthControl = new ABCJS.synth.CreateSynth();
+
+  try {
+    await audioContext.resume();
+    
+    await synthControl.init({
+      visualObj: visualObj,
+      audioContext: audioContext,
+      millisecondsPerMeasure: visualObj.millisecondsPerMeasure(),
+      options: {
+        qpm: bpm,
+        midiTranspose: transposeValue,
+        ...options // Mescla com vozesOff ou chordsOff
+      }
+    });
+
+    await synthControl.prime();
+    synthControl.start();
+  } catch (e) {
+    console.error("Erro no áudio:", e);
+  }
+}
+
+function stop() {
+  if (synthControl) {
+    synthControl.stop();
+    synthControl = null;
+  }
+}
+
+// Eventos de Transposição
+document.getElementById("up").onclick = () => { transposeValue++; updateUI(); };
+document.getElementById("down").onclick = () => { transposeValue--; updateUI(); };
+document.getElementById("tempo").oninput = updateUI;
+
+function updateUI() {
+  document.getElementById("transposeValue").textContent = transposeValue;
+  processAndRender();
+}
+
+// Mapeamento dos Botões de Áudio
+document.getElementById("play-all").onclick = () => play({});
+document.getElementById("play-chords").onclick = () => play({ voicesOff: true });
+document.getElementById("play-melodies").onclick = () => play({ chordsOff: true });
+document.getElementById("play-v1").onclick = () => play({ chordsOff: true, voicesOff: [1] });
+document.getElementById("play-v2").onclick = () => play({ chordsOff: true, voicesOff: [0] });
+document.getElementById("stop").onclick = stop;
+
+</script>
+
+</body>
+</html>
