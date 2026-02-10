@@ -64,10 +64,11 @@
         lista.innerHTML = '';
         
         const categorias = dados.reduce((acc, m) => {
-            acc[m.categoria] = acc[m.categoria] || [];
-            acc[m.categoria].push(m);
-            return acc;
-        }, {});
+    if (!m.categoria) return acc; // <-- ADICIONE ESTA LINHA: se não tiver categoria (tipo a INFO), ignora.
+    acc[m.categoria] = acc[m.categoria] || [];
+    acc[m.categoria].push(m);
+    return acc;
+    }, {});
 
         for (let cat in categorias) {
             const divPai = document.createElement('div');
