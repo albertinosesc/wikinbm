@@ -185,18 +185,18 @@
   </section>
 
   <script>
-    function enviarEmail(event) {
-      event.preventDefault();
-      const mensagem = document.getElementById('msgTexto').value;
-      const destinatario = 'albertinosesc@gmail.com';
-      const assunto = 'Mensagem da Biblioteca NBM';
-      
-      // Abre o programa de e-mail com o texto preenchido
-      window.location.href = `mailto:${destinatario}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(mensagem)}`;
-      
-      // Limpa o campo após o clique
-      document.getElementById('msgTexto').value = '';
-    }
+    <section class="contact-section">
+  <h3 style="margin-top: 0;">📩 Envie uma mensagem</h3>
+  <p style="color: #bdc3c7;">Dúvidas, sugestões ou pedidos de partituras.</p>
+  
+  <form class="contact-form" action="https://formspree.io/f/xjgegbwp" method="POST">
+    <textarea name="mensagem" placeholder="Escreva aqui sua mensagem..." required></textarea>
+    
+    <input type="hidden" name="_subject" value="Nova mensagem da Biblioteca NBM">
+    
+    <button type="submit" class="btn-submit">Enviar Mensagem Agora</button>
+  </form>
+</section>
   </script>
 
 </div>
