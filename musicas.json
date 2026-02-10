@@ -1,5 +1,6 @@
 [
   { "titulo": "Asa Branca", "compositor": "Luiz Gonzaga", "categoria": "Piano", "path": "musicas/asa-branca.abc" },
   { "titulo": "Beto", "compositor": "Desconhecido", "categoria": "Piano", "path": "musicas/beto.abc" },
+  { "titulo": "001 - Antífona", "compositor": "Desconhecido", "categoria": "Cantor Cristão", "path": "musicas/Cantor Cristão/001 - Antífona.abc" },
   { "titulo": "Atirei o Pau no Gato", "compositor": "Folclore", "categoria": "Melodia", "path": "musicas/melodia/gato.abc" }
 ]
