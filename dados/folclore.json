@@ -1,4 +1,14 @@
 [
-  { "titulo": "1507 - Eu Entrei Na Roda", "compositor": "Folclore brasileiro", "categoria": "Folclore Brasileiro", "path": "musicas/Folclore Brasileiro/1507.abc" },
-  { "titulo": "2705 - Mucama Bonita", "compositor": "Folclore brasileiro", "categoria": "Folclore Brasileiro", "path": "musicas/Folclore Brasileiro/2705.abc" }
+  {
+    "titulo": "1507 - Eu Entrei Na Roda",
+    "compositor": "Folclore brasileiro",
+    "categoria": "Folclore Brasileiro",
+    "path": "musicas/Folclore Brasileiro/1507.abc"
+  },
+  {
+    "titulo": "2705 - Mucama Bonita",
+    "compositor": "Folclore brasileiro",
+    "categoria": "Folclore Brasileiro",
+    "path": "musicas/Folclore Brasileiro/2705.abc"
+  }
 ]
