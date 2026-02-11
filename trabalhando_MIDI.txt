@@ -10,13 +10,13 @@ editor abc
 3 - https://michaeleskin.com/abctools/abctools.html
 
 Biblioteca Musical Unificada
-4 - https://script.google.com/macros/s/AKfycbxjckk2VwrcDaObH9E-wz0vkWUJ1AhZq4R4K8cULC9fuyuJB10YeiI_7plX-wDzvFEy/exec
+4 - https://script.google........
 
 musicas/pasta
-5 - https://github.com/albertinosesc/wikinbm/tree/main/musicas
+5 - https://github.com........
 
 dados/pasta
-6 - https://github.com/albertinosesc/wikinbm/blob/main/dados/mpb.json
+6 - https://github.com.......
 
 
 
