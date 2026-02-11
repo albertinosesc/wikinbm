@@ -21,5 +21,11 @@
 {"titulo": "225 - The otter's holt - Ireland", "compositor": "Junior Crehan", "categoria": "10", "path": "musicas/225.abc"},
 {"titulo": "239 - Paddy's trip to Scotland - Ireland", "compositor": "", "categoria": "10", "path": "musicas/239.abc"},
 {"titulo": "243 - Peggy on the settle - Ireland", "compositor": "", "categoria": "10", "path": "musicas/243.abc"},
-{"titulo": "259 - Reel de Ti=Jean", "compositor": "", "categoria": "10", "path": "musicas/259.abc"}
+{"titulo": "259 - Reel de Ti=Jean", "compositor": "", "categoria": "10", "path": "musicas/259.abc"},
+{"titulo": "277 - Sarah", "compositor": "Lee Anne Welch", "categoria": "10", "path": "musicas/277.abc"},
+{"titulo": "280 - Scotch Mary", "compositor": "", "categoria": "10", "path": "musicas/280.abc"},
+{"titulo": "287 - The silver spear", "compositor": "", "categoria": "10", "path": "musicas/287.abc"},
+{"titulo": "298 - The spinners delight", "compositor": "", "categoria": "10", "path": "musicas/298.abc"},
+{"titulo": "312 - The tailor's thimble", "compositor": "", "categoria": "10", "path": "musicas/312.abc"},
+{"titulo": "324 - Torry Burn lasses", "compositor": "", "categoria": "10", "path": "musicas/324.abc"}
 ]
