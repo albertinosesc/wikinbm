@@ -1,5 +1,5 @@
 [
-  {"titulo": "007 - Bear Island reel", "compositor": "Finbar Dwyer", "categoria": "13", "path": "musicas/007.abc"},
+{"titulo": "007 - Bear Island reel", "compositor": "Finbar Dwyer", "categoria": "13", "path": "musicas/007.abc"},
 {"titulo": "008 - Belfast chicken", "compositor": "Mike Long", "categoria": "13", "path": "musicas/008.abc"},
 {"titulo": "017 - Bonnie Kate", "compositor": "Mike Long", "categoria": "13", "path": "musicas/017.abc"},
 {"titulo": "025 - The bucks of Oranmore", "compositor": "Mike Long", "categoria": "13", "path": "musicas/025.abc"},
@@ -51,5 +51,20 @@
 {"titulo": "247 - The piper's despair", "compositor": "", "categoria": "13", "path": "musicas/247.abc"},
 {"titulo": "252 - Rakish Paddy", "compositor": "", "categoria": "13", "path": "musicas/252.abc"},
 {"titulo": "253 - The rambling sailor", "compositor": "", "categoria": "13", "path": "musicas/253.abc"},
-{"titulo": "263 - Richard Dwyer's", "compositor": "", "categoria": "13", "path": "musicas/263.abc"}
+{"titulo": "263 - Richard Dwyer's", "compositor": "", "categoria": "13", "path": "musicas/263.abc"},
+{"titulo": "265 - The road to the glen", "compositor": "Ed Reavy", "categoria": "13", "path": "musicas/265.abc"},
+{"titulo": "269 - Rolling on the ryegrass", "compositor": "", "categoria": "13", "path": "musicas/269.abc"},
+{"titulo": "270 - The Roscommon reel", "compositor": "", "categoria": "13", "path": "musicas/270.abc"},
+{"titulo": "272 - The sailor's return", "compositor": "", "categoria": "13", "path": "musicas/272.abc"},
+{"titulo": "274 - The Salamanca", "compositor": "", "categoria": "13", "path": "musicas/274.abc"},
+{"titulo": "286 - The ships are sailing", "compositor": "", "categoria": "13", "path": "musicas/286.abc"},
+{"titulo": "292 - The Skylark", "compositor": "James Morrison", "categoria": "13", "path": "musicas/292.abc"},
+{"titulo": "294 - The Sligo lasses", "compositor": "", "categoria": "13", "path": "musicas/294.abc"},
+{"titulo": "295 - The Sligo maid", "compositor": "", "categoria": "13", "path": "musicas/295.abc"},
+{"titulo": "302 - Sporting Peggy", "compositor": "", "categoria": "13", "path": "musicas/302.abc"},
+{"titulo": "303 - The Star of Munster", "compositor": "", "categoria": "13", "path": "musicas/303.abc"},
+{"titulo": "311 - Swinging on a gate", "compositor": "", "categoria": "13", "path": "musicas/311.abc"},
+{"titulo": "314 - Tarbolton Lodge", "compositor": "", "categoria": "13", "path": "musicas/314.abc"},
+{"titulo": "326 - Trim the velvet", "compositor": "", "categoria": "13", "path": "musicas/326.abc"},
+{"titulo": "327 - The trip to Durrow", "compositor": "", "categoria": "13", "path": "musicas/327.abc"}
 ]
