@@ -16,5 +16,9 @@
 {"titulo": "111 - The groom in his shirt", "compositor": "Mike Long", "categoria": "9", "path": "musicas/111.abc"},
 {"titulo": "115 - The hills of Clogher", "compositor": "Mike Long", "categoria": "9", "path": "musicas/115.abc"},
 {"titulo": "129 - Jenny Pippin - Ireland", "compositor": "Mike Long", "categoria": "9", "path": "musicas/129.abc"},
-{"titulo": "131 - Jimmy's return - Ireland", "compositor": "Mike Long", "categoria": "9", "path": "musicas/131.abc"}
+{"titulo": "131 - Jimmy's return - Ireland", "compositor": "Mike Long", "categoria": "9", "path": "musicas/131.abc"},
+{"titulo": "168 - Maggie's pancakes - Stuart Morison", "compositor": "Mike Long", "categoria": "9", "path": "musicas/168.abc"},
+{"titulo": "174 - The man from Bundoran", "compositor": "Mike Long", "categoria": "9", "path": "musicas/174.abc"},
+{"titulo": "191 - Miss McLeod's - Scotland, Ireland", "compositor": "Mike Long", "categoria": "9", "path": "musicas/191.abc"},
+{"titulo": "197 - Money musk - Ireland, Scotland", "compositor": "Mike Long", "categoria": "9", "path": "musicas/197.abc"}
 ]
