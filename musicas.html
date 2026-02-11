@@ -14,7 +14,7 @@
     <title>Acervo Musical NBM</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        :root { --primary: #2c3e50; --accent: #e67e22; }
+        :root { --primary: #2c3e50; --accent: #e67e22; --text-light: #666; }
         body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; color: #333; }
         
         nav { background: var(--primary); padding: 1rem; text-align: center; }
@@ -22,24 +22,39 @@
         
         .container { max-width: 800px; margin: 20px auto; padding: 20px; }
         
-        .app-description { text-align: center; color: #666; font-size: 0.95rem; margin-bottom: 25px; line-height: 1.5; }
+        /* Cabeçalho e Descrição */
+        .app-header { text-align: center; margin-bottom: 30px; }
+        .app-description { color: var(--text-light); font-size: 0.95rem; line-height: 1.5; margin-bottom: 15px; }
+        
+        /* Badge do Contador Geral */
+        #contador-geral { 
+            display: inline-block; 
+            background: var(--primary); 
+            color: white; 
+            padding: 4px 15px; 
+            border-radius: 20px; 
+            font-size: 0.85rem; 
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
 
         .search-box { 
             width: 100%; padding: 15px; border-radius: 25px; 
             border: 2px solid #ddd; font-size: 1.1rem; outline: none; 
             margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            transition: border-color 0.3s;
+            transition: all 0.3s;
+            box-sizing: border-box;
         }
-        .search-box:focus { border-color: var(--accent); }
+        .search-box:focus { border-color: var(--accent); background: #fff; }
         
-        /* Estilos do Acordeão */
+        /* Estilos do Acordeão (Categorias) */
         .categoria-pai { background: white; margin-bottom: 12px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow: hidden; }
         .header-pai { 
             padding: 15px 20px; cursor: pointer; display: flex; 
-            justify-content: space-between; font-weight: bold; 
-            background: #fff; transition: background 0.3s; 
+            justify-content: space-between; align-items: center;
+            font-weight: bold; background: #fff; transition: background 0.3s; 
         }
-        .header-pai:hover { background: #fefefe; }
+        .header-pai:hover { background: #fcfcfc; }
         
         .filhos-container { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; background: #fafafa; }
         .musica-item { 
@@ -49,11 +64,12 @@
         }
         .musica-item:hover { background: #fff5ed; color: var(--accent); padding-left: 35px; }
         
-        .aberto .filhos-container { max-height: 2500px; }
+        /* Classes de estado */
+        .aberto .filhos-container { max-height: 3000px; }
         .aberto .seta { transform: rotate(180deg); }
-        .seta { transition: transform 0.3s; color: var(--accent); }
+        .seta { transition: transform 0.3s; color: var(--accent); font-size: 0.8rem; }
 
-        .loading-msg { text-align: center; padding: 20px; color: #888; }
+        .loading-msg { text-align: center; padding: 40px; color: #888; font-style: italic; }
     </style>
 </head>
 <body>
@@ -65,20 +81,22 @@
 </nav>
 
 <div class="container">
-    <p class="app-description">
-        <strong>NBM Partituras:</strong> Visualize, transpõe tons, altere o andamento e isole vozes de partituras em tempo real, facilitando o seu estudo musical.
-    </p>
+    <div class="app-header">
+        <p class="app-description">
+            <strong>NBM Partituras:</strong> Visualize, transpõe tons e isole vozes de partituras em tempo real, facilitando o seu estudo musical.
+        </p>
+        <div id="contador-geral">Sincronizando...</div>
+    </div>
     
     <input type="text" id="inputBusca" class="search-box" placeholder="Pesquisar título, compositor ou categoria...">
     
     <div id="lista-acervo">
-        <p class="loading-msg">Sincronizando acervo musical...</p>
+        <p class="loading-msg">Carregando acervo musical...</p>
     </div>
 </div>
 
 <script>
-    // 1. CONFIGURAÇÃO DOS ARQUIVOS (Manutenção fácil)
-    // Se seus arquivos estiverem na mesma pasta do HTML, remova o 'dados/'
+    // 1. LISTA DE ARQUIVOS JSON (Adicione novos aqui)
     const arquivosJson = [
         'dados/folclore.json',
         'dados/cantor_cristao.json'
@@ -89,37 +107,43 @@
 
     let acervoCompleto = [];
 
-    // 2. CARREGAMENTO DOS DADOS (À prova de falhas)
+    // 2. CARREGAMENTO DOS DADOS
     async function carregarAcervo() {
         const listaDiv = document.getElementById('lista-acervo');
+        const badgeContador = document.getElementById('contador-geral');
         
         try {
-            // Tenta carregar cada JSON individualmente
+            // Busca todos os arquivos individualmente
             const promessas = arquivosJson.map(url => 
                 fetch(url)
                     .then(res => {
-                        if (!res.ok) throw new Error(`Arquivo não encontrado: ${url}`);
+                        if (!res.ok) throw new Error(`Não encontrado: ${url}`);
                         return res.json();
                     })
                     .catch(err => {
                         console.warn(err.message);
-                        return []; // Se um falhar, retorna lista vazia para não quebrar o resto
+                        return []; // Retorna lista vazia se falhar para não travar o app
                     })
             );
             
             const resultados = await Promise.all(promessas);
             
-            // Une os resultados e limpa dados nulos/inválidos
+            // Une os resultados, remove nulos e garante que tenha título e categoria
             acervoCompleto = resultados.flat().filter(m => m && m.titulo && m.categoria);
             
+            // Atualiza o contador geral com a soma total
+            badgeContador.textContent = `${acervoCompleto.length} músicas no acervo`;
+            
             if (acervoCompleto.length === 0) {
-                listaDiv.innerHTML = '<p class="loading-msg">Nenhum arquivo de música carregado. Verifique os arquivos JSON na pasta.</p>';
+                listaDiv.innerHTML = '<p class="loading-msg">Nenhuma música disponível no momento.</p>';
+                badgeContador.textContent = "Acervo vazio";
             } else {
                 renderizar(acervoCompleto);
             }
         } catch (error) {
             console.error("Erro Crítico:", error);
-            listaDiv.innerHTML = '<p style="color:red; text-align:center;">Erro ao carregar o sistema de busca. Verifique sua conexão.</p>';
+            listaDiv.innerHTML = '<p style="color:red; text-align:center;">Erro ao carregar o banco de dados.</p>';
+            badgeContador.textContent = "Erro de conexão";
         }
     }
 
@@ -129,7 +153,7 @@
         lista.innerHTML = '';
         
         if (dados.length === 0) {
-            lista.innerHTML = '<p class="loading-msg">Nenhuma música corresponde à sua busca.</p>';
+            lista.innerHTML = '<p class="loading-msg">Nenhuma música corresponde aos filtros.</p>';
             return;
         }
 
@@ -149,9 +173,9 @@
             const divPai = document.createElement('div');
             divPai.className = 'categoria-pai';
             
-            // Abre automaticamente se houver texto na busca
-            const estaBuscando = document.getElementById('inputBusca').value.length > 0;
-            if (estaBuscando) divPai.classList.add('aberto');
+            // Abre automaticamente se estiver pesquisando algo
+            const termoBusca = document.getElementById('inputBusca').value.trim();
+            if (termoBusca) divPai.classList.add('aberto');
 
             divPai.innerHTML = `
                 <div class="header-pai" onclick="this.parentElement.classList.toggle('aberto')">
@@ -162,7 +186,7 @@
                     ${itens.map(m => `
                         <a href="viewer.html?file=${encodeURIComponent(m.path)}" class="musica-item">
                             <strong>${m.titulo}</strong>
-                            <span style="display:block; font-size:0.8rem; color:#888;">${m.compositor || 'Compositor desconhecido'}</span>
+                            <span style="display:block; font-size:0.8rem; color:#888;">${m.compositor || 'Autor não informado'}</span>
                         </a>
                     `).join('')}
                 </div>
@@ -184,7 +208,7 @@
         renderizar(filtrados);
     });
 
-    // Iniciar
+    // Iniciar carregamento
     window.onload = carregarAcervo;
 </script>
 </body>
