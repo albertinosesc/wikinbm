@@ -14,12 +14,12 @@
 {"titulo": "159 - The laurel tree - Ireland", "compositor": "Mike Long", "categoria": "10", "path": "musicas/159.abc"},
 {"titulo": "173 - The maids Of Mitchellstown - Ireland", "compositor": "Mike Long", "categoria": "10", "path": "musicas/173.abc"},
 {"titulo": "178 - Mary Grace - Ireland", "compositor": "Mike Long", "categoria": "10", "path": "musicas/178.abc"},
-{"titulo": "207 - The musical priest - Ireland", "compositor": "Mike Long", "categoria": "10", "path": "musicas/207.abc"},
-{"titulo": "211 - Nellie O'Donovan - Ireland", "compositor": "Mike Long", "categoria": "10", "path": "musicas/211.abc"},
-{"titulo": "213 - The new copperplate", "compositor": "Mike Long", "categoria": "10", "path": "musicas/213.abc"},
-{"titulo": "216 - The nine points of roguery - Ireland", "compositor": "Mike Long", "categoria": "10", "path": "musicas/216.abc"},
-{"titulo": "225 - The otter's holt - Ireland", "compositor": "Mike Long", "categoria": "10", "path": "musicas/225.abc"},
-{"titulo": "239 - Paddy's trip to Scotland - Ireland", "compositor": "Mike Long", "categoria": "10", "path": "musicas/239.abc"},
-{"titulo": "243 - Peggy on the settle - Ireland", "compositor": "Mike Long", "categoria": "10", "path": "musicas/243.abc"},
-{"titulo": "259 - Reel de Ti=Jean", "compositor": "Mike Long", "categoria": "10", "path": "musicas/259.abc"}
+{"titulo": "207 - The musical priest - Ireland", "compositor": "", "categoria": "10", "path": "musicas/207.abc"},
+{"titulo": "211 - Nellie O'Donovan - Ireland", "compositor": "", "categoria": "10", "path": "musicas/211.abc"},
+{"titulo": "213 - The new copperplate", "compositor": "", "categoria": "10", "path": "musicas/213.abc"},
+{"titulo": "216 - The nine points of roguery - Ireland", "compositor": "", "categoria": "10", "path": "musicas/216.abc"},
+{"titulo": "225 - The otter's holt - Ireland", "compositor": "Junior Crehan", "categoria": "10", "path": "musicas/225.abc"},
+{"titulo": "239 - Paddy's trip to Scotland - Ireland", "compositor": "", "categoria": "10", "path": "musicas/239.abc"},
+{"titulo": "243 - Peggy on the settle - Ireland", "compositor": "", "categoria": "10", "path": "musicas/243.abc"},
+{"titulo": "259 - Reel de Ti=Jean", "compositor": "", "categoria": "10", "path": "musicas/259.abc"}
 ]
