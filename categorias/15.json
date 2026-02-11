@@ -1,4 +1,9 @@
 [
 {"titulo": "005 - Barrel Rafferty", "compositor": "Sean Maguire & Liam Donnelly", "categoria": "15", "path": "musicas/005.abc"},
-{"titulo": "010 - Big John McNeil", "compositor": "Mike Long", "categoria": "15", "path": "musicas/010.abc"}
+{"titulo": "010 - Big John McNeil", "compositor": "Mike Long", "categoria": "15", "path": "musicas/010.abc"},
+{"titulo": "068 - Dr. Gilbert's", "compositor": "Mike Long", "categoria": "15", "path": "musicas/068.abc"},
+{"titulo": "071 - Dowd's #9", "compositor": "Mike Long", "categoria": "15", "path": "musicas/071.abc"},
+{"titulo": "096 - The fox chased", "compositor": "Mike Long", "categoria": "15", "path": "musicas/096.abc"},
+{"titulo": "103 - Gerry Cronins", "compositor": "Mike Long", "categoria": "15", "path": "musicas/103.abc"},
+{"titulo": "118 - Hughie Shorty's reel", "compositor": "Mike Long", "categoria": "15", "path": "musicas/118.abc"}
 ]
