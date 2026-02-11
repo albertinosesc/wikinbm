@@ -1,0 +1,24 @@
+
+
+baixar midi
+1 - https://www.beakauffmann.com/
+
+Editor de partitura - Midi
+2 - https://www.noteflight.com/home/myScores
+
+editor abc
+3 - https://michaeleskin.com/abctools/abctools.html
+
+Biblioteca Musical Unificada
+4 - https://script.google.com/macros/s/AKfycbxjckk2VwrcDaObH9E-wz0vkWUJ1AhZq4R4K8cULC9fuyuJB10YeiI_7plX-wDzvFEy/exec
+
+musicas/pasta
+5 - https://github.com/albertinosesc/wikinbm/tree/main/musicas
+
+dados/pasta
+6 - https://github.com/albertinosesc/wikinbm/blob/main/dados/mpb.json
+
+
+
+
+
