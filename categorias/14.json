@@ -14,5 +14,7 @@
 {"titulo": "192 - Miss Monaghan - Ireland", "compositor": "Mike Long", "categoria": "14", "path": "musicas/192.abc"},
 {"titulo": "206 - Music in the glen - Ireland", "compositor": "", "categoria": "14", "path": "musicas/206.abc"},
 {"titulo": "212 - Never was piping so gay - Ed Reavy", "compositor": "Ed Reavy", "categoria": "14", "path": "musicas/212.abc"},
-{"titulo": "232 - Paddy Fahy's 1 - Ireland", "compositor": "", "categoria": "14", "path": "musicas/232.abc"}
+{"titulo": "232 - Paddy Fahy's 1 - Ireland", "compositor": "", "categoria": "14", "path": "musicas/232.abc"},
+{"titulo": "306 - The swallow's tail", "compositor": "", "categoria": "14", "path": "musicas/306.abc"},
+{"titulo": "321 - Tom Ward's downfall", "compositor": "", "categoria": "14", "path": "musicas/321.abc"}
 ]
