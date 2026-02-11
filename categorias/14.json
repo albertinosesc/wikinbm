@@ -1,10 +1,15 @@
 [
-  {"titulo": "013 - The blackberry blossom", "compositor": "Mike Long", "categoria": "14", "path": "musicas/013.abc"},
+{"titulo": "013 - The blackberry blossom", "compositor": "Mike Long", "categoria": "14", "path": "musicas/013.abc"},
 {"titulo": "040 - The college groves", "compositor": "Mike Long", "categoria": "14", "path": "musicas/040.abc"},
 {"titulo": "053 - Courting them all", "compositor": "Mike Long", "categoria": "14", "path": "musicas/053.abc"},
 {"titulo": "065 - Denis Lanctot's", "compositor": "Paul Stewart Cranford", "categoria": "14", "path": "musicas/065.abc"},
 {"titulo": "085 - Farewell to Erin", "compositor": "Mike Long", "categoria": "14", "path": "musicas/085.abc"},
 {"titulo": "092 - Fisherman's island", "compositor": "Henrik Norbeck, Mike Long", "categoria": "14", "path": "musicas/092.abc"},
 {"titulo": "106 - The glen road to Carrick", "compositor": "Mike Long", "categoria": "14", "path": "musicas/106.abc"},
-{"titulo": "127 - Jean's reel - Bobby MacLeod", "compositor": "Mike Long", "categoria": "14", "path": "musicas/127.abc"}
+{"titulo": "127 - Jean's reel - Bobby MacLeod", "compositor": "Mike Long", "categoria": "14", "path": "musicas/127.abc"},
+{"titulo": "142 - The Killavil fancy - Ireland", "compositor": "Mike Long", "categoria": "14", "path": "musicas/142.abc"},
+{"titulo": "148 - Lad O'Beirne's - Ireland", "compositor": "Mike Long", "categoria": "14", "path": "musicas/148.abc"},
+{"titulo": "149 - The lads of Leish - Ireland", "compositor": "Mike Long", "categoria": "14", "path": "musicas/149.abc"},
+{"titulo": "177 - Martin Wynne's - Ireland", "compositor": "Mike Long", "categoria": "14", "path": "musicas/177.abc"},
+{"titulo": "192 - Miss Monaghan - Ireland", "compositor": "Mike Long", "categoria": "14", "path": "musicas/192.abc"}
 ]
