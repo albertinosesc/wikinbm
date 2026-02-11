@@ -6,5 +6,8 @@
 {"titulo": "126 - Jackson's", "compositor": "Mike Long", "categoria": "8", "path": "musicas/126.abc"},
 {"titulo": "182 - Matt People's", "compositor": "Mike Long", "categoria": "8", "path": "musicas/182.abc"},
 {"titulo": "196 - Molly Rankin's - John Morris Rankin", "compositor": "Mike Long", "categoria": "8", "path": "musicas/196.abc"},
-{"titulo": "244 - The Pig Town", "compositor": "", "categoria": "8", "path": "musicas/244.abc"}
+{"titulo": "244 - The Pig Town", "compositor": "", "categoria": "8", "path": "musicas/244.abc"},
+{"titulo": "285 - Shetland fiddler", "compositor": "", "categoria": "8", "path": "musicas/285.abc"},
+{"titulo": "291 - The Skibbereen lasses", "compositor": "", "categoria": "8", "path": "musicas/291.abc"},
+{"titulo": "315 - Tear the calico", "compositor": "", "categoria": "8", "path": "musicas/315.abc"}
 ]
