@@ -15,28 +15,45 @@
     <link rel="stylesheet" href="style.css">
     <style>
         :root { --primary: #2c3e50; --accent: #e67e22; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; color: #333; }
+        
         nav { background: var(--primary); padding: 1rem; text-align: center; }
         nav a { color: white; text-decoration: none; margin: 0 15px; font-weight: bold; }
         
         .container { max-width: 800px; margin: 20px auto; padding: 20px; }
-        .search-box { width: 100%; padding: 15px; border-radius: 25px; border: 2px solid #ddd; font-size: 1.1rem; outline: none; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         
-        /* Descrição do App */
-        .app-description { text-align: center; color: #666; font-size: 0.9rem; margin-bottom: 20px; }
+        .app-description { text-align: center; color: #666; font-size: 0.95rem; margin-bottom: 25px; line-height: 1.5; }
 
-        /* Acordeão Pai e Filho */
-        .categoria-pai { background: white; margin-bottom: 10px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow: hidden; }
-        .header-pai { padding: 15px 20px; cursor: pointer; display: flex; justify-content: space-between; font-weight: bold; background: #fff; transition: 0.3s; }
-        .header-pai:hover { background: #f9f9f9; }
+        .search-box { 
+            width: 100%; padding: 15px; border-radius: 25px; 
+            border: 2px solid #ddd; font-size: 1.1rem; outline: none; 
+            margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: border-color 0.3s;
+        }
+        .search-box:focus { border-color: var(--accent); }
         
-        .filhos-container { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; background: #fafafa; }
-        .musica-item { display: block; padding: 12px 30px; color: #3498db; text-decoration: none; border-top: 1px solid #eee; font-size: 0.95rem; }
-        .musica-item:hover { background: #fff5ed; color: var(--accent); }
+        /* Estilos do Acordeão */
+        .categoria-pai { background: white; margin-bottom: 12px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow: hidden; }
+        .header-pai { 
+            padding: 15px 20px; cursor: pointer; display: flex; 
+            justify-content: space-between; font-weight: bold; 
+            background: #fff; transition: background 0.3s; 
+        }
+        .header-pai:hover { background: #fefefe; }
         
-        .aberto .filhos-container { max-height: 2000px; overflow-y: auto; }
+        .filhos-container { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; background: #fafafa; }
+        .musica-item { 
+            display: block; padding: 14px 30px; color: #3498db; 
+            text-decoration: none; border-top: 1px solid #eee; font-size: 0.95rem; 
+            transition: all 0.2s;
+        }
+        .musica-item:hover { background: #fff5ed; color: var(--accent); padding-left: 35px; }
+        
+        .aberto .filhos-container { max-height: 2500px; }
         .aberto .seta { transform: rotate(180deg); }
-        .seta { transition: 0.3s; color: var(--accent); }
+        .seta { transition: transform 0.3s; color: var(--accent); }
+
+        .loading-msg { text-align: center; padding: 20px; color: #888; }
     </style>
 </head>
 <body>
@@ -49,18 +66,19 @@
 
 <div class="container">
     <p class="app-description">
-        Uma ferramenta inteligente para músicos que visualiza partituras, transpõe tons, altera o andamento e isola vozes em tempo real.
+        <strong>NBM Partituras:</strong> Visualize, transpõe tons, altere o andamento e isole vozes de partituras em tempo real, facilitando o seu estudo musical.
     </p>
     
-    <input type="text" id="inputBusca" class="search-box" placeholder="Pesquisar música ou compositor...">
+    <input type="text" id="inputBusca" class="search-box" placeholder="Pesquisar título, compositor ou categoria...">
     
     <div id="lista-acervo">
-        <p style="text-align:center;">Carregando acervo...</p>
+        <p class="loading-msg">Sincronizando acervo musical...</p>
     </div>
 </div>
 
 <script>
-    // 1. LISTA DE ARQUIVOS JSON (Adicione novos arquivos aqui para manutenção fácil)
+    // 1. CONFIGURAÇÃO DOS ARQUIVOS (Manutenção fácil)
+    // Se seus arquivos estiverem na mesma pasta do HTML, remova o 'dados/'
     const arquivosJson = [
         'dados/folclore.json',
         'dados/cantor_cristao.json'
@@ -68,66 +86,80 @@
 
     let acervoCompleto = [];
 
-    // 2. FUNÇÃO PARA CARREGAR TODOS OS JSONs
+    // 2. CARREGAMENTO DOS DADOS (À prova de falhas)
     async function carregarAcervo() {
+        const listaDiv = document.getElementById('lista-acervo');
+        
         try {
+            // Tenta carregar cada JSON individualmente
             const promessas = arquivosJson.map(url => 
-                fetch(url).then(r => {
-                    if (!r.ok) throw new Error(`Falha ao carregar ${url}`);
-                    return r.json();
-                })
+                fetch(url)
+                    .then(res => {
+                        if (!res.ok) throw new Error(`Arquivo não encontrado: ${url}`);
+                        return res.json();
+                    })
+                    .catch(err => {
+                        console.warn(err.message);
+                        return []; // Se um falhar, retorna lista vazia para não quebrar o resto
+                    })
             );
             
             const resultados = await Promise.all(promessas);
             
-            // Junta todos os arrays em um só (Flat) e remove itens inválidos
-            acervoCompleto = resultados.flat().filter(m => m.categoria && m.titulo);
+            // Une os resultados e limpa dados nulos/inválidos
+            acervoCompleto = resultados.flat().filter(m => m && m.titulo && m.categoria);
             
-            renderizar(acervoCompleto);
-        } catch (e) { 
-            console.error(e);
-            document.getElementById('lista-acervo').innerHTML = 
-                '<p style="color:red; text-align:center;">Erro ao carregar os dados do acervo. Verifique os arquivos JSON.</p>';
+            if (acervoCompleto.length === 0) {
+                listaDiv.innerHTML = '<p class="loading-msg">Nenhum arquivo de música carregado. Verifique os arquivos JSON na pasta.</p>';
+            } else {
+                renderizar(acervoCompleto);
+            }
+        } catch (error) {
+            console.error("Erro Crítico:", error);
+            listaDiv.innerHTML = '<p style="color:red; text-align:center;">Erro ao carregar o sistema de busca. Verifique sua conexão.</p>';
         }
     }
 
-    // 3. FUNÇÃO DE RENDERIZAÇÃO COM ORDENAÇÃO
+    // 3. RENDERIZAÇÃO DA INTERFACE
     function renderizar(dados) {
         const lista = document.getElementById('lista-acervo');
         lista.innerHTML = '';
         
         if (dados.length === 0) {
-            lista.innerHTML = '<p style="text-align:center; color:#999;">Nenhuma música encontrada.</p>';
+            lista.innerHTML = '<p class="loading-msg">Nenhuma música corresponde à sua busca.</p>';
             return;
         }
 
-        // Agrupa por categoria
-        const categorias = dados.reduce((acc, m) => {
-            acc[m.categoria] = acc[m.categoria] || [];
-            acc[m.categoria].push(m);
+        // Agrupamento por Categoria
+        const categoriasMap = dados.reduce((acc, musica) => {
+            const cat = musica.categoria;
+            if (!acc[cat]) acc[cat] = [];
+            acc[cat].push(musica);
             return acc;
         }, {});
 
-        // Pega os nomes das categorias e coloca em ordem alfabética
-        const categoriasOrdenadas = Object.keys(categorias).sort();
+        // Ordenação das Categorias (A-Z)
+        const categoriasOrdenadas = Object.keys(categoriasMap).sort();
 
-        categoriasOrdenadas.forEach(cat => {
+        categoriasOrdenadas.forEach(catNome => {
+            const itens = categoriasMap[catNome];
             const divPai = document.createElement('div');
             divPai.className = 'categoria-pai';
             
-            // Se estiver pesquisando, as categorias já começam abertas
-            const termoBusca = document.getElementById('inputBusca').value;
-            if (termoBusca) divPai.classList.add('aberto');
+            // Abre automaticamente se houver texto na busca
+            const estaBuscando = document.getElementById('inputBusca').value.length > 0;
+            if (estaBuscando) divPai.classList.add('aberto');
 
             divPai.innerHTML = `
                 <div class="header-pai" onclick="this.parentElement.classList.toggle('aberto')">
-                    <span>${cat} (${categorias[cat].length})</span>
+                    <span>${catNome} <small style="color:#999; margin-left:8px;">(${itens.length})</small></span>
                     <span class="seta">▼</span>
                 </div>
                 <div class="filhos-container">
-                    ${categorias[cat].map(m => `
+                    ${itens.map(m => `
                         <a href="viewer.html?file=${encodeURIComponent(m.path)}" class="musica-item">
-                            ${m.titulo} <small style="color:#999">— ${m.compositor}</small>
+                            <strong>${m.titulo}</strong>
+                            <span style="display:block; font-size:0.8rem; color:#888;">${m.compositor || 'Compositor desconhecido'}</span>
                         </a>
                     `).join('')}
                 </div>
@@ -136,17 +168,20 @@
         });
     }
 
-    // 4. LÓGICA DE BUSCA
+    // 4. SISTEMA DE BUSCA EM TEMPO REAL
     document.getElementById('inputBusca').addEventListener('input', (e) => {
-        const termo = e.target.value.toLowerCase();
+        const termo = e.target.value.toLowerCase().trim();
+        
         const filtrados = acervoCompleto.filter(m => 
             m.titulo.toLowerCase().includes(termo) || 
             m.compositor.toLowerCase().includes(termo) ||
             m.categoria.toLowerCase().includes(termo)
         );
+        
         renderizar(filtrados);
     });
 
+    // Iniciar
     window.onload = carregarAcervo;
 </script>
 </body>
