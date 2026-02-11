@@ -1,5 +1,5 @@
 [
-  { "titulo": "001 - Antífona", "compositor": "Manoel Arredondo", "categoria": "Cantor Cristão", "path": "musicas/Cantor Cristão/001 - Antífona.abc" },
+{ "titulo": "001 - Antífona", "compositor": "Manoel Arredondo", "categoria": "Cantor Cristão", "path": "musicas/Cantor Cristão/001 - Antífona.abc" },
 { "titulo": "002 - Adoração", "compositor": "William Shrubsole", "categoria": "Cantor Cristão", "path": "musicas/Cantor Cristão/cc002-soprano.abc" },
 { "titulo": "003 - Santo, Santo, Santo", "compositor": "John Bacchus Dykes", "categoria": "Cantor Cristão", "path": "musicas/Cantor Cristão/cc003-soprano.abc" },
 { "titulo": "004 - Ao Deus de Abrão Louvai", "compositor": "Melodia Hebraica", "categoria": "Cantor Cristão", "path": "musicas/Cantor Cristão/cc004-soprano.abc" },
