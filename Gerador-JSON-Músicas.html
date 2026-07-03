@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Gerador de JSON para Músicas</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 18px;
+            margin-bottom: 5px;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-family: Consolas, monospace;
+        }
+        textarea {
+            height: 200px;
+            resize: vertical;
+        }
+        .botoes {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: #3498db;
+            color: white;
+            transition: 0.2s;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        button.verde {
+            background: #27ae60;
+        }
+        button.verde:hover {
+            background: #1e8449;
+        }
+        button.cinza {
+            background: #7f8c8d;
+        }
+        button.cinza:hover {
+            background: #616a6b;
+        }
+        button.ajuda {
+            background: #f39c12;
+        }
+        button.ajuda:hover {
+            background: #d68910;
+        }
+        #resultado {
+            margin-top: 20px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow: auto;
+            font-family: Consolas, monospace;
+            font-size: 13px;
+            display: none;
+        }
+        #status {
+            margin-top: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        /* Modal de ajuda */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .modal-content h2 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+        .modal-content ul, .modal-content p {
+            margin: 12px 0;
+            line-height: 1.6;
+        }
+        .modal-content code {
+            background: #f1f1f1;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+        .modal-content .fechar {
+            float: right;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .modal-content .fechar:hover {
+            background: #c0392b;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🎵 Gerador de JSON para Músicas</h1>
+
+    <label for="categoria">Categoria:</label>
+    <input type="text" id="categoria" placeholder="Ex: Internacional" value="Internacional">
+
+    <label for="titulos">Títulos (um por linha, formato: <code>Número - Nome da Música - Compositor</code>):</label>
+    <textarea id="titulos" placeholder="181 - Master Crowley's - Ireland&#10;23931 - A Casa - Vinícius de Moraes&#10;23933 - Bete Balanço - Cazuza">181 - Master Crowley's - Ireland
+23931 - A Casa - Vinícius de Moraes
+23933 - Bete Balanço - Cazuza</textarea>
+
+    <div class="botoes">
+        <button onclick="gerarJSON()">Gerar JSON</button>
+        <button class="verde" onclick="baixarJSON()" id="btnBaixar" style="display:none;">Baixar JSON (.json)</button>
+        <button class="cinza" onclick="copiarJSON()" id="btnCopiar" style="display:none;">Copiar JSON</button>
+        <button class="ajuda" onclick="mostrarAjuda()">❓ Ajuda</button>
+    </div>
+
+    <div id="status"></div>
+    <div id="resultado"></div>
+</div>
+
+<!-- Modal de ajuda -->
+<div class="modal-overlay" id="modalAjuda">
+    <div class="modal-content">
+        <button class="fechar" onclick="fecharAjuda()">✕ Fechar</button>
+        <h2>📖 Tutorial – Como usar</h2>
+        <p><strong>1. Preencha a categoria</strong> – ex: <code>Internacional</code>, <code>MPB</code>, <code>Rock</code>.</p>
+        <p><strong>2. Cole os títulos</strong> – cada linha deve seguir o formato:</p>
+        <pre><code>Número - Nome da Música - Compositor</code></pre>
+        <p><strong>Exemplos:</strong></p>
+        <ul>
+            <li><code>181 - Master Crowley's - Ireland</code></li>
+            <li><code>23931 - A Casa - Vinícius de Moraes</code></li>
+            <li><code>23933 - Bete Balanço - Cazuza</code></li>
+        </ul>
+        <p><strong>3. Clique em "Gerar JSON"</strong> – o resultado aparecerá abaixo.</p>
+        <p><strong>4. Use os botões</strong> para copiar ou baixar o JSON.</p>
+        <p><strong>Formato do JSON gerado:</strong></p>
+        <ul>
+            <li><code>titulo</code> – número + nome da música (ex: <code>"181 - Master Crowley's"</code>)</li>
+            <li><code>compositor</code> – o terceiro campo (ex: <code>"Ireland"</code>)</li>
+            <li><code>categoria</code> – a categoria que você digitou</li>
+            <li><code>path</code> – caminho no formato <code>musicas/categoria/numero.abc</code></li>
+        </ul>
+        <p>O JSON é gerado com cada objeto em uma linha, facilitando a leitura e o processamento.</p>
+        <p style="margin-top:20px;"><button onclick="fecharAjuda()" style="background:#3498db;">Entendi!</button></p>
+    </div>
+</div>
+
+<script>
+    let dadosJSON = [];
+    let jsonFormatado = '';
+
+    function gerarJSON() {
+        const categoria = document.getElementById('categoria').value.trim() || "Sem categoria";
+        const texto = document.getElementById('titulos').value;
+        const linhas = texto.split('\n').filter(line => line.trim() !== '');
+
+        const resultados = [];
+
+        linhas.forEach((linha, index) => {
+            const partes = linha.split(' - ').map(p => p.trim());
+
+            let numero = '';
+            let nomeMusica = '';
+            let compositor = 'Desconhecido';
+
+            if (partes.length === 3) {
+                numero = partes[0];
+                nomeMusica = partes[1];
+                compositor = partes[2];
+            } else if (partes.length === 2) {
+                numero = partes[0];
+                nomeMusica = partes[1];
+            } else if (partes.length === 1) {
+                nomeMusica = partes[0];
+                numero = (index + 1).toString();
+            }
+
+            if (!numero) {
+                numero = (index + 1).toString();
+            }
+
+            const numeroLimpo = numero.replace(/[^0-9]/g, '');
+
+            const objeto = {
+                titulo: `${numero} - ${nomeMusica}`,
+                compositor: compositor,
+                categoria: categoria,
+                path: `musicas/${categoria}/${numeroLimpo}.abc`
+            };
+
+            resultados.push(objeto);
+        });
+
+        dadosJSON = resultados;
+
+        // Gerar JSON com cada objeto em uma linha
+        const jsonParts = resultados.map(obj => JSON.stringify(obj));
+        jsonFormatado = '[\n' + jsonParts.join(',\n') + '\n]';
+
+        // Exibir no resultado
+        const resultadoDiv = document.getElementById('resultado');
+        resultadoDiv.textContent = jsonFormatado;
+        resultadoDiv.style.display = 'block';
+
+        document.getElementById('btnBaixar').style.display = 'inline-block';
+        document.getElementById('btnCopiar').style.display = 'inline-block';
+
+        document.getElementById('status').innerHTML = `✅ ${resultados.length} itens gerados.`;
+    }
+
+    function baixarJSON() {
+        if (!jsonFormatado) {
+            alert('Nenhum dado para baixar. Gere o JSON primeiro.');
+            return;
+        }
+        const blob = new Blob([jsonFormatado], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'dados.json';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+
+    function copiarJSON() {
+        if (!jsonFormatado) {
+            alert('Nenhum dado para copiar. Gere o JSON primeiro.');
+            return;
+        }
+        navigator.clipboard.writeText(jsonFormatado).then(() => {
+            alert('JSON copiado para a área de transferência!');
+        }).catch(err => {
+            alert('Erro ao copiar: ' + err);
+        });
+    }
+
+    function mostrarAjuda() {
+        document.getElementById('modalAjuda').style.display = 'flex';
+    }
+
+    function fecharAjuda() {
+        document.getElementById('modalAjuda').style.display = 'none';
+    }
+
+    // Fecha o modal se clicar fora dele
+    window.onclick = function(event) {
+        const modal = document.getElementById('modalAjuda');
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    }
+</script>
+
+</body>
+</html>

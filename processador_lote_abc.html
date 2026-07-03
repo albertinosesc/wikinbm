@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Processador em Lote de ABC → JSON</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        h1 { text-align: center; color: #2c3e50; }
+        .controles {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .controles label {
+            font-weight: 600;
+            margin-right: 5px;
+        }
+        .controles input[type="text"], .controles select {
+            padding: 6px 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        .file-input-wrapper .btn {
+            display: inline-block;
+            padding: 8px 18px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .file-input-wrapper .btn:hover { background: #1e7e34; }
+        button {
+            padding: 8px 18px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover { background: #0056b3; }
+        button:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-ajuda {
+            background: #f39c12;
+        }
+        .btn-ajuda:hover {
+            background: #d68910;
+        }
+        #status {
+            margin: 10px 0;
+            font-weight: 600;
+            color: #28a745;
+        }
+        #resultado {
+            margin-top: 20px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #dee2e6;
+            overflow: auto;
+            max-height: 500px;
+            white-space: pre-wrap;
+            font-family: 'Consolas', monospace;
+            font-size: 13px;
+            display: none;
+        }
+        .acoes {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .acoes button {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .btn-copiar { background: #6c757d; color: white; }
+        .btn-copiar:hover { background: #5a6268; }
+        .btn-baixar { background: #28a745; color: white; }
+        .btn-baixar:hover { background: #1e7e34; }
+        .btn-limpar { background: #dc3545; color: white; }
+        .btn-limpar:hover { background: #c82333; }
+        .badge { background: #007bff; color: white; padding: 2px 10px; border-radius: 12px; font-size: 0.8rem; }
+        .hidden { display: none; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 13px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 6px 8px;
+            text-align: left;
+        }
+        th { background: #e9ecef; }
+
+        /* Modal de ajuda */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .modal-content h2 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+        .modal-content ul, .modal-content p {
+            margin: 12px 0;
+            line-height: 1.6;
+        }
+        .modal-content code {
+            background: #f1f1f1;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+        .modal-content .fechar {
+            float: right;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .modal-content .fechar:hover {
+            background: #c0392b;
+        }
+        .modal-content pre {
+            background: #f1f1f1;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>📂 Processador em Lote de ABC → JSON (Linear)</h1>
+    <p>Selecione uma pasta com arquivos <code>.abc</code>. O aplicativo lerá todos, extrairá as músicas e gerará um JSON com uma entrada por música, <strong>sem duplicar o número no título</strong>.</p>
+
+    <div class="controles">
+        <div class="file-input-wrapper">
+            <span class="btn">📁 Selecionar Pasta</span>
+            <input type="file" id="pastaInput" webkitdirectory multiple accept=".abc">
+        </div>
+        <span id="infoArquivos" class="badge hidden">0 arquivos</span>
+
+        <label>Categoria:
+            <input type="text" id="categoria" value="Músicas" style="width:120px;">
+        </label>
+
+        <label>Compositor (campo):
+            <select id="campoCompositor">
+                <option value="C">C:</option>
+                <option value="O">O:</option>
+                <option value="S">S:</option>
+                <option value="B">B:</option>
+                <option value="Z">Z:</option>
+                <option value="Nenhum" selected>Nenhum</option>
+            </select>
+        </label>
+
+        <label>Prefixar caminho:
+            <input type="text" id="prefixoPath" value="musicas/" style="width:100px;">
+        </label>
+    </div>
+
+    <button id="processarBtn" onclick="processar()">⚡ Processar Todos</button>
+    <button onclick="limpar()" class="btn-limpar" style="background:#dc3545;color:white;border:none;padding:8px 18px;border-radius:4px;">🗑️ Limpar</button>
+    <button class="btn-ajuda" onclick="mostrarAjuda()">❓ Ajuda</button>
+    <div id="status"></div>
+
+    <div id="resultado"></div>
+    <div class="acoes" id="acoes" style="display:none;">
+        <button class="btn-copiar" onclick="copiarJSON()">📋 Copiar JSON</button>
+        <button class="btn-baixar" onclick="baixarJSON()">💾 Baixar JSON</button>
+    </div>
+</div>
+
+<!-- Modal de ajuda -->
+<div class="modal-overlay" id="modalAjuda">
+    <div class="modal-content">
+        <button class="fechar" onclick="fecharAjuda()">✕ Fechar</button>
+        <h2>📖 Tutorial – Processador em Lote de ABC → JSON</h2>
+
+        <p><strong>1. Selecionar a pasta</strong><br>
+        Clique em <strong>"📁 Selecionar Pasta"</strong> e escolha a pasta que contém seus arquivos <code>.abc</code>. O aplicativo mostrará quantos arquivos foram encontrados.</p>
+
+        <p><strong>2. Configurar as opções</strong></p>
+        <ul>
+            <li><strong>Categoria</strong> – define o valor do campo <code>categoria</code> no JSON. Ex: <code>Músicas</code>, <code>Folclore</code>, <code>Internacional</code>.</li>
+            <li><strong>Compositor (campo)</strong> – escolha de qual campo extrair o compositor (ex: <code>C:</code>, <code>O:</code>, <code>S:</code>, <code>B:</code>, <code>Z:</code> ou <code>Nenhum</code>). O aplicativo também tenta <code>O:</code> e <code>S:</code> como fallback.</li>
+            <li><strong>Prefixar caminho</strong> – define o prefixo do campo <code>path</code> no JSON. Ex: <code>musicas/</code> → <code>"path": "musicas/101.abc"</code>.</li>
+        </ul>
+
+        <p><strong>3. Processar</strong><br>
+        Clique em <strong>"⚡ Processar Todos"</strong>. O aplicativo lerá todos os arquivos, extrairá cada música (separadas por <code>X:</code>) e gerará um JSON com uma entrada por música. O título é limpo automaticamente para evitar duplicação (ex: <code>"98 - 098 - Fred Finn's"</code> → <code>"98 - Fred Finn's"</code>).</p>
+
+        <p><strong>4. Visualizar e exportar</strong></p>
+        <ul>
+            <li>O JSON gerado aparece na tela, com cada objeto em uma linha.</li>
+            <li>Uma <strong>tabela resumo</strong> mostra as primeiras 50 músicas.</li>
+            <li>Use <strong>"📋 Copiar JSON"</strong> para copiar o JSON para a área de transferência.</li>
+            <li>Use <strong>"💾 Baixar JSON"</strong> para salvar o arquivo <code>acervo_completo.json</code>.</li>
+        </ul>
+
+        <p><strong>5. Integrar com o Acervo Musical</strong><br>
+        O JSON gerado pode substituir os arquivos da pasta <code>dados/</code> (ex: <code>musicas.json</code>) para que o <code>musicas.html</code> liste todas as músicas individualmente.</p>
+
+        <p style="margin-top:20px;"><button onclick="fecharAjuda()" style="background:#3498db;color:white;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;">Entendi!</button></p>
+    </div>
+</div>
+
+<script>
+    let todosResultados = [];
+    let jsonGerado = '';
+
+    document.getElementById('pastaInput').addEventListener('change', function(e) {
+        const files = e.target.files;
+        const abcFiles = Array.from(files).filter(f => f.name.toLowerCase().endsWith('.abc'));
+        document.getElementById('infoArquivos').textContent = `${abcFiles.length} arquivos .abc`;
+        document.getElementById('infoArquivos').classList.remove('hidden');
+        document.getElementById('status').textContent = `${abcFiles.length} arquivos prontos. Clique em "Processar".`;
+        document.getElementById('status').style.color = '#007bff';
+    });
+
+    function extrairCampo(conteudo, campo) {
+        const regex = new RegExp('^' + campo + ':(.*)$', 'm');
+        const match = conteudo.match(regex);
+        return match ? match[1].trim() : '';
+    }
+
+    function extrairMusicas(conteudo) {
+        const blocos = conteudo.split(/\n(?=X:\d+)/);
+        const lista = [];
+        blocos.forEach(bloco => {
+            const x = extrairCampo(bloco, 'X');
+            const titulo = extrairCampo(bloco, 'T') || 'Sem título';
+            if (x) {
+                lista.push({ x, titulo, codigo: bloco.trim() });
+            }
+        });
+        return lista;
+    }
+
+    function limparTitulo(x, titulo) {
+        const padrao = new RegExp('^' + x.padStart(3, '0') + '\\s*[-–]\\s*');
+        const padraoSemZero = new RegExp('^' + x + '\\s*[-–]\\s*');
+        let limpo = titulo;
+        if (padrao.test(titulo)) {
+            limpo = titulo.replace(padrao, '');
+        } else if (padraoSemZero.test(titulo)) {
+            limpo = titulo.replace(padraoSemZero, '');
+        }
+        return limpo;
+    }
+
+    function processar() {
+        const input = document.getElementById('pastaInput');
+        const files = input.files;
+        if (!files || files.length === 0) {
+            alert('Selecione uma pasta com arquivos .abc primeiro.');
+            return;
+        }
+
+        const abcFiles = Array.from(files).filter(f => f.name.toLowerCase().endsWith('.abc'));
+        if (abcFiles.length === 0) {
+            alert('Nenhum arquivo .abc encontrado.');
+            return;
+        }
+
+        const categoria = document.getElementById('categoria').value.trim() || 'Músicas';
+        const campoComp = document.getElementById('campoCompositor').value;
+        const prefixo = document.getElementById('prefixoPath').value.trim();
+
+        const todos = [];
+        let lidos = 0;
+        const total = abcFiles.length;
+
+        document.getElementById('status').textContent = `Lendo ${total} arquivos... 0%`;
+        document.getElementById('status').style.color = '#007bff';
+
+        abcFiles.forEach(file => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const conteudo = e.target.result;
+                const musicas = extrairMusicas(conteudo);
+
+                musicas.forEach(m => {
+                    let compositor = 'Desconhecido';
+                    if (campoComp !== 'Nenhum') {
+                        const comp = extrairCampo(m.codigo, campoComp);
+                        if (comp) compositor = comp;
+                    }
+                    if (compositor === 'Desconhecido') {
+                        const o = extrairCampo(m.codigo, 'O');
+                        if (o) compositor = o;
+                    }
+                    if (compositor === 'Desconhecido') {
+                        const s = extrairCampo(m.codigo, 'S');
+                        if (s) compositor = s;
+                    }
+
+                    const tituloLimpo = limparTitulo(m.x, m.titulo);
+                    const tituloFinal = `${m.x} - ${tituloLimpo}`;
+
+                    const nomeArquivo = file.name;
+                    const path = prefixo ? prefixo + nomeArquivo : nomeArquivo;
+
+                    todos.push({
+                        titulo: tituloFinal,
+                        compositor: compositor,
+                        categoria: categoria,
+                        path: path
+                    });
+                });
+
+                lidos++;
+                const pct = Math.round((lidos / total) * 100);
+                document.getElementById('status').textContent = `Lendo ${total} arquivos... ${pct}%`;
+
+                if (lidos === total) {
+                    todos.sort((a, b) => {
+                        const numA = parseInt(a.titulo.split(' - ')[0], 10) || 0;
+                        const numB = parseInt(b.titulo.split(' - ')[0], 10) || 0;
+                        return numA - numB;
+                    });
+
+                    todosResultados = todos;
+
+                    const jsonParts = todos.map(obj => JSON.stringify(obj));
+                    jsonGerado = '[\n' + jsonParts.join(',\n') + '\n]';
+
+                    document.getElementById('resultado').textContent = jsonGerado;
+                    document.getElementById('resultado').style.display = 'block';
+                    document.getElementById('acoes').style.display = 'flex';
+                    document.getElementById('status').textContent = `✅ ${todos.length} músicas extraídas de ${total} arquivos.`;
+                    document.getElementById('status').style.color = '#28a745';
+
+                    let html = `<h3>📋 Resumo (${todos.length} músicas)</h3><table><tr><th>#</th><th>Título</th><th>Compositor</th><th>Categoria</th><th>Arquivo</th></tr>`;
+                    todos.slice(0, 50).forEach((item, idx) => {
+                        const nomeArquivo = item.path.split('/').pop() || item.path;
+                        html += `<tr><td>${idx+1}</td><td>${item.titulo}</td><td>${item.compositor}</td><td>${item.categoria}</td><td>${nomeArquivo}</td></tr>`;
+                    });
+                    if (todos.length > 50) html += `<tr><td colspan="5">... e mais ${todos.length - 50} músicas</td></tr>`;
+                    html += '</table>';
+                    const infoDiv = document.createElement('div');
+                    infoDiv.innerHTML = html;
+                    const resultadoDiv = document.getElementById('resultado');
+                    resultadoDiv.parentNode.insertBefore(infoDiv, resultadoDiv.nextSibling);
+                }
+            };
+            reader.readAsText(file);
+        });
+    }
+
+    function copiarJSON() {
+        if (!jsonGerado) {
+            alert('Nenhum JSON gerado.');
+            return;
+        }
+        navigator.clipboard.writeText(jsonGerado).then(() => {
+            alert('JSON copiado!');
+        }).catch(() => {
+            alert('Erro ao copiar.');
+        });
+    }
+
+    function baixarJSON() {
+        if (!jsonGerado) {
+            alert('Nenhum JSON gerado.');
+            return;
+        }
+        const blob = new Blob([jsonGerado], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'acervo_completo.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    function limpar() {
+        document.getElementById('pastaInput').value = '';
+        document.getElementById('resultado').style.display = 'none';
+        document.getElementById('resultado').textContent = '';
+        document.getElementById('acoes').style.display = 'none';
+        document.getElementById('status').textContent = '';
+        document.getElementById('infoArquivos').classList.add('hidden');
+        todosResultados = [];
+        jsonGerado = '';
+        const tabela = document.querySelector('#resultado + div');
+        if (tabela) tabela.remove();
+    }
+
+    function mostrarAjuda() {
+        document.getElementById('modalAjuda').style.display = 'flex';
+    }
+
+    function fecharAjuda() {
+        document.getElementById('modalAjuda').style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+        const modal = document.getElementById('modalAjuda');
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    }
+</script>
+
+</body>
+</html>

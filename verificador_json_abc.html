@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Verificador de Numeração e Ordenador</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+            background: #f4f4f4;
+        }
+        h1 {
+            text-align: center;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 15px;
+        }
+        textarea {
+            width: 100%;
+            height: 250px;
+            font-family: Consolas, monospace;
+            font-size: 14px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: vertical;
+        }
+        button {
+            padding: 10px 25px;
+            margin: 8px 8px 8px 0;
+            font-size: 16px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button.verde {
+            background: #28a745;
+        }
+        button.verde:hover {
+            background: #1e7e34;
+        }
+        button.cinza {
+            background: #6c757d;
+        }
+        button.cinza:hover {
+            background: #5a6268;
+        }
+        button.laranja {
+            background: #fd7e14;
+        }
+        button.laranja:hover {
+            background: #e06b0a;
+        }
+        #resultado {
+            margin-top: 20px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 500px;
+            overflow: auto;
+            display: none;
+            font-family: Consolas, monospace;
+            font-size: 13px;
+        }
+        #faltantes {
+            margin-top: 10px;
+            background: #fff3cd;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ffeeba;
+            display: none;
+            font-weight: bold;
+        }
+        #status {
+            margin-top: 10px;
+            color: green;
+            font-weight: bold;
+        }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .modal-content h2 { margin-top: 0; }
+        .modal-content ul { margin: 12px 0; line-height: 1.6; }
+        .modal-content code { background: #f1f1f1; padding: 2px 6px; border-radius: 3px; }
+        .modal-content .fechar {
+            float: right;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .botao-ajuda {
+            background: #f39c12;
+        }
+        .botao-ajuda:hover {
+            background: #d68910;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🔢 Verificador de Numeração e Ordenador</h1>
+    <p>Cole um JSON com lista de objetos (cada um com campo <code>titulo</code> no formato <code>"Número - Nome"</code>). O sistema extrairá os números, ordenará e dirá quais estão faltando.</p>
+
+    <label for="jsonInput">JSON de entrada:</label>
+    <textarea id="jsonInput" placeholder='[
+{"titulo":"23933 - Bete Balanço","compositor":"Cazuza","categoria":"MPB","path":"musicas/mpb/23933-Bete Balanço.abc"},
+{"titulo":"23931 - A Casa","compositor":"Vinícius de Moraes","categoria":"MPB","path":"musicas/mpb/23931-A_Casa.abc"}
+]'>[
+{"titulo":"23933 - Bete Balanço","compositor":"Cazuza","categoria":"MPB","path":"musicas/mpb/23933-Bete Balanço.abc"},
+{"titulo":"23931 - A Casa","compositor":"Vinícius de Moraes","categoria":"MPB","path":"musicas/mpb/23931-A_Casa.abc"}
+]</textarea>
+
+    <div class="botoes">
+        <button onclick="processar()">🔍 Ordenar e Verificar</button>
+        <button class="verde" onclick="baixarJSON()" id="btnBaixar" style="display:none;">📥 Baixar JSON (linha única)</button>
+        <button class="cinza" onclick="copiarJSON()" id="btnCopiar" style="display:none;">📋 Copiar JSON</button>
+        <button class="laranja" onclick="baixarFaltantes()" id="btnBaixarFaltantes" style="display:none;">📄 Baixar Faltantes (.txt)</button>
+        <button class="botao-ajuda" onclick="mostrarAjuda()">❓ Ajuda</button>
+    </div>
+
+    <div id="status"></div>
+    <div id="faltantes"></div>
+    <div id="resultado"></div>
+</div>
+
+<!-- Modal de ajuda -->
+<div class="modal-overlay" id="modalAjuda">
+    <div class="modal-content">
+        <button class="fechar" onclick="fecharAjuda()">✕ Fechar</button>
+        <h2>📖 Tutorial – Como usar</h2>
+        <p><strong>1. Cole o JSON</strong> – deve ser um array de objetos. Cada objeto deve ter pelo menos um campo <code>titulo</code> no formato <code>"Número - Nome"</code>.</p>
+        <p><strong>2. Clique em "Ordenar e Verificar"</strong> – o sistema irá:</p>
+        <ul>
+            <li>🔢 Extrair o número do início de cada título.</li>
+            <li>📊 Ordenar a lista do menor para o maior número.</li>
+            <li>🔎 Identificar quais números estão faltando no intervalo entre o menor e o maior.</li>
+            <li>📝 Exibir a lista ordenada (em linha única) e os números faltantes.</li>
+        </ul>
+        <p><strong>3. Baixar ou copiar</strong> – use os botões para:</p>
+        <ul>
+            <li><strong>Baixar JSON</strong> – salva o array ordenado em formato compacto (uma linha).</li>
+            <li><strong>Copiar JSON</strong> – copia o JSON compacto para a área de transferência.</li>
+            <li><strong>Baixar Faltantes</strong> – salva em um arquivo .txt a lista de números que faltam (um por linha).</li>
+        </ul>
+        <p><strong>Exemplo:</strong></p>
+        <pre style="background:#f1f1f1;padding:10px;border-radius:5px;">
+Entrada: 23933, 23931 → Ordenado: 23931, 23933 → Faltando: 23932
+        </pre>
+        <p style="margin-top:20px;"><button onclick="fecharAjuda()" style="background:#3498db;color:white;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;">Entendi!</button></p>
+    </div>
+</div>
+
+<script>
+    let dadosOrdenados = [];
+    let jsonFinal = '';
+    let numerosFaltantes = [];
+
+    function extrairNumero(titulo) {
+        const match = titulo.match(/^(\d+)/);
+        return match ? parseInt(match[1], 10) : null;
+    }
+
+    function processar() {
+        const texto = document.getElementById('jsonInput').value.trim();
+        if (!texto) {
+            alert('Cole um JSON válido.');
+            return;
+        }
+
+        let lista;
+        try {
+            lista = JSON.parse(texto);
+            if (!Array.isArray(lista)) {
+                throw new Error('O JSON deve ser um array.');
+            }
+        } catch (e) {
+            alert('Erro ao analisar o JSON: ' + e.message);
+            return;
+        }
+
+        // Extrai números e filtra os que têm número válido
+        const itensComNumero = lista.map(item => {
+            const num = extrairNumero(item.titulo || '');
+            return { ...item, _num: num };
+        }).filter(item => item._num !== null);
+
+        if (itensComNumero.length === 0) {
+            alert('Nenhum título com número válido encontrado.');
+            return;
+        }
+
+        // Ordena pelo número
+        itensComNumero.sort((a, b) => a._num - b._num);
+
+        // Remove o campo _num antes de exibir
+        dadosOrdenados = itensComNumero.map(({ _num, ...resto }) => resto);
+
+        // Encontra números faltantes
+        const numeros = itensComNumero.map(item => item._num);
+        const min = Math.min(...numeros);
+        const max = Math.max(...numeros);
+        numerosFaltantes = [];
+        for (let i = min; i <= max; i++) {
+            if (!numeros.includes(i)) {
+                numerosFaltantes.push(i);
+            }
+        }
+
+        // Exibe resultado em formato compacto (linha única)
+        const resultadoDiv = document.getElementById('resultado');
+        jsonFinal = JSON.stringify(dadosOrdenados);
+        resultadoDiv.textContent = jsonFinal;
+        resultadoDiv.style.display = 'block';
+
+        // Exibe números faltantes
+        const faltantesDiv = document.getElementById('faltantes');
+        if (numerosFaltantes.length > 0) {
+            faltantesDiv.innerHTML = `⚠️ Números faltando no intervalo (${min} a ${max}): <strong>${numerosFaltantes.join(', ')}</strong>`;
+            faltantesDiv.style.display = 'block';
+        } else {
+            faltantesDiv.innerHTML = `✅ Nenhum número faltando no intervalo (${min} a ${max}).`;
+            faltantesDiv.style.display = 'block';
+        }
+
+        document.getElementById('btnBaixar').style.display = 'inline-block';
+        document.getElementById('btnCopiar').style.display = 'inline-block';
+        document.getElementById('btnBaixarFaltantes').style.display = numerosFaltantes.length > 0 ? 'inline-block' : 'none';
+        document.getElementById('status').innerHTML = `✅ ${dadosOrdenados.length} itens ordenados.`;
+    }
+
+    function baixarJSON() {
+        if (!jsonFinal) {
+            alert('Nenhum dado para baixar. Processe o JSON primeiro.');
+            return;
+        }
+        const blob = new Blob([jsonFinal], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'ordenado.json';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+
+    function copiarJSON() {
+        if (!jsonFinal) {
+            alert('Nenhum dado para copiar. Processe o JSON primeiro.');
+            return;
+        }
+        navigator.clipboard.writeText(jsonFinal).then(() => {
+            alert('JSON ordenado copiado (em linha única)!');
+        }).catch(err => {
+            alert('Erro ao copiar: ' + err);
+        });
+    }
+
+    function baixarFaltantes() {
+        if (numerosFaltantes.length === 0) {
+            alert('Nenhum número faltante para baixar.');
+            return;
+        }
+        const conteudo = numerosFaltantes.join('\n');
+        const blob = new Blob([conteudo], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'numeros_faltantes.txt';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+
+    function mostrarAjuda() {
+        document.getElementById('modalAjuda').style.display = 'flex';
+    }
+
+    function fecharAjuda() {
+        document.getElementById('modalAjuda').style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+        const modal = document.getElementById('modalAjuda');
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    }
+</script>
+
+</body>
+</html>

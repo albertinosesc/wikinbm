@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Buscador de Títulos por Número</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 30px; background: #f4f4f4; }
+        h1 { text-align: center; }
+        .container {
+            max-width: 1000px; margin: 0 auto; background: white;
+            padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        label { font-weight: bold; display: block; margin-top: 15px; }
+        textarea {
+            width: 100%; height: 150px; font-family: Consolas, monospace;
+            font-size: 14px; padding: 10px; border: 1px solid #ccc;
+            border-radius: 4px; resize: vertical;
+        }
+        #listaTitulos { height: 300px; }
+        button {
+            padding: 10px 25px; margin: 8px 8px 8px 0;
+            font-size: 16px; background: #007bff; color: white;
+            border: none; border-radius: 4px; cursor: pointer;
+        }
+        button:hover { background: #0056b3; }
+        button.verde { background: #28a745; }
+        button.verde:hover { background: #1e7e34; }
+        button.cinza { background: #6c757d; }
+        button.cinza:hover { background: #5a6268; }
+        button.ajuda { background: #f39c12; }
+        button.ajuda:hover { background: #d68910; }
+        #resultado {
+            margin-top: 20px; background: #f8f9fa; padding: 15px;
+            border-radius: 4px; border: 1px solid #dee2e6;
+            white-space: pre-wrap; word-break: break-word;
+            max-height: 500px; overflow: auto;
+            display: none; font-family: Consolas, monospace; font-size: 13px;
+        }
+        #status { margin-top: 10px; color: green; font-weight: bold; }
+        .checkbox-group { margin-top: 10px; }
+        .checkbox-group label { display: inline; font-weight: normal; margin-left: 5px; }
+
+        /* Modal de ajuda */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: rgba(0,0,0,0.5);
+            z-index: 1000; justify-content: center; align-items: center;
+        }
+        .modal-content {
+            background: white; padding: 30px; border-radius: 10px;
+            max-width: 700px; width: 90%; max-height: 80vh; overflow-y: auto;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .modal-content h2 { margin-top: 0; }
+        .modal-content ul, .modal-content p { margin: 12px 0; line-height: 1.6; }
+        .modal-content code { background: #f1f1f1; padding: 2px 6px; border-radius: 3px; }
+        .modal-content .fechar {
+            float: right; background: #e74c3c; color: white;
+            border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer;
+        }
+        .modal-content .fechar:hover { background: #c0392b; }
+        pre { background: #f1f1f1; padding: 10px; border-radius: 5px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🔍 Buscador de Títulos por Número</h1>
+    <p>Cole a lista de títulos (coluna B) e a lista de números. O aplicativo retornará os títulos correspondentes.</p>
+
+    <label for="listaTitulos">📋 Lista de Títulos (um por linha):</label>
+    <textarea id="listaTitulos" placeholder="Cole aqui os nomes das músicas (coluna B)&#10;Linha 1 - Título 1&#10;Linha 2 - Título 2&#10;..."></textarea>
+
+    <div class="checkbox-group">
+        <input type="checkbox" id="cabecalho" checked>
+        <label for="cabecalho">A primeira linha é cabeçalho (ignorar)</label>
+        <br>
+        <input type="checkbox" id="limparNumero" checked>
+        <label for="limparNumero">Remover número do início do título (ex: "105 - The glass of beer" → "The glass of beer")</label>
+    </div>
+
+    <label for="listaNumeros">🔢 Lista de Números (um por linha, com ou sem ".abc"):</label>
+    <textarea id="listaNumeros" placeholder="106.abc&#10;149.abc&#10;160.abc"></textarea>
+
+    <div class="botoes">
+        <button onclick="buscar()">🔍 Buscar Títulos</button>
+        <button class="verde" onclick="baixarResultado()" id="btnBaixar" style="display:none;">📥 Baixar Resultados (.txt)</button>
+        <button class="cinza" onclick="copiarResultado()" id="btnCopiar" style="display:none;">📋 Copiar Resultados</button>
+        <button class="ajuda" onclick="mostrarAjuda()">❓ Ajuda</button>
+    </div>
+
+    <div id="status"></div>
+    <div id="resultado"></div>
+</div>
+
+<!-- Modal de ajuda -->
+<div class="modal-overlay" id="modalAjuda">
+    <div class="modal-content">
+        <button class="fechar" onclick="fecharAjuda()">✕ Fechar</button>
+        <h2>📖 Tutorial – Como usar</h2>
+        <p><strong>1. Cole a lista de títulos</strong> – copie a coluna B da sua planilha e cole no primeiro textarea. Cada linha deve ser um título.</p>
+        <p><strong>2. Marque as opções:</strong></p>
+        <ul>
+            <li><strong>"A primeira linha é cabeçalho"</strong> – marque se a linha 1 for um cabeçalho (ex: "Música").</li>
+            <li><strong>"Remover número do início do título"</strong> – se seus títulos já tiverem números (ex: "105 - The glass of beer"), esta opção extrai apenas o nome, evitando duplicação.</li>
+        </ul>
+        <p><strong>3. Cole a lista de números</strong> – cada número em uma linha, podendo estar no formato <code>106.abc</code> ou apenas <code>106</code>.</p>
+        <p><strong>4. Clique em "Buscar Títulos"</strong> – o sistema retornará os títulos correspondentes na ordem dos números fornecidos.</p>
+        <p><strong>5. Baixar ou copiar</strong> – use os botões para salvar os resultados em <code>.txt</code> ou copiar para a área de transferência.</p>
+        <p><strong>Exemplo de saída:</strong></p>
+        <pre style="background:#f1f1f1;padding:10px;border-radius:5px;">
+106 - The glass of beer
+149 - Lad O'Beirne's - Ireland
+160 - The laurel tree - Ireland
+...
+        </pre>
+        <p style="margin-top:20px;"><button onclick="fecharAjuda()" style="background:#3498db;">Entendi!</button></p>
+    </div>
+</div>
+
+<script>
+    let resultadoAtual = [];
+
+    function extrairNumero(texto) {
+        const match = texto.match(/^(\d+)/);
+        return match ? parseInt(match[1], 10) : null;
+    }
+
+    function limparTitulo(titulo) {
+        // Remove prefixo numérico + separador, ex: "105 - The glass of beer" → "The glass of beer"
+        const match = titulo.match(/^\d+\s*[-–]\s*(.*)/);
+        if (match) {
+            return match[1].trim();
+        }
+        return titulo;
+    }
+
+    function buscar() {
+        const titulosRaw = document.getElementById('listaTitulos').value.split('\n');
+        const numerosRaw = document.getElementById('listaNumeros').value.split('\n');
+        const temCabecalho = document.getElementById('cabecalho').checked;
+        const removerNumero = document.getElementById('limparNumero').checked;
+
+        const titulos = titulosRaw.map(l => l.trim()).filter(l => l !== '');
+        const numeros = numerosRaw.map(l => l.trim()).filter(l => l !== '');
+
+        if (titulos.length === 0) {
+            alert('Cole a lista de títulos.');
+            return;
+        }
+        if (numeros.length === 0) {
+            alert('Cole a lista de números.');
+            return;
+        }
+
+        let offset = temCabecalho ? 1 : 0;
+        const resultados = [];
+        const naoEncontrados = [];
+
+        numeros.forEach(item => {
+            const num = extrairNumero(item);
+            if (num === null) {
+                naoEncontrados.push(`"${item}" (não é um número válido)`);
+                return;
+            }
+
+            const idx = num - 1 - offset;
+            if (idx >= 0 && idx < titulos.length) {
+                let titulo = titulos[idx];
+                if (removerNumero) {
+                    titulo = limparTitulo(titulo);
+                }
+                resultados.push({
+                    numero: num,
+                    titulo: titulo
+                });
+            } else {
+                naoEncontrados.push(`${num} (linha não encontrada)`);
+            }
+        });
+
+        let saida = '';
+        resultados.forEach(r => {
+            saida += `${r.numero} - ${r.titulo}\n`;
+        });
+        if (naoEncontrados.length > 0) {
+            saida += '\n--- Não encontrados ---\n' + naoEncontrados.join('\n');
+        }
+
+        const resultadoDiv = document.getElementById('resultado');
+        resultadoDiv.textContent = saida;
+        resultadoDiv.style.display = 'block';
+
+        resultadoAtual = resultados;
+
+        document.getElementById('btnBaixar').style.display = 'inline-block';
+        document.getElementById('btnCopiar').style.display = 'inline-block';
+        document.getElementById('status').innerHTML = `✅ ${resultados.length} títulos encontrados. ${naoEncontrados.length} não encontrados.`;
+    }
+
+    function baixarResultado() {
+        if (resultadoAtual.length === 0) {
+            alert('Nenhum resultado para baixar.');
+            return;
+        }
+        let conteudo = '';
+        resultadoAtual.forEach(r => {
+            conteudo += `${r.numero} - ${r.titulo}\n`;
+        });
+        const blob = new Blob([conteudo], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'resultados.txt';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+
+    function copiarResultado() {
+        if (resultadoAtual.length === 0) {
+            alert('Nenhum resultado para copiar.');
+            return;
+        }
+        let texto = '';
+        resultadoAtual.forEach(r => {
+            texto += `${r.numero} - ${r.titulo}\n`;
+        });
+        navigator.clipboard.writeText(texto).then(() => {
+            alert('Resultados copiados para a área de transferência!');
+        }).catch(err => {
+            alert('Erro ao copiar: ' + err);
+        });
+    }
+
+    function mostrarAjuda() {
+        document.getElementById('modalAjuda').style.display = 'flex';
+    }
+
+    function fecharAjuda() {
+        document.getElementById('modalAjuda').style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+        const modal = document.getElementById('modalAjuda');
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    }
+</script>
+
+</body>
+</html>

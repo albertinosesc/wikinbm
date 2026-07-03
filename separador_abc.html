@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Separador ABC por Livros</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+body { margin:30px; background:#f4f4f4; font-family:Arial; }
+h1 { text-align:center; }
+textarea { width:100%; height:450px; font-family:Consolas; font-size:15px; padding:10px; resize:vertical; }
+button { padding:12px 25px; margin:8px; font-size:16px; cursor:pointer; }
+#resultado { margin-top:20px; background:white; padding:15px; border-radius:8px; overflow-x:auto; }
+table { width:100%; border-collapse:collapse; margin-top:15px; }
+th, td { border:1px solid #ccc; padding:8px; text-align:left; }
+th { background:#ececec; }
+#status { margin-top:15px; color:green; font-weight:bold; }
+
+/* Estilos do modal */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    max-width: 700px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+.modal-content h2 {
+    color: #2c3e50;
+    margin-top: 0;
+}
+.modal-content ul, .modal-content p {
+    margin: 12px 0;
+    line-height: 1.6;
+}
+.modal-content code {
+    background: #f1f1f1;
+    padding: 2px 6px;
+    border-radius: 3px;
+}
+.modal-content .fechar {
+    float: right;
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.modal-content .fechar:hover {
+    background: #c0392b;
+}
+.botao-ajuda {
+    background: #f39c12;
+}
+.botao-ajuda:hover {
+    background: #d68910;
+}
+</style>
+</head>
+<body>
+
+<h1>Separador ABC por Livros (B: e S:)</h1>
+<p>Cole vários arquivos ABC. O sistema agrupará por livro/fonte e criará pastas no ZIP, com arquivos nomeados pelo número X:.</p>
+<textarea id="abc"></textarea>
+<br>
+<button onclick="analisar()">Analisar Arquivos</button>
+<button onclick="exportarZIP()">Exportar Tudo em ZIP</button>
+<button class="botao-ajuda" onclick="mostrarAjuda()">❓ Ajuda</button>
+<div id="status"></div>
+<div id="resultado"></div>
+
+<!-- Modal de ajuda -->
+<div class="modal-overlay" id="modalAjuda">
+    <div class="modal-content">
+        <button class="fechar" onclick="fecharAjuda()">✕ Fechar</button>
+        <h2>📖 Tutorial – Separador ABC por Livros</h2>
+        <p><strong>1. Cole os arquivos ABC</strong> – cole no textarea os blocos de músicas em notação ABC. Cada bloco deve começar com <code>X:número</code>.</p>
+        <p><strong>2. Clique em "Analisar Arquivos"</strong> – o sistema irá listar todas as músicas encontradas, mostrando o número (X:), título (T:) e a fonte (B: ou S:).</p>
+        <p><strong>3. Clique em "Exportar Tudo em ZIP"</strong> – o sistema irá:</p>
+        <ul>
+            <li>📁 Criar pastas com base no campo <strong>B:</strong> (prioridade) ou <strong>S:</strong>.</li>
+            <li>📄 Nomear cada arquivo apenas com o número do campo <strong>X:</strong> (ex: <code>038.abc</code>).</li>
+            <li>📦 Gerar um arquivo <code>ABC_por_livros.zip</code> para download.</li>
+        </ul>
+        <p><strong>Exemplo de estrutura do ZIP:</strong></p>
+        <pre style="background:#f1f1f1;padding:10px;border-radius:5px;">
+ABC_por_livros.zip
+├── O'Neill's 1186/
+│   ├── 002.abc
+│   ├── 003.abc
+│   └── ...
+├── Kerr's Fourth/
+│   ├── 008.abc
+│   └── ...
+└── Outras/
+    ├── 004.abc
+    └── ...
+        </pre>
+        <p><strong>Dicas:</strong></p>
+        <ul>
+            <li>Se o campo <strong>B:</strong> tiver múltiplas referências (ex: <code>O'Neill's 1186, O'Neill's 1326</code>), o sistema usará apenas a primeira.</li>
+            <li>Se não houver <strong>B:</strong> nem <strong>S:</strong>, a música irá para a pasta <code>Outras</code>.</li>
+            <li>Arquivos sem número <strong>X:</strong> serão nomeados como <code>Sem_numero.abc</code>.</li>
+        </ul>
+        <p style="margin-top:20px;"><button onclick="fecharAjuda()" style="background:#3498db;color:white;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;">Entendi!</button></p>
+    </div>
+</div>
+
+<script>
+let musicas = [];
+
+function extrairCampo(bloco, campo) {
+    const regex = new RegExp('^' + campo + ':(.*)$', 'm');
+    const match = bloco.match(regex);
+    return match ? match[1].trim() : '';
+}
+
+function limparNome(nome) {
+    return nome.replace(/[\\\/:*?"<>|]/g, '');
+}
+
+function analisar() {
+    let texto = document.getElementById("abc").value.trim();
+    if (!texto) {
+        alert("Cole algum arquivo ABC.");
+        return;
+    }
+    texto = texto.replace(/\r/g, '');
+    musicas = texto.split(/\n(?=X:\d+)/);
+
+    let html = "<h2>Total de músicas: " + musicas.length + "</h2>";
+    html += "<table><tr><th>Nº</th><th>Número (X:)</th><th>Título</th><th>Livro/Fonte</th></tr>";
+
+    musicas.forEach((m, i) => {
+        let x = extrairCampo(m, 'X');
+        let titulo = extrairCampo(m, 'T') || "Sem título";
+        let b = extrairCampo(m, 'B');
+        let s = extrairCampo(m, 'S');
+        let fonte = b || s || "Não identificado";
+
+        html += `<tr><td>${i+1}</td><td>${x}</td><td>${titulo}</td><td>${fonte}</td></tr>`;
+    });
+
+    html += "</table>";
+    document.getElementById("resultado").innerHTML = html;
+    document.getElementById("status").innerHTML = "Análise concluída. " + musicas.length + " músicas encontradas.";
+}
+
+async function exportarZIP() {
+    if (musicas.length === 0) {
+        analisar();
+        if (musicas.length === 0) return;
+    }
+
+    document.getElementById("status").innerHTML = "Criando ZIP organizado por pastas...";
+
+    const zip = new JSZip();
+
+    musicas.forEach((m, i) => {
+        let x = extrairCampo(m, 'X');
+        let nomeArquivo = x || "Sem_numero";
+        nomeArquivo = limparNome(nomeArquivo);
+
+        let b = extrairCampo(m, 'B');
+        let s = extrairCampo(m, 'S');
+        let pasta = b || s || "Outras";
+        pasta = limparNome(pasta);
+
+        if (pasta.includes(',')) {
+            pasta = pasta.split(',')[0].trim();
+        }
+
+        zip.file(pasta + "/" + nomeArquivo + ".abc", m);
+    });
+
+    const conteudo = await zip.generateAsync({
+        type: "blob",
+        compression: "DEFLATE",
+        compressionOptions: { level: 9 }
+    });
+
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(conteudo);
+    link.download = "ABC_por_livros.zip";
+    link.click();
+    URL.revokeObjectURL(link.href);
+
+    document.getElementById("status").innerHTML = "✅ ZIP criado com sucesso! Pastas organizadas por fonte, arquivos nomeados pelo número X:.";
+}
+
+function mostrarAjuda() {
+    document.getElementById('modalAjuda').style.display = 'flex';
+}
+
+function fecharAjuda() {
+    document.getElementById('modalAjuda').style.display = 'none';
+}
+
+window.onclick = function(event) {
+    const modal = document.getElementById('modalAjuda');
+    if (event.target === modal) {
+        modal.style.display = 'none';
+    }
+}
+</script>
+
+</body>
+</html>
