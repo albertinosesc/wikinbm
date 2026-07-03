@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -100,7 +101,7 @@
         'dados/cantor-cristao.json',
         'dados/evangelicas.json',
         'dados/hinario-ccb.json',
-        'dados/musicas.json',
+        'dados/enciclopedia_musica.json',
         'dados/outros.json',
         'dados/mpb.json'
     ];
@@ -177,12 +178,24 @@
                     <span class="seta">▼</span>
                 </div>
                 <div class="filhos-container">
-                    ${itens.map(m => `
-                        <a href="viewer.html?file=${encodeURIComponent(m.path)}" class="musica-item">
-                            <strong>${m.titulo}</strong>
-                            <span style="display:block; font-size:0.8rem; color:#888;">${m.compositor || 'Compositor desconhecido'}</span>
-                        </a>
-                    `).join('')}
+                    
+${itens.map(m => {
+    // Extrai o número do início do título (ex: "97 - The foxhunter's reel" → "97")
+    const numMatch = m.titulo.match(/^(\d+)/);
+    const num = numMatch ? numMatch[1] : '';
+    const link = `viewer.html?file=${encodeURIComponent(m.path)}${num ? '&num=' + num : ''}`;
+    return `
+        <a href="${link}" class="musica-item">
+            <strong>${m.titulo}</strong>
+            <span style="display:block; font-size:0.8rem; color:#888;">${m.compositor || 'Compositor desconhecido'}</span>
+        </a>
+    `;
+}).join('')}
+
+
+
+
+
                 </div>
             `;
             lista.appendChild(divPai);
