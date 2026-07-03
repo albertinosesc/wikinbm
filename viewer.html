@@ -24,7 +24,6 @@
       border-radius: 8px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-
     .control-group {
       margin-bottom: 15px;
       display: flex;
@@ -32,17 +31,12 @@
       align-items: center;
       gap: 10px;
     }
-
     .audio-modes {
       border-top: 1px solid #ddd;
       padding-top: 15px;
       margin-top: 10px;
     }
-
-    .controls label {
-      font-weight: bold;
-    }
-
+    .controls label { font-weight: bold; }
     .controls button {
       cursor: pointer;
       padding: 8px 12px;
@@ -51,11 +45,7 @@
       border-radius: 4px;
       transition: all 0.2s;
     }
-
-    .controls button:hover {
-      background: #e9e9e9;
-    }
-
+    .controls button:hover { background: #e9e9e9; }
     .btn-play { background-color: #e7f3ff !important; border-color: #007bff !important; color: #007bff; font-weight: bold; }
     .btn-stop { background-color: #fff0f0 !important; border-color: #dc3545 !important; color: #dc3545; font-weight: bold; }
     
@@ -66,7 +56,6 @@
       border-radius: 8px;
     }
 
-    /* Estilos para a navegação de músicas */
     .nav-musicas {
       background: #f8f9fa;
       padding: 12px 15px;
@@ -84,18 +73,10 @@
       border: 1px solid #ccc;
       font-size: 14px;
       min-width: 200px;
-      flex: 1;
-    }
-    .nav-musicas input[type="text"] {
-      padding: 8px 12px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-      font-size: 14px;
-      min-width: 150px;
-      flex: 1;
+      flex: 2;
     }
     .nav-musicas .info-musica {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: #555;
       white-space: nowrap;
     }
@@ -113,16 +94,20 @@
       border: none;
       border-radius: 4px;
       cursor: pointer;
+      font-size: 14px;
     }
-    .nav-musicas button:hover {
-      background: #0056b3;
+    .nav-musicas button:hover { background: #0056b3; }
+    .nav-musicas .compositor-info {
+      color: #888;
+      font-size: 0.8rem;
+      margin-left: 8px;
     }
   </style>
 </head>
 <body>
 
 <header>
-  <h1>🎼 Partitura Interativa2</h1>
+  <h1>🎼 Partitura Interativa</h1>
 </header>
 
 <nav>
@@ -134,7 +119,6 @@
   <!-- Navegação entre músicas do arquivo -->
   <div class="nav-musicas" id="navMusicas" style="display:none;">
     <span class="badge" id="totalMusicas">0</span>
-    <input type="text" id="buscaMusica" placeholder="Buscar por número ou título...">
     <select id="listaMusicas" size="1"></select>
     <button id="btnAnterior" title="Música anterior">◀</button>
     <button id="btnProximo" title="Próxima música">▶</button>
@@ -145,13 +129,11 @@
     <div class="control-group">
       <label>Andamento (BPM):</label>
       <input type="number" id="tempo" value="100" min="40" max="240" style="width: 60px; padding: 5px;">
-
       <label style="margin-left:20px;">Transposição:</label>
       <button id="down">−</button>
       <span id="transposeValue" style="font-size: 1.2em; min-width: 20px; text-align: center;">0</span>
       <button id="up">+</button>
     </div>
-
     <div class="control-group audio-modes">
       <label>Tocar:</label>
       <button class="btn-play" id="play-all">Play</button>
@@ -171,53 +153,94 @@
 // ============================================================
 // 1. VARIÁVEIS GLOBAIS
 // ============================================================
-let abcRawText = "";          // texto completo do arquivo ABC
-let musicas = [];             // array de objetos { x, titulo, codigo }
-let musicaSelecionada = 0;    // índice atual
+let musicas = [];
+let musicaSelecionada = 0;
 let visualObj = null;
 let synthControl = null;
 let transposeValue = 0;
 let audioContext = null;
 
 // ============================================================
-// 2. EXTRAIR MÚSICAS DO ARQUIVO ABC
+// 2. FUNÇÕES AUXILIARES
+// ============================================================
+function extrairCampo(bloco, campo) {
+  const regex = new RegExp('^' + campo + ':(.*)$', 'm');
+  const match = bloco.match(regex);
+  return match ? match[1].trim() : '';
+}
+
+function limparTitulo(x, titulo) {
+  const padrao = new RegExp('^' + x.padStart(3, '0') + '\\s*[-–]\\s*');
+  const padraoSemZero = new RegExp('^' + x + '\\s*[-–]\\s*');
+  let limpo = titulo;
+  if (padrao.test(titulo)) limpo = titulo.replace(padrao, '');
+  else if (padraoSemZero.test(titulo)) limpo = titulo.replace(padraoSemZero, '');
+  return limpo;
+}
+
+// ============================================================
+// 3. EXTRAIR MÚSICAS DO ARQUIVO ABC
 // ============================================================
 function extrairMusicas(texto) {
-  // Divide o texto em blocos começando com "X:"
   const blocos = texto.split(/\n(?=X:\d+)/);
   const lista = [];
   blocos.forEach(bloco => {
-    const xMatch = bloco.match(/^X:(\d+)/m);
-    const tMatch = bloco.match(/^T:(.*)$/m);
-    if (xMatch) {
-      const x = xMatch[1];
-      const titulo = tMatch ? tMatch[1].trim() : `Música ${x}`;
-      lista.push({ x, titulo, codigo: bloco.trim() });
-    }
+    const x = extrairCampo(bloco, 'X');
+    if (!x) return;
+    const tituloRaw = extrairCampo(bloco, 'T') || `Música ${x}`;
+    const compositor = extrairCampo(bloco, 'C') || 
+                       extrairCampo(bloco, 'O') || 
+                       extrairCampo(bloco, 'S') || 
+                       'Desconhecido';
+    const tituloLimpo = limparTitulo(x, tituloRaw);
+    lista.push({
+      x: x,
+      titulo: `${x} - ${tituloLimpo}`,
+      tituloLimpo: tituloLimpo,
+      compositor: compositor,
+      codigo: bloco.trim()
+    });
   });
+  lista.sort((a, b) => parseInt(a.x, 10) - parseInt(b.x, 10));
   return lista;
 }
 
 // ============================================================
-// 3. RENDERIZAR UMA MÚSICA ESPECÍFICA
+// 4. RENDERIZAR UMA MÚSICA ESPECÍFICA
 // ============================================================
 function renderizarMusica(indice) {
   if (!musicas.length || indice < 0 || indice >= musicas.length) return;
-  
   musicaSelecionada = indice;
   const musica = musicas[indice];
   const bpm = document.getElementById("tempo").value;
 
-  // Monta o código ABC com o andamento desejado
   let codigo = musica.codigo;
-  // Remove Q: antigo se existir
-  codigo = codigo.replace(/^Q:.*\n?/gm, "");
-  // Insere o Q: após o campo K:
-  codigo = codigo.replace(/(K:.*\n)/, `$1Q:${bpm}\n`);
+
+  // Verifica se já existe um campo Q: neste bloco
+  const hasQ = /^Q:.*/m.test(codigo);
+
+  if (!hasQ) {
+    // Se NÃO tem Q:, insere com o BPM atual
+    codigo = codigo.replace(/^Q:.*$/gm, "");
+    codigo = codigo.replace(/^\s*[\r\n]/gm, "");
+
+    const kMatch = codigo.match(/^(K:.*)$/m);
+    if (kMatch) {
+      codigo = codigo.replace(/^(K:.*)$/m, `$1\nQ:${bpm}`);
+    } else {
+      const tMatch = codigo.match(/^(T:.*)$/m);
+      if (tMatch) {
+        codigo = codigo.replace(/^(T:.*)$/m, `$1\nQ:${bpm}`);
+      } else {
+        codigo = `Q:${bpm}\n` + codigo;
+      }
+    }
+  }
+  // Se já tem Q:, mantém o código original (não modifica)
 
   // Renderiza
   const paperDiv = document.getElementById("paper");
-  paperDiv.innerHTML = ""; // limpa
+  paperDiv.innerHTML = "";
 
   const visual = ABCJS.renderAbc("paper", codigo, {
     responsive: "resize",
@@ -226,47 +249,50 @@ function renderizarMusica(indice) {
 
   visualObj = visual && visual.length > 0 ? visual[0] : null;
 
-  // Atualiza informações
-  document.getElementById("infoMusicaAtual").textContent = 
-    `${musica.x} - ${musica.titulo}`;
+  document.getElementById("infoMusicaAtual").innerHTML = 
+    `${musica.titulo} <span class="compositor-info">(${musica.compositor})</span>`;
   document.getElementById("listaMusicas").value = indice;
 
-  // Para qualquer áudio em execução
   stop();
 }
 
 // ============================================================
-// 4. POPULAR SELECT E FILTRAR
+// 5. POPULAR SELECT
 // ============================================================
-function popularSelect(filtro = "") {
+function popularSelect(selecionarNum = null) {
   const select = document.getElementById("listaMusicas");
   select.innerHTML = "";
-  const termo = filtro.toLowerCase().trim();
-  const filtradas = musicas.filter(m => 
-    m.x.includes(termo) || m.titulo.toLowerCase().includes(termo)
-  );
   
-  filtradas.forEach((m, idx) => {
+  musicas.forEach((m) => {
     const option = document.createElement("option");
-    option.value = musicas.indexOf(m); // índice original
-    option.textContent = `${m.x} - ${m.titulo}`;
+    option.value = musicas.indexOf(m);
+    option.textContent = `${m.x} - ${m.tituloLimpo} (${m.compositor})`;
     select.appendChild(option);
   });
 
-  if (filtradas.length > 0) {
-    select.selectedIndex = 0;
-    renderizarMusica(parseInt(select.value));
-  } else {
-    document.getElementById("paper").innerHTML = "<p style='color:red;'>Nenhuma música encontrada com esse filtro.</p>";
+  if (musicas.length === 0) {
+    document.getElementById("paper").innerHTML = "<p style='color:red;'>Nenhuma música encontrada no arquivo.</p>";
     visualObj = null;
+    return;
   }
+
+  let idxSelecionado = 0;
+  if (selecionarNum) {
+    const encontrado = musicas.findIndex(m => m.x === selecionarNum);
+    if (encontrado !== -1) {
+      idxSelecionado = encontrado;
+    }
+  }
+  select.selectedIndex = idxSelecionado;
+  renderizarMusica(Number(select.value));
 }
 
 // ============================================================
-// 5. CARREGAR ARQUIVO
+// 6. CARREGAR ARQUIVO
 // ============================================================
 const params = new URLSearchParams(window.location.search);
 const file = params.get("file") || "exemplo.abc";
+const numParam = params.get("num") || null;
 
 fetch(file)
   .then(r => {
@@ -274,34 +300,23 @@ fetch(file)
     return r.text();
   })
   .then(text => {
-    abcRawText = text;
     musicas = extrairMusicas(text);
-    
     if (musicas.length === 0) {
       document.getElementById("paper").innerHTML = "<p style='color:red;'>Nenhuma música encontrada no arquivo.</p>";
       return;
     }
 
-    // Mostra navegação
     document.getElementById("navMusicas").style.display = "flex";
     document.getElementById("totalMusicas").textContent = musicas.length;
 
-    // Popula select e renderiza primeira
-    popularSelect();
+    popularSelect(numParam);
 
-    // Evento de seleção
     document.getElementById("listaMusicas").addEventListener("change", function() {
-      renderizarMusica(parseInt(this.value));
+      renderizarMusica(Number(this.value));
     });
 
-    // Busca
-    document.getElementById("buscaMusica").addEventListener("input", function() {
-      popularSelect(this.value);
-    });
-
-    // Anterior / Próximo
     document.getElementById("btnAnterior").addEventListener("click", function() {
-      const atual = parseInt(document.getElementById("listaMusicas").value);
+      const atual = Number(document.getElementById("listaMusicas").value);
       const idx = musicas.findIndex((_, i) => i === atual);
       if (idx > 0) {
         const novoIdx = idx - 1;
@@ -311,7 +326,7 @@ fetch(file)
     });
 
     document.getElementById("btnProximo").addEventListener("click", function() {
-      const atual = parseInt(document.getElementById("listaMusicas").value);
+      const atual = Number(document.getElementById("listaMusicas").value);
       const idx = musicas.findIndex((_, i) => i === atual);
       if (idx < musicas.length - 1) {
         const novoIdx = idx + 1;
@@ -326,7 +341,7 @@ fetch(file)
   });
 
 // ============================================================
-// 6. CONTROLES DE ÁUDIO E TRANSPOSIÇÃO
+// 7. CONTROLES DE ÁUDIO E TRANSPOSIÇÃO
 // ============================================================
 function processAndRender() {
   if (musicas.length === 0) return;
@@ -345,18 +360,14 @@ function updateUI() {
 async function play(options = {}) {
   if (!visualObj) return;
   stop();
-
   if (!audioContext) {
     window.AudioContext = window.AudioContext || window.webkitAudioContext;
     audioContext = new AudioContext();
   }
-
   const bpm = parseInt(document.getElementById("tempo").value, 10);
   synthControl = new ABCJS.synth.CreateSynth();
-
   try {
     await audioContext.resume();
-    
     await synthControl.init({
       visualObj: visualObj,
       audioContext: audioContext,
@@ -367,7 +378,6 @@ async function play(options = {}) {
         ...options
       }
     });
-
     await synthControl.prime();
     synthControl.start();
   } catch (e) {
@@ -388,7 +398,6 @@ document.getElementById("play-melodies").onclick = () => play({ chordsOff: true 
 document.getElementById("play-v1").onclick = () => play({ chordsOff: true, voicesOff: [1] });
 document.getElementById("play-v2").onclick = () => play({ chordsOff: true, voicesOff: [0] });
 document.getElementById("stop").onclick = stop;
-
 </script>
 
 </body>
