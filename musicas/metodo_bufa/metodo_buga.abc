@@ -1,0 +1,797 @@
+
+X:1
+T:12 - Sing to Me
+L:1/4
+M:2/4
+Z:1480 - PDF - Edna Mae Burnam_p20
+K:C
+V:1
+CD | E2 | CD | E2 |] 
+V:2
+z2 | z2 | z2 | z2 |] 
+
+
+X:2
+T:1 - Fiesta de Cumpleanos
+L:1/4
+M:2/4
+Z:1447 - PDF - John Thompson_p3
+K:C
+V:1
+CD | E2 | CD | E2 |DC | DE | C2 | C2 |] 
+V:2
+z2 | z2 | z2 | z2 |z2 | z2 | z2 | z2 |] 
+
+X:3
+T:1 - The Flyer
+L:1/4
+M:2/4
+Z:	2980 - PDF - Leila Fletche_p12
+K:C
+V:1
+CD | ED | CD | E2 | DE | DE | CE | C2 |] 
+V:2
+z2 | z2 | z2 | z2 |z2 | z2 | z2 | z2 |] 
+
+X:4
+T:2 - The Boatman
+L:1/4
+M:2/4
+Z:	2980 - PDF - Leila Fletche_p13
+K:C
+V:1
+CD | E2 | CE | D2 | CD | EC | ED | C2 |] 
+V:2
+z2 | z2 | z2 | z2 |z2 | z2 | z2 | z2 |] 
+
+
+X:5
+T:9 - Mary Had a Little Lamb
+L:1/4
+M:4/4
+Z:	1448 - PDF - John Thompson_p16
+K:C
+V:1
+EDCD | EEE2 | DDD2 | EEE2 | EDCD | EEEC | DDED | C4 |] 
+V:2
+z4 | z4 | z4 | z4 | z4 | z4 | z4 | z4 |] 
+
+
+X:1
+T:14 - Meu Gatinho
+L:1/4
+M:4/4
+Z:	3348 - PDF - Botelho_p16
+K:C
+V:1
+ z4 | z4 | z4 | z4 |] 
+V:2 bass
+A,B,A,B, | C2C2 | B,B,CB, | A,2A,2 |] 
+
+X:2
+T:16 - In the Snow
+L:1/4
+M:2/4
+Z:	1480 - PDF - Edna Mae Burnam_p22
+K:C
+V:1
+z2 | z2 | z2 | z2 |] 
+V:2 bass
+CB, | A,2 | CB, | A,2 |] 
+
+X:3
+T:2 - Balada
+L:1/4
+M:2/4
+Z:	1447 - PDF - John Thompson_p4
+K:C
+V:1
+z2 | z2 | z2 | z2 |z2 | z2 | z2 | z2 |] 
+V:2 bass
+CB, | A,2 | CB, | A,2 | B,C | B,C | A,2 | A,2 |] 
+
+X:4
+T:3 - Off to the Circus
+L:1/4
+M:2/4
+Z:	2980 - PDF - Leila Fletcher
+K:C
+V:1
+z2 | z2 | z2 | z2 |z2 | z2 | z2 | z2 |] 
+V:2 bass
+CB, | A,B, | CB, | A,B, | C2 | C2 | CC | C2 |] 
+
+X:5
+T:4 - Tiger Hunt
+L:1/4
+M:2/4
+Z:	2980 - PDF - Leila Fletcher
+K:C
+V:1
+z2 | z2 | z2 | z2 |z2 | z2 | z2 | z2 |] 
+V:2 bass
+CB, | A,2 | A,A,| A,2 |CB, | A,C | A,C | A,2 |] 
+
+X:6
+T:15 - Kitty Cat
+L:1/4
+M:4/4
+Z:	1480 - PDF - Edna Mae Burnam_p22
+K:C
+V:1
+z4 | z4 | z4 | z4 |] 
+V:2 bass
+A,A,A,B, | C2C2 | B,B,B,B, | A,4 |] 
+
+X:7
+T:10 - The Paratrooper
+L:1/4
+M:3/4
+Z:1448 - PDF - John Thompson_17
+K:C
+V:1
+z3 | z3 | z3 | z3 | z3 | z3 | z3 | z3 |] 
+V:2 bass
+A,2C | B,3 | A,2C | B,3 | A,2B, | CB,A, | B,2C | A,3 |]
+
+
+
+X:1
+T:7 - Saltitando_p8
+L:1/4
+M:4/4
+Z:81 - PDF - Edna Mae Burnam_p8
+K:C
+V:1
+CEC2 | z4 | CECE | C4 :|] 
+V:2 bass
+z4 | CA,C2 | z4 | z4 :|] 
+
+
+
+
+X:1
+T:29 - Sheep
+L:1/4
+M:4/4
+Z:1480 - PDF - Edna Mae Burnam_p31
+K:C
+V:1
+CDEC | DDCC | z4 | C4 |] 
+V:2 bass
+z4 | z4 | B,B,B,B, | z4 |] 
+
+
+
+X:1
+T:12 - Agora estou pronto
+L:1/4
+M:4/4
+Z:81 - PDF - Edna Mae Burnam_p9
+K:C
+V:1
+CDEC | DED2 | z4 | EDC2 :|]
+V:2 bass
+z4 | z4 | CB,CC | z4 |] 
+
+X:2
+T:31 - Late Delivery
+L:1/4
+M:4/4
+Z:1480 - PDF - Edna Mae Burnam_p32
+K:C
+V:1
+E2z2 | D2ED | z2E2 | z4 | z2D2 | z4 | z2E2 | z4 | 
+E2zz | D2ED | zzE2 | z4 | zzD2 | zzD2 | C4- | C4 |] 
+V:2 bass
+z2CC | z4 | C2z2 | z4 | B,2z2 | z4 | C2z2 | z4 |
+ zzCC | z4 | C2zz | z4 | B,2zz | z4 | z4 | z4 |] 
+
+
+
+
+X:1
+T:23 - Goldfish
+L:1/4
+M:4/4
+Z:1480 - PDF - Edna Mae Burnam_p28
+K:C
+V:1
+CDED | z4 | C4- | C4 | CDED | z4 | z4 | z4 |] 
+V:2 bass
+z4 | CB,A,B, | z4 | z4 | z4 | CB,A,B, | C4- | C4 |] 
+
+X:2
+T:5 - Rolando no chão
+L:1/4
+M:4/4
+Z:81 - PDF - Edna Mae Burnam_p7
+K:C
+V:1
+CDED | z4 | CDED | C4 :|] 
+V:2 bass
+z4 | CB,A,B, | z4 | z4 :|] 
+
+X:3
+T:16 - Vem Cá Totó
+L:1/4
+M:2/4
+Z:3348 - PDF - Botelho
+K:C
+V:1
+z2 | z2 | DD | E2 | DD | z2 | CC | z2 |
+ z2 | z2 | DD | E2 | DD | z2 | z2 | z2 |] 
+V:2 bass
+A,B, | CC | z2 | z2 | z2 | B,B, | z2 | A,2 | 
+A,B, | CC | z2 | z2 | z2 | CC | B,B, | A,2 |] 
+
+X:4
+T:11 - Marching Up and Down
+L:1/4
+M:2/4
+Z:1448 - PDF - John Thompson_p18
+K:C
+V:1
+z2 | z2 | z2 | z2 | CD | E2 | ED | C2 |] 
+V:2 bass
+A,B, | C2 | CB, | A,2 | z2 | z2 | z2 | z2 |] 
+
+X:5
+T:3 - El Beis-bol
+L:1/4
+M:2/4
+Z:1447 - PDF - John Thompson_p5
+K:C
+V:1
+CD | E2 | z2 | z2 | DE | D2 | z2 | z2 |] 
+V:2 bass
+z2 | z2 | A,B, | C2 |z2 | z2 | CB, | C2 |] 
+
+X:6
+T:5 - The Steamboat
+L:1/4
+M:2/4
+Z:2980 - PDF - Leila Fletcher
+K:C
+V:1
+CD |ED | CD | ED | z2 | z2 | z2 | z2 |] 
+V:2 bass
+z2 | z2 | z2 | z2 | CB, | A,B, | C2 | C2 |] 
+
+X:7
+T:18 - North Wind
+L:1/4
+M:3/4
+Z:1480 - PDF - Edna Mae Burnam_p25
+K:C
+V:1
+z3 | z3 | DED | C3 |] 
+V:2 bass
+CCB, | A,B,C | z3 | z3 |] 
+
+X:8
+T:30 - Wheels
+L:1/4
+M:3/4
+Z:1480 - PDF - Edna Mae Burnam_p31
+K:C
+V:1
+CDE | CDE | C3- | C3 | z3 | CDE | C3- | C3 |] 
+V:2 bass
+z3 | z3 | z3 | z3 | CB,A, | z3 | z3 | z3 |] 
+
+X:9
+T:12 - Rag-Time Raggles
+L:1/4
+M:4/4
+Z:1448 - PDF - John Thompson_19
+K:C
+V:1
+CD2E | D2C2 | D4 | D4 | z4 | z4 | z4 | z4 |
+ CD2E | D2C2 | CD2E | D2C2 | ED2C | D2E2 | C4 | z4 |] 
+V:2 bass
+z4 | z4 | z4 | z4 | CB,2A, | B,2C2 | B,4 | B,4 |
+ z4 | z4 | z4 | z4 | z4 | z4 | z4 | z4 |] 
+
+X:10
+T:6 - My Best Friend
+L:1/4
+M:4/4
+Z:2702 - PDF - Hal Leonard_p44
+K:C
+V:1
+CCCD | E2D2 | CCDD | C4 | z4 | z4 | z4 | z4 |] 
+V:2 bass
+z4 | z4 | z4 | z4 | A,A,A,B, | C2B,2 | A,A,B,B, | A,4 |] 
+
+
+
+X:11
+T:6 - Autumn Snow Storm
+L:1/4
+M:3/4
+Z:2980 - PDF - Leila Fletcher
+K:C
+V:1
+CDE | z3 | C2D | E3 | CDE | z3 | D2z | z3 | z3 | z3 | z3| z3 |] 
+V:2 bass
+z3 | CB,A, | z3 | z3 | z3 | A,B,C | z2B, | C2C | B,A,B, | C2C | B,A,B, | C3 |] 
+
+
+X:1
+T:	7 - Tambourine Tune
+L:1/4
+M:4/4
+Z:2702 - PDF - Hal Leonard_p45
+K:C
+V:1
+z2CD | E2E2 | DDCD | E4 | z2CD | E2E2 | DDCz | z4 :|]
+V:2 bass
+A,B,z2 | z4 | z4 | z4 | A,B,z2 | z4 | z3B, | A,4 :|]
+
+
+
+X:1
+T:15 - Solemn Event
+L:1/4
+M:4/4
+Z:2702 - PDF - Hal Leonard_p56
+K:C
+V:1
+EDz2 | z4 | EDz2 | z4 | z4 | D2zD | EDz2 | z4 |] 
+V:2 bass
+z2CB, | CB,A,2 | z2CB, | CB,A,B, | C2A,C | z2B,z | z2CB, | CB,A,2 |] 
+
+
+
+X:1
+T:5 - Andando com o Dó
+L:1/4
+M:4/4
+Z:3348 - PDF - Botelho
+K:C
+V:1
+z2DD | z2DD | z4 | C4 |] 
+V:2 bass
+CCz2 | CCz2 | CCB,B, | z4 |] 
+
+X:2
+T:7 - March of the Gnomes
+L:1/4
+M:2/4
+Z:1448 - PDF - John Thompson_p14
+K:C
+V:1
+CD | z2 | C2 | z2 | CD | z2 | C2 | z2 |] 
+V:2 bass
+z2 | CB, | z2 | C2 | z2 | CB, | z2 | C2 |] 
+
+X:3
+T:7 - Dó e Seus Vizinhos
+L:1/4
+M:2/4
+Z:3348 - PDF - Botelho
+K:C
+V:1
+CD | C2 | z2 | z2 | CC | DD | Cz | z2 |] 
+V:2 bass
+z2 | z2 | CB, | C2 | z2 | z2 | zB, | C2 |] 
+
+
+
+X:4
+T:10 - Vamos marchar
+L:1/4
+M:2/4
+Z:3348 - PDF - Botelho
+K:C
+V:1
+CC | DD | CC | D2 | z2 | z2 | z2 | z2 |] 
+V:2 bass
+ z2 | z2 | z2 | z2 |B,B, | CC | B,B, | C2 |] 
+
+
+X:5
+T:10 - In a Hammock
+L:1/4
+M:4/4
+Z:1480 - PDF - Edna Mae Burnam_p18
+K:C
+V:1
+CDz2 | CDz2 | CDz2 | C2C2 |] 
+V:2 bass
+z2CB, | z2CB, | z2CB, | z4 |] 
+
+
+X:6
+T:	9 - The Drum
+L:1/4
+M:4/4
+Z:1480 - PDF - Edna Mae Burnam_p18
+K:C
+V:1
+CCC2 | z4 | z2DD | C4 |] 
+V:2 bass
+z4 | CCC2 | B,B,z2 | z4 |] 
+
+
+X:7
+T:8 - Dance of the Gnomes
+L:1/4
+M:3/4
+Z:1448 - PDF - John Thompson_p15
+K:C
+V:1
+C2D | z3 | C3 | z3 | C2D | z3 | C3 | z3 | 
+C2D | z3 | C3 | z3 | C2D | z3 | C3 | z3 |] 
+V:2 bass
+z3 | C2B, | z3 | C3 | z3 | C2B, | z3 | C3 |
+ z3 | C2B, | z3 | C3 | z3 | C2B, | z3 | C3 |] 
+
+
+
+X:1
+T:1 - Let's Play Right Hand
+L:1/4
+M:4/4
+Z:1448 - PDF - John Thompson_p6
+K:C
+V:1
+C4 | C4 | C4 | C4 |] 
+V:2 bass
+z4 | z4 | z4 | z4 |] 
+
+
+X:1
+T:2 - Let's Play Left Hand
+L:1/4
+M:4/4
+Z:1448 - PDF - John Thompson_p7
+K:C
+V:1
+z4 | z4 | z4 | z4 |] 
+V:2 bass
+C4 | C4 | C4 | C4 |] 
+
+
+
+X:1
+T:3 - Grandfather's Clock
+L:1/4
+M:4/4
+Z:1448 - PDF - John Thompson_p8
+K:C
+V:1
+C2C2 | z4 | C2C2 | z4 |] 
+V:2 bass
+z4 | C2C2 | z4 | C2C2 |] 
+
+
+X:2
+T:4 - Moccasin Dance
+L:1/4
+M:4/4
+Z:1448 - PDF - John Thompson_p9
+K:C
+V:1
+CCCC | z4 | CCCC | z4 | CCCC | z4 | CCCC | z4 |] 
+V:2 bass
+ z4 | CCCC | z4 | CCCC | z4 | CCCC | z4 |CCCC|] 
+
+X:3
+T:2 - Passeando com o Dó
+L:1/4
+M:4/4
+Z:3348 - PDF - Botelho
+K:C
+V:1
+CC|CCCC | C2z2 | z4 | z2|]
+V:2 bass
+z2|z4 | z2CC | CCCC | C2|]
+
+
+X:4
+T:1 - Tip Toe
+L:1/4
+M:2/4
+Z:1480 - PDF - Edna Mae Burnam_p14
+K:C
+V:1
+CC | z2 | CC | C2 |] 
+V:2 bass
+z2 | CC | z2 | z2 |] 
+
+X:5
+T:3 - Pop Corn
+L:1/4
+M:4/4
+Z:1480 - PDF - Edna Mae Burnam_p15
+K:C
+V:1
+CCz2 | C2z2 | CCz2 | C2z2 |] 
+V:2 bass
+z2CC | z2C2 | z2CC | z2C2 |] 
+
+X:6
+%%score {1|2}
+T:2 - Passeando com o Dó
+L:1/4
+M:3/4
+Z:3348 - PDF - Botelho
+K:C
+V:1
+CCC | C3 | z3 | z3 |] 
+V:2 bass
+z3 | z3 | CCC | C3 |] 
+
+X:7
+%%score {1|2}
+T:2 - Hop and Stop
+L:1/4
+M:4/4
+Z:1480 - PDF - Edna Mae Burnam_p15
+K:C
+V:1
+CCC2 | z4 | CCz2 | C4 |] 
+V:2 bass
+z4 | CCC2 | z2CC | z4 |] 
+
+
+X:1
+%%score {1|2}
+T:	4 - Chutando com a perna direita
+L:1/4
+M:4/4
+Z:81 - PDF - Edna Mae Burnam_p12
+K:C
+V:1
+(C.F)C2 | (C.F)C2 | (C.F)(C.F) | C4 :|]
+V:2 bass
+z4 | z4 | z4 | z4 :|] 
+
+
+
+X:1
+%%score {1|2}
+T:	Tema
+L:1/4
+M:4/4
+Z:4487 - PDF - Nancy Faber_Randall Faber_p32
+K:C
+V:1
+C4 | D4 | E4 | D4 | F4 | E4 | D4 | C4 |] 
+V:2 bass
+z4 | z4 | z4 | z4 | z4 | z4 | z4 | z4 |] 
+
+X:2
+%%score {1|2}
+T:	17 - The Church Organ
+L:1/4
+M:4/4
+Z:1448 - PDF - John Thompson_p26
+K:C
+V:1
+F2E2 | D2C2 | D2E2 | F4 | F2E2 | D2C2 | D2E2 | F4 |] 
+V:2 bass
+z4 | z4 | z4 | z4 | z4 | z4 | z4 | z4 |] 
+
+X:3
+%%score {1|2}
+T:8 - Slumber Boat
+L:1/4
+M:4/4
+Z:2980 - PDF - Leila Fletcher_p19
+K:C
+V:1
+D2C2 | DDC2 | DEFE | DEC2 | D2C2 | DDC2 | DEFE | DEC2 |] 
+V:2 bass
+z4 | z4 | z4 | z4 | z4 | z4 | z4 | z4 |] 
+
+
+X:4
+%%score {1|2}
+T:	4 - Flexionando
+L:1/4
+M:3/4
+Z:81 - PDF - Edna Mae Burnam_p15
+K:C
+V:1
+CDE | FED | C3 | C3 :|] 
+V:2 bass
+z3 | z3 | z3 | z3 :|] 
+
+
+X:5
+%%score {1|2}
+T:	Variación 1
+L:1/4
+M:4/4
+Z:4487 - PDF - Nancy Faber_Randall Faber_p32
+K:C
+V:1
+CDE2 | DEF2 | EDC2 | D4 | DEF2 | EDC2 | D2ED | C4 |] 
+V:2 bass
+z4 | z4 | z4 | z4 | z4 | z4 | z4 | z4 |] 
+
+X:1
+%%score {1|2}
+T:	Variación 2
+L:1/4
+M:4/4
+Z:4487 - PDF - Nancy Faber_Randall Faber_p33
+K:C
+V:1
+CDEE | DEFF | EDCC | D4 | DEFF | EDCC | DDED | CGC2 |]
+V:2 bass
+z4 | z4 | z4 | z4 | z4 | z4 | z4 | z4 |] 
+
+
+
+X:1
+%%score {1|2}
+T:3 - Tocando a ponta dos pés
+L:1/4
+M:4/4
+Z:81 - PDF - Edna Mae Burnam_p10
+K:C
+V:1
+z4 | z4 | z4 | z4 :|] 
+V:2 bass
+C2G,2 | G,4 | C2G,G, | C4 :|]
+
+
+X:2
+%%score {1|2}
+T:5 - Chutando com a perna esquerda
+L:1/4
+M:4/4
+Z:81 - PDF - Edna Mae Burnam_p12
+K:C
+V:1
+z4 | z4 | z4 | z4 :|] 
+V:2 bass
+(C.G,)G,2 | (C.G,)G,2 | (C.G,)(C.G,) | C4 :|]
+
+
+
+
+X:1
+%%score {1|2}
+T:5 - Flexionando
+L:1/4
+M:3/4
+Z:81 - PDF - Edna Mae Burnam_p15
+K:C
+V:1
+z3 | z3 | z3 | z3 :|] 
+V:2 bass
+CB,A, | G,A,B, |C3 | C3 :|] 
+
+
+
+X:1
+%%score {1|2}
+T:9 - El Buen Rey Wenceslao
+L:1/4
+M:2/4
+Z:81 - PDF - Edna Mae Burnam_p11
+K:C
+V:1
+CC | CD | CC | z2 | z2 | z2 | z2 | z2 |
+ CC | CD | CC | z2 | z2 | z2 | z2 | C2 |]
+V:2 bass
+z2 | z2 | z2  | G,2 | A,G, | A,B, | C2 | C2 | 
+z2 | z2 | z2 | G,2 | A,G, | A,B, | C2 | z2 |] 
+
+
+
+
+X:1
+%%score {1|2}
+T:31 - De Marré
+L:1/4
+M:4/4
+Z:3348 - PDF - Botelho
+K:C
+V:1
+z2 |DDDE | DDz2 | z4 | z4 | DDDE | DDz2 | z2D2 | z2 |]
+V:2 bass
+G,B,|z4 | z2CB, | A,B,CA, | B,2G,B, | z4 | z2CB, | A,2z2 | G,2|]
+
+X:2
+%%score {1|2}
+T:9 - Long,Long Ago
+L:1/4
+M:4/4
+Z:2702 - PDF - Hal Leonard_p47
+K:C
+V:1
+z4 | z4 | D2ED | z4 | D2z2 | z4 | z4 | z4 |
+ z4 | z4 | D2ED | z4 | D2z2 | z4 | z2E2 | D4 |] 
+V:2 bass
+G,2G,A, | B,2B,C | z4 | B,4 | z2CB, | A,4 | C2B,A, | G,4 |
+G,2G,A, | B,2B,C | z4 | B,4 |  z2CB, | A,2B,A, |G,2z2 | z4  |] 
+
+
+
+X:1
+%%score {1|2}
+T:La Primavera
+L:1/4
+M:4/4
+Z:3430 - PDF - Ana Mary Cervantes_p_55
+K:C
+V:1
+z4 | D3D/C/ | z4 | D3D/C/ | zC/D/ C z | z4 | 
+DzCD | ED3 | DzCD | EDz2 | EDz2 | z4 | z4 |] 
+V:2 bass
+B,B,B,A,/G,/ | z4 | B,B,B,A,/G,/ | z4 | B,zzB, | A,4 | 
+zC/B,/z2 | z4 | zC/B,/z2  | z2zG, | z2zC | B,A,/G,/A,2 | G,4 |] 
+
+
+X:2
+%%score {1|2}
+T:21 - Buen Ritmo
+L:1/4
+M:4/4
+Z:1265 - PDF - ELENA WAISS_p10
+K:C
+V:1
+CzDz | E4 | z4 | z4 | zzDz | Ezz2 | Dzz2 | z4 |] 
+V:2 bass
+z4 | z4 | G,zA,z | B,4 | Czz2 | zzCz | z2G,z | C4 |] 
+
+
+X:3
+%%score {1|2}
+T:1 - La mia stellina
+L:1/4
+M:4/4
+Z:7030 - PDF - James Bastien_p4
+K:C
+V:1
+z2DD | EED2 | z4 | z4 | DDCC | z4 | 
+DDCC | z4 | z2DD | EED2 | z4 | z4 |] 
+V:2 bass
+G,G,z2 | z4 | CCB,B, | A,A,G,2 | z4 | B,B,A,2 | 
+z4 | B,B,A,2 | G,G,z2 | z4 | CCB,B, | A,A,G,2 |] 
+
+
+X:4
+%%score {1|2}
+T:Tengo Una Muñeca
+L:1/4
+M:4/4
+Z:4487 - PDF - Nancy Faber_Randall Faber_p42
+K:C
+V:1
+DDDE | Dz3 | D2E2 | D4 | CCCD | z4 | z4 | z4 :|] 
+V:2 bass
+z4 | zB,G,B, | z4 | z4 | z4 | CB,A,B, | C2A,2 | G,4 :|] 
+
+
+X:5
+%%score {1|2}
+T:16 - Blow the Man Down
+L:1/4
+M:3/4
+Z:1448 - PDF - John Thompsonp_25
+K:C
+V:1
+DED | z3 | DED | z3 | D3 | E3 | z3 | z3 | 
+z3 | z3 | z3 | E3 | DDD | D2C | z3 | z3 |] 
+V:2 bass
+z3 | B,G,B, | z3 | B,3 | z3 | z3 | CB,C | A,2A, | 
+A,A,A, | CB,A, | CB,A, | z3 | z3 | z3 | B,A,B, | G,3 |] 
+
+
+
+
+
+
+
+
+
+
+
+
