@@ -25993,19 +25993,18 @@ X:2141
 T:2141 - French Children's Song - French Folk Song
 
 X:2142
-T:2142 - O Sapo nÃ£o lava o pÃ©
+T:2142 - O Sapo naão lava o pé
 L:1/8
 Q:1/4=70
 M:2/4
-I:linebreak $
 K:D
 V:1 treble nm="Violin"
 K:None
 I:percmap =c c 38 normal
 I:percmap c c 37 normal
 V:1
-z2 z A | d/dA/ BA | F2 z A | d/dA/ BA |$ G2 z A/A/ | c/cA/ BA | c/cA/ BA | cA Bc |$ dA dA |
-d2 z2 |]
+z2 z A | d/dA/ BA | F2 z A | d/dA/ BA | G2 z A/A/ | 
+c/cA/ BA | c/cA/ BA | cA Bc |$ dA dA |d2 z2 |]
 
 X:2143
 T:2143 - London Bridge - Folk Song
