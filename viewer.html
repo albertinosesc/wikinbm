@@ -102,6 +102,20 @@
       font-size: 0.8rem;
       margin-left: 8px;
     }
+    .nav-musicas .categoria-info {
+      color: #e67e22;
+      font-size: 0.85rem;
+      font-weight: bold;
+      margin-left: auto;
+      white-space: nowrap;
+    }
+    .nav-musicas .titulo-esquerda {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      min-width: 150px;
+    }
 
     /* Instrumento MIDI */
     .midi-control {
@@ -227,6 +241,12 @@
       font-weight: bold;
       color: #2c3e50;
     }
+    .modal-content tr:not(.categoria-label) {
+      cursor: pointer;
+    }
+    .modal-content tr:not(.categoria-label):hover {
+      background: #d4edda !important;
+    }
   </style>
 </head>
 <body>
@@ -244,10 +264,13 @@
   <!-- Navegação entre músicas do arquivo -->
   <div class="nav-musicas" id="navMusicas" style="display:none;">
     <span class="badge" id="totalMusicas">0</span>
-    <select id="listaMusicas" size="1"></select>
-    <button id="btnAnterior" title="Música anterior">◀</button>
-    <button id="btnProximo" title="Próxima música">▶</button>
+    <div class="titulo-esquerda">
+      <select id="listaMusicas" size="1"></select>
+      <button id="btnAnterior" title="Música anterior">◀</button>
+      <button id="btnProximo" title="Próxima música">▶</button>
+    </div>
     <span class="info-musica" id="infoMusicaAtual"></span>
+    <span class="categoria-info" id="categoriaAtual">📂 Categoria</span>
   </div>
 
   <div class="controls">
@@ -290,7 +313,7 @@
   <div class="modal-content">
     <button class="fechar" onclick="fecharModalInstrumentos()">✕ Fechar</button>
     <h2>🎹 Tabela General MIDI (0 a 127)</h2>
-    <p style="text-align:center; color:#666; font-size:0.9rem;">Selecione um número e clique em <strong>"Aplicar"</strong> para confirmar a alteração.</p>
+    <p style="text-align:center; color:#666; font-size:0.9rem;">Clique em um instrumento para selecioná-lo.</p>
     <input type="text" class="busca-instrumento" id="buscaInstrumento" placeholder="🔍 Buscar instrumento..." oninput="filtrarInstrumentos()">
     <div class="contador" id="contadorInstrumentos">Mostrando 128 instrumentos</div>
     <div id="tabelaInstrumentos"></div>
@@ -408,6 +431,7 @@ let synthControl = null;
 let transposeValue = 0;
 let audioContext = null;
 let midiOriginal = null;
+let categoriaAtual = '';
 
 // ============================================================
 // 3. FUNÇÕES AUXILIARES
@@ -433,6 +457,8 @@ function limparTitulo(x, titulo) {
 function extrairMusicas(texto) {
   const blocos = texto.split(/\n(?=X:\d+)/);
   const lista = [];
+  let categoriaTemp = '';
+  
   blocos.forEach(bloco => {
     const x = extrairCampo(bloco, 'X');
     if (!x) return;
@@ -447,13 +473,17 @@ function extrairMusicas(texto) {
     const midiMatch = bloco.match(/^%%MIDI\s+program\s+(\d+)/m);
     const midiProgram = midiMatch ? parseInt(midiMatch[1], 10) : null;
     
+    // Tenta extrair categoria do campo S: ou O:
+    const categoria = extrairCampo(bloco, 'S') || extrairCampo(bloco, 'O') || 'Músicas';
+    
     lista.push({
       x: x,
       titulo: `${x} - ${tituloLimpo}`,
       tituloLimpo: tituloLimpo,
       compositor: compositor,
       codigo: bloco.trim(),
-      midiProgram: midiProgram
+      midiProgram: midiProgram,
+      categoria: categoria
     });
   });
   lista.sort((a, b) => parseInt(a.x, 10) - parseInt(b.x, 10));
@@ -494,7 +524,7 @@ function renderizarMusica(indice) {
   codigo = codigo.replace(/^%%MIDI\s+program\s+\d+.*$/gm, "");
   codigo = codigo.replace(/^\s*[\r\n]/gm, "");
 
-  // Pega o valor do campo MIDI (se inválido, usa 0)
+  // Pega o valor do campo MIDI (se inválido, usa o valor atual ou 0)
   let midiVal = parseInt(document.getElementById('midiProgram').value);
   if (isNaN(midiVal) || midiVal < 0 || midiVal > 127) {
     midiVal = 0;
@@ -526,9 +556,9 @@ function renderizarMusica(indice) {
 
   visualObj = visual && visual.length > 0 ? visual[0] : null;
 
-  // Atualiza informações
-  document.getElementById("infoMusicaAtual").innerHTML = 
-    `${musica.titulo} <span class="compositor-info">(${musica.compositor})</span>`;
+  // Atualiza informações - título e categoria
+  document.getElementById("infoMusicaAtual").textContent = `${musica.titulo}`;
+  document.getElementById("categoriaAtual").textContent = `📂 ${musica.categoria}`;
   document.getElementById("listaMusicas").value = indice;
 
   // Atualiza o campo MIDI com o valor da música
@@ -540,9 +570,12 @@ function renderizarMusica(indice) {
   } else {
     // Se não tem MIDI, mantém o valor atual ou 0
     if (midiOriginal === null) {
-      document.getElementById('midiProgram').value = 0;
-      document.getElementById('instrumentName').textContent = 'Acoustic Grand Piano';
-      document.getElementById('infoOriginal').textContent = '(Sem instrumento definido - Piano padrão)';
+      // Não sobrescreve o valor se o usuário já escolheu um
+      if (!document.getElementById('midiProgram').value || document.getElementById('midiProgram').value === '0') {
+        document.getElementById('midiProgram').value = 0;
+        document.getElementById('instrumentName').textContent = 'Acoustic Grand Piano';
+        document.getElementById('infoOriginal').textContent = '(Sem instrumento definido - Piano padrão)';
+      }
     }
   }
 
@@ -563,6 +596,15 @@ function aplicarMIDI() {
   document.getElementById('instrumentName').textContent = getInstrumentName(val);
   // Re-renderiza a música atual com o novo MIDI
   renderizarMusica(musicaSelecionada);
+  // Mostra feedback visual
+  const btn = document.querySelector('.midi-control button:first-of-type');
+  const originalText = btn.textContent;
+  btn.textContent = '✅ Aplicado!';
+  btn.style.background = '#28a745';
+  setTimeout(() => {
+    btn.textContent = originalText;
+    btn.style.background = '#28a745';
+  }, 1500);
 }
 
 // ============================================================
@@ -590,13 +632,12 @@ function gerarTabelaInstrumentos(filtro) {
     const nome = instrumentosMIDI[i];
     const cat = getCategoria(i);
     if (termo === '' || nome.toLowerCase().includes(termo) || i.toString().includes(termo)) {
-      // Mostra a categoria como separador
       if (cat !== ultimaCategoria) {
         ultimaCategoria = cat;
         html += `<tr class="categoria-label"><td colspan="3">${cat}</td></tr>`;
       }
       const destaque = i === parseInt(document.getElementById('midiProgram').value) ? 'destaque' : '';
-      html += `<tr class="${destaque}"><td><strong>${i}</strong></td><td>${nome}</td><td style="font-size:0.75rem;color:#888;">${cat}</td></tr>`;
+      html += `<tr class="${destaque}" data-midi="${i}"><td><strong>${i}</strong></td><td>${nome}</td><td style="font-size:0.75rem;color:#888;">${cat}</td></tr>`;
       count++;
     }
   }
@@ -604,12 +645,12 @@ function gerarTabelaInstrumentos(filtro) {
   container.innerHTML = html;
   document.getElementById('contadorInstrumentos').textContent = `Mostrando ${count} de ${instrumentosMIDI.length} instrumentos`;
   
-  // Se clicar em uma linha, preenche o campo
+  // Se clicar em uma linha (exceto cabeçalho de categoria), preenche o campo
   container.querySelectorAll('tr:not(.categoria-label)').forEach(tr => {
-    tr.style.cursor = 'pointer';
     tr.addEventListener('click', function() {
-      const num = parseInt(this.querySelector('td:first-child').textContent);
+      const num = parseInt(this.dataset.midi);
       if (!isNaN(num)) {
+        // Preenche o campo MIDI com o número selecionado
         document.getElementById('midiProgram').value = num;
         document.getElementById('instrumentName').textContent = getInstrumentName(num);
         fecharModalInstrumentos();
