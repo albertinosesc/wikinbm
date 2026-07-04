@@ -431,7 +431,7 @@ let synthControl = null;
 let transposeValue = 0;
 let audioContext = null;
 let midiOriginal = null;
-let categoriaAtual = '';
+let categoriaGlobal = '';
 
 // ============================================================
 // 3. FUNÇÕES AUXILIARES
@@ -457,7 +457,6 @@ function limparTitulo(x, titulo) {
 function extrairMusicas(texto) {
   const blocos = texto.split(/\n(?=X:\d+)/);
   const lista = [];
-  let categoriaTemp = '';
   
   blocos.forEach(bloco => {
     const x = extrairCampo(bloco, 'X');
@@ -473,9 +472,6 @@ function extrairMusicas(texto) {
     const midiMatch = bloco.match(/^%%MIDI\s+program\s+(\d+)/m);
     const midiProgram = midiMatch ? parseInt(midiMatch[1], 10) : null;
     
-    // Tenta extrair categoria do campo S: ou O:
-    const categoria = extrairCampo(bloco, 'S') || extrairCampo(bloco, 'O') || 'Músicas';
-    
     lista.push({
       x: x,
       titulo: `${x} - ${tituloLimpo}`,
@@ -483,7 +479,7 @@ function extrairMusicas(texto) {
       compositor: compositor,
       codigo: bloco.trim(),
       midiProgram: midiProgram,
-      categoria: categoria
+      categoria: categoriaGlobal // Usa a categoria vinda do JSON via URL
     });
   });
   lista.sort((a, b) => parseInt(a.x, 10) - parseInt(b.x, 10));
@@ -570,7 +566,6 @@ function renderizarMusica(indice) {
   } else {
     // Se não tem MIDI, mantém o valor atual ou 0
     if (midiOriginal === null) {
-      // Não sobrescreve o valor se o usuário já escolheu um
       if (!document.getElementById('midiProgram').value || document.getElementById('midiProgram').value === '0') {
         document.getElementById('midiProgram').value = 0;
         document.getElementById('instrumentName').textContent = 'Acoustic Grand Piano';
@@ -594,9 +589,7 @@ function aplicarMIDI() {
     document.getElementById('instrumentName').textContent = 'Acoustic Grand Piano';
   }
   document.getElementById('instrumentName').textContent = getInstrumentName(val);
-  // Re-renderiza a música atual com o novo MIDI
   renderizarMusica(musicaSelecionada);
-  // Mostra feedback visual
   const btn = document.querySelector('.midi-control button:first-of-type');
   const originalText = btn.textContent;
   btn.textContent = '✅ Aplicado!';
@@ -645,16 +638,13 @@ function gerarTabelaInstrumentos(filtro) {
   container.innerHTML = html;
   document.getElementById('contadorInstrumentos').textContent = `Mostrando ${count} de ${instrumentosMIDI.length} instrumentos`;
   
-  // Se clicar em uma linha (exceto cabeçalho de categoria), preenche o campo
   container.querySelectorAll('tr:not(.categoria-label)').forEach(tr => {
     tr.addEventListener('click', function() {
       const num = parseInt(this.dataset.midi);
       if (!isNaN(num)) {
-        // Preenche o campo MIDI com o número selecionado
         document.getElementById('midiProgram').value = num;
         document.getElementById('instrumentName').textContent = getInstrumentName(num);
         fecharModalInstrumentos();
-        // Aplica automaticamente ao clicar na tabela
         aplicarMIDI();
       }
     });
@@ -666,7 +656,6 @@ function filtrarInstrumentos() {
   gerarTabelaInstrumentos(filtro);
 }
 
-// Fecha o modal se clicar fora
 window.onclick = function(event) {
   const modal = document.getElementById('modalInstrumentos');
   if (event.target === modal) {
@@ -712,6 +701,10 @@ function popularSelect(selecionarNum = null) {
 const params = new URLSearchParams(window.location.search);
 const file = params.get("file") || "exemplo.abc";
 const numParam = params.get("num") || null;
+const categoriaParam = params.get("categoria") || "Músicas";
+
+// Armazena a categoria global
+categoriaGlobal = categoriaParam;
 
 fetch(file)
   .then(r => {
