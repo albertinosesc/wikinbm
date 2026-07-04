@@ -270,7 +270,7 @@
       <button id="btnProximo" title="Próxima música">▶</button>
     </div>
     <span class="info-musica" id="infoMusicaAtual"></span>
-    <span class="categoria-info" id="categoriaAtual">📂 Categoria</span>
+    <span class="categoria-info" id="categoriaAtual"></span>
   </div>
 
   <div class="controls">
@@ -557,7 +557,8 @@ function renderizarMusica(indice) {
   visualObj = visual && visual.length > 0 ? visual[0] : null;
 
   // Atualiza informações - título e categoria
-  document.getElementById("categoriaAtual").textContent = `${musica.categoria}`;
+  document.getElementById("infoMusicaAtual").textContent = musica.titulo;
+  document.getElementById("categoriaAtual").textContent = musica.categoria;
   document.getElementById("listaMusicas").value = indice;
 
   // Atualiza o campo MIDI com o valor da música
