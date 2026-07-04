@@ -557,7 +557,7 @@ function renderizarMusica(indice) {
   visualObj = visual && visual.length > 0 ? visual[0] : null;
 
   // Atualiza informações - título e categoria
-  document.getElementById("categoriaAtual").textContent = `📂 ${musica.categoria}`;
+  document.getElementById("categoriaAtual").textContent = `${musica.categoria}`;
   document.getElementById("listaMusicas").value = indice;
 
   // Atualiza o campo MIDI com o valor da música
