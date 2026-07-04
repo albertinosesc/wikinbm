@@ -128,7 +128,7 @@
     .midi-control .instrument-name {
       font-size: 0.85rem;
       color: #555;
-      min-width: 140px;
+      min-width: 160px;
     }
     .midi-control button {
       padding: 4px 14px;
@@ -222,6 +222,11 @@
       text-align: center;
       margin-bottom: 10px;
     }
+    .modal-content .categoria-label {
+      background: #e9ecef;
+      font-weight: bold;
+      color: #2c3e50;
+    }
   </style>
 </head>
 <body>
@@ -259,8 +264,8 @@
     <div class="control-group midi-control">
       <label>🎹 Instrumento MIDI:</label>
       <input type="number" id="midiProgram" value="0" min="0" max="127">
-      <span class="instrument-name" id="instrumentName">Piano Acústico</span>
-      <button onclick="aplicarMIDI()">Aplicar</button>
+      <span class="instrument-name" id="instrumentName">Acoustic Grand Piano</span>
+      <button onclick="aplicarMIDI()">✅ Aplicar</button>
       <button class="btn-instrumentos" onclick="abrirModalInstrumentos()">📋 Ver Instrumentos</button>
       <span class="info-original" id="infoOriginal"></span>
     </div>
@@ -284,8 +289,8 @@
 <div class="modal-overlay" id="modalInstrumentos">
   <div class="modal-content">
     <button class="fechar" onclick="fecharModalInstrumentos()">✕ Fechar</button>
-    <h2>🎹 Tabela de Instrumentos MIDI</h2>
-    <p style="text-align:center; color:#666; font-size:0.9rem;">Selecione um número (0 a 127) e clique em "Aplicar" para alterar o instrumento.</p>
+    <h2>🎹 Tabela General MIDI (0 a 127)</h2>
+    <p style="text-align:center; color:#666; font-size:0.9rem;">Selecione um número e clique em <strong>"Aplicar"</strong> para confirmar a alteração.</p>
     <input type="text" class="busca-instrumento" id="buscaInstrumento" placeholder="🔍 Buscar instrumento..." oninput="filtrarInstrumentos()">
     <div class="contador" id="contadorInstrumentos">Mostrando 128 instrumentos</div>
     <div id="tabelaInstrumentos"></div>
@@ -294,40 +299,87 @@
 
 <script>
 // ============================================================
-// 1. MAPA DE INSTRUMENTOS MIDI (0 a 127)
+// 1. MAPA DE INSTRUMENTOS MIDI (0 a 127) - General MIDI
 // ============================================================
 const instrumentosMIDI = [
-  "Piano Acústico", "Piano Brilhante", "Piano Elétrico", "Piano Honky-tonk",
-  "Piano Rhodes", "Piano Chorado", "Cravo", "Clavicórdio",
-  "Celesta", "Glockenspiel", "Caixa de Música", "Vibrafone",
-  "Marimba", "Xilofone", "Carilhão", "Dulcimer",
-  "Órgão Hammond", "Órgão Percussivo", "Órgão Rock", "Órgão de Igreja",
-  "Acordeão", "Bandolim", "Violão Clássico", "Violão Elétrico",
-  "Violão Distorcido", "Violão Acústico", "Guitarra Jazz", "Guitarra Limpa",
-  "Baixo Elétrico", "Baixo Fretless", "Baixo Synth", "Baixo Acústico",
-  "Violino", "Viola", "Violoncelo", "Contrabaixo",
-  "Tremolo", "Pizzicato", "Harpa", "Timpani",
-  "Orquestra de Cordas", "Orquestra Lenta", "Synth de Cordas", "Synth Voz",
-  "Trompete", "Trombone", "Tuba", "Trompete Surdo",
-  "Corneta", "Trompa", "Saxofone Soprano", "Saxofone Tenor",
-  "Saxofone Barítono", "Oboé", "Fagote", "Clarinete",
-  "Piccolo", "Flauta", "Gaita", "Flauta Doce",
-  "Pandeiro", "Xilofone 2", "Bongo", "Percussão",
-  "Synth 1 (Analog)", "Synth 2 (Digital)", "Synth 3 (Bass)", "Synth 4 (Pad)",
-  "Synth 5 (Strings)", "Synth 6 (Brass)", "Synth 7 (Winds)", "Synth 8 (FX)",
-  "Synth 9 (Vox)", "Synth 10 (Ethnic)", "Synth 11 (Bell)", "Synth 12 (Choir)",
-  "Efeito 1 (Rain)", "Efeito 2 (Soundtrack)", "Efeito 3 (Crystal)", "Efeito 4 (Atmosphere)",
-  "Efeito 5 (Brightness)", "Efeito 6 (Goblins)", "Efeito 7 (Echoes)", "Efeito 8 (Sci-Fi)",
+  // Piano (0-7)
+  "Acoustic Grand Piano", "Bright Acoustic Piano", "Electric Grand Piano", "Honky-tonk Piano",
+  "Electric Piano 1 (Rhodes)", "Electric Piano 2 (Chorused)", "Harpsichord (Cravo)", "Clavinet",
+  // Chromatic Percussion (8-15)
+  "Celesta", "Glockenspiel", "Music Box (Caixinha)", "Vibraphone",
+  "Marimba", "Xylophone", "Tubular Bells", "Dulcimer",
+  // Organ (16-23)
+  "Drawbar Organ", "Percussive Organ", "Rock Organ", "Church Organ (Tubos)",
+  "Reed Organ", "Accordion", "Harmonica (Gaita)", "Tango Accordion",
+  // Guitar (24-31)
+  "Acoustic Guitar (Nylon)", "Acoustic Guitar (Steel)", "Electric Guitar (Jazz)", "Electric Guitar (Clean)",
+  "Electric Guitar (Muted)", "Overdriven Guitar", "Distortion Guitar", "Guitar Harmonics",
+  // Bass (32-39)
+  "Acoustic Bass", "Electric Bass (Finger)", "Electric Bass (Pick)", "Fretless Bass",
+  "Slap Bass 1", "Slap Bass 2", "Synth Bass 1", "Synth Bass 2",
+  // Strings (40-47)
+  "Violin", "Viola", "Cello", "Contrabass",
+  "Tremolo Strings", "Pizzicato Strings", "Orchestral Harp", "Timpani",
+  // Ensemble (48-55)
+  "String Ensemble 1", "String Ensemble 2", "Synth Strings 1", "Synth Strings 2",
+  "Choir Aahs", "Voice Oohs", "Synth Voice", "Orchestra Hit",
+  // Brass (56-63)
+  "Trumpet", "Trombone", "Tuba", "Muted Trumpet",
+  "French Horn (Trompa)", "Brass Section", "Synth Brass 1", "Synth Brass 2",
+  // Reed (64-71)
+  "Soprano Sax", "Alto Sax", "Tenor Sax", "Baritone Sax",
+  "Oboe", "English Horn", "Bassoon (Fagote)", "Clarinet",
+  // Pipe (72-79)
+  "Piccolo", "Flute", "Recorder (Flauta Doce)", "Pan Flute",
+  "Blown Bottle", "Shakuhachi", "Whistle (Apito)", "Ocarina",
+  // Synth Lead (80-87)
+  "Lead 1 (Square)", "Lead 2 (Sawtooth)", "Lead 3 (Calliope)", "Lead 4 (Chiff)",
+  "Lead 5 (Charang)", "Lead 6 (Voice)", "Lead 7 (Fifths)", "Lead 8 (Bass+Lead)",
+  // Synth Pad (88-95)
+  "Pad 1 (New Age)", "Pad 2 (Warm)", "Pad 3 (Polysynth)", "Pad 4 (Choir)",
+  "Pad 5 (Bowed)", "Pad 6 (Metallic)", "Pad 7 (Halo)", "Pad 8 (Sweep)",
+  // Synth Effects (96-103)
+  "FX 1 (Rain)", "FX 2 (Soundtrack)", "FX 3 (Crystal)", "FX 4 (Atmosphere)",
+  "FX 5 (Brightness)", "FX 6 (Goblins)", "FX 7 (Echoes)", "FX 8 (Sci-fi)",
+  // Ethnic (104-111)
   "Sitar", "Banjo", "Shamisen", "Koto",
-  "Kalimba", "Flauta de Pã", "Charango", "Violão Havaiano",
-  "Tabla", "Tumbadora", "Synth Bass 1", "Synth Bass 2",
-  "Percussão 1 (Tambor)", "Percussão 2 (Címbalo)", "Percussão 3 (Bloco)", "Percussão 4 (Shaker)",
-  "Percussão 5 (Chocalho)", "Percussão 6 (Bateria)", "Percussão 7 (Gongo)", "Percussão 8 (Tímpano)",
-  "FX 1 (Buzina)", "FX 2 (Claxon)", "FX 3 (Sirene)", "FX 4 (Motor)",
-  "FX 5 (Explosão)", "FX 6 (Risada)", "FX 7 (Corrida)", "FX 8 (Batida)",
-  "Sirene (Alerta)", "Chip (8-bit)", "Tropical (Calypso)", "Ethereal (Espacial)",
-  "Gamelan", "Bells (Sinos)", "Special 1 (Órgão)", "Special 2 (Piano)"
+  "Kalimba", "Bagpipe (Gaita de Foles)", "Fiddle (Rabeca)", "Shanai",
+  // Percussive (112-119)
+  "Tinkle Bell", "Agogo", "Steel Drums", "Woodblock",
+  "Taiko Drum", "Melodic Tom", "Synth Drum", "Reverse Cymbal",
+  // Sound Effects (120-127)
+  "Guitar Fret Noise", "Breath Noise", "Seashore (Mar)", "Bird Tweet",
+  "Telephone Ring", "Helicopter", "Applause (Palmas)", "Gunshot"
 ];
+
+// Categorias para exibição
+const categorias = [
+  { inicio: 0, fim: 7, nome: "🎹 Piano" },
+  { inicio: 8, fim: 15, nome: "🔔 Chromatic Percussion" },
+  { inicio: 16, fim: 23, nome: "🎵 Organ" },
+  { inicio: 24, fim: 31, nome: "🎸 Guitar" },
+  { inicio: 32, fim: 39, nome: "🎸 Bass" },
+  { inicio: 40, fim: 47, nome: "🎻 Strings" },
+  { inicio: 48, fim: 55, nome: "🎻 Ensemble" },
+  { inicio: 56, fim: 63, nome: "🎺 Brass" },
+  { inicio: 64, fim: 71, nome: "🎷 Reed" },
+  { inicio: 72, fim: 79, nome: "🎵 Pipe" },
+  { inicio: 80, fim: 87, nome: "🎹 Synth Lead" },
+  { inicio: 88, fim: 95, nome: "🎹 Synth Pad" },
+  { inicio: 96, fim: 103, nome: "🔊 Synth Effects" },
+  { inicio: 104, fim: 111, nome: "🌍 Ethnic" },
+  { inicio: 112, fim: 119, nome: "🥁 Percussive" },
+  { inicio: 120, fim: 127, nome: "🎬 Sound Effects" }
+];
+
+function getCategoria(num) {
+  for (const cat of categorias) {
+    if (num >= cat.inicio && num <= cat.fim) {
+      return cat.nome;
+    }
+  }
+  return '';
+}
 
 function getInstrumentName(program) {
   if (program >= 0 && program < instrumentosMIDI.length) {
@@ -342,7 +394,7 @@ document.getElementById('midiProgram').addEventListener('input', function() {
   if (!isNaN(val) && val >= 0 && val <= 127) {
     document.getElementById('instrumentName').textContent = getInstrumentName(val);
   } else {
-    document.getElementById('instrumentName').textContent = 'Piano (padrão)';
+    document.getElementById('instrumentName').textContent = 'Acoustic Grand Piano (padrão)';
   }
 });
 
@@ -447,7 +499,7 @@ function renderizarMusica(indice) {
   if (isNaN(midiVal) || midiVal < 0 || midiVal > 127) {
     midiVal = 0;
     document.getElementById('midiProgram').value = 0;
-    document.getElementById('instrumentName').textContent = 'Piano Acústico';
+    document.getElementById('instrumentName').textContent = 'Acoustic Grand Piano';
   }
 
   // Insere o %%MIDI program
@@ -489,7 +541,7 @@ function renderizarMusica(indice) {
     // Se não tem MIDI, mantém o valor atual ou 0
     if (midiOriginal === null) {
       document.getElementById('midiProgram').value = 0;
-      document.getElementById('instrumentName').textContent = 'Piano Acústico';
+      document.getElementById('instrumentName').textContent = 'Acoustic Grand Piano';
       document.getElementById('infoOriginal').textContent = '(Sem instrumento definido - Piano padrão)';
     }
   }
@@ -498,7 +550,7 @@ function renderizarMusica(indice) {
 }
 
 // ============================================================
-// 6. APLICAR MIDI
+// 6. APLICAR MIDI (CONFIRMAR SELEÇÃO)
 // ============================================================
 function aplicarMIDI() {
   if (musicas.length === 0) return;
@@ -506,7 +558,7 @@ function aplicarMIDI() {
   if (isNaN(val) || val < 0 || val > 127) {
     val = 0;
     document.getElementById('midiProgram').value = 0;
-    document.getElementById('instrumentName').textContent = 'Piano Acústico';
+    document.getElementById('instrumentName').textContent = 'Acoustic Grand Piano';
   }
   document.getElementById('instrumentName').textContent = getInstrumentName(val);
   // Re-renderiza a música atual com o novo MIDI
@@ -530,14 +582,21 @@ function gerarTabelaInstrumentos(filtro) {
   const container = document.getElementById('tabelaInstrumentos');
   const termo = filtro.toLowerCase().trim();
   let html = '<table>';
-  html += '<tr><th>Nº</th><th>Instrumento</th></tr>';
+  html += '<tr><th>Nº</th><th>Instrumento</th><th>Categoria</th></tr>';
   
   let count = 0;
+  let ultimaCategoria = '';
   for (let i = 0; i < instrumentosMIDI.length; i++) {
     const nome = instrumentosMIDI[i];
+    const cat = getCategoria(i);
     if (termo === '' || nome.toLowerCase().includes(termo) || i.toString().includes(termo)) {
+      // Mostra a categoria como separador
+      if (cat !== ultimaCategoria) {
+        ultimaCategoria = cat;
+        html += `<tr class="categoria-label"><td colspan="3">${cat}</td></tr>`;
+      }
       const destaque = i === parseInt(document.getElementById('midiProgram').value) ? 'destaque' : '';
-      html += `<tr class="${destaque}"><td><strong>${i}</strong></td><td>${nome}</td></tr>`;
+      html += `<tr class="${destaque}"><td><strong>${i}</strong></td><td>${nome}</td><td style="font-size:0.75rem;color:#888;">${cat}</td></tr>`;
       count++;
     }
   }
@@ -546,7 +605,7 @@ function gerarTabelaInstrumentos(filtro) {
   document.getElementById('contadorInstrumentos').textContent = `Mostrando ${count} de ${instrumentosMIDI.length} instrumentos`;
   
   // Se clicar em uma linha, preenche o campo
-  container.querySelectorAll('tr').forEach(tr => {
+  container.querySelectorAll('tr:not(.categoria-label)').forEach(tr => {
     tr.style.cursor = 'pointer';
     tr.addEventListener('click', function() {
       const num = parseInt(this.querySelector('td:first-child').textContent);
@@ -554,6 +613,7 @@ function gerarTabelaInstrumentos(filtro) {
         document.getElementById('midiProgram').value = num;
         document.getElementById('instrumentName').textContent = getInstrumentName(num);
         fecharModalInstrumentos();
+        // Aplica automaticamente ao clicar na tabela
         aplicarMIDI();
       }
     });
