@@ -2,559 +2,963 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📋 Playlist – NBM</title>
+  <title>🎼 Partitura Interativa</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/abcjs@6.2.3/dist/abcjs-basic-min.js"></script>
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-DP3HN6DMXQ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-DP3HN6DMXQ');
+  </script>
+
   <style>
-    * { box-sizing: border-box; }
-    body {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      background: #f4f7f6;
-      margin: 0;
-      padding: 20px;
-      color: #333;
-    }
-    .container {
-      max-width: 1000px;
-      margin: 0 auto;
-      background: white;
-      padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-    }
-    h1 { text-align: center; color: #2c3e50; }
-    nav {
-      background: #2c3e50;
-      padding: 1rem;
-      text-align: center;
-      border-radius: 8px;
-      margin-bottom: 20px;
-    }
-    nav a {
-      color: white;
-      text-decoration: none;
-      margin: 0 15px;
-      font-weight: bold;
-    }
-    nav a:hover { text-decoration: underline; }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-    @media (max-width: 700px) {
-      .grid-2 { grid-template-columns: 1fr; }
-    }
-
-    .panel {
-      background: #f8f9fa;
-      border-radius: 8px;
+    /* Estilos existentes... */
+    .controls {
+      margin: 20px 0;
       padding: 15px;
-      border: 1px solid #ddd;
+      background: #f4f4f4;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-    .panel h3 {
-      margin-top: 0;
-      color: #2c3e50;
-      border-bottom: 2px solid #e67e22;
-      padding-bottom: 8px;
-    }
-
-    .search-box {
-      width: 100%;
-      padding: 10px;
-      border: 2px solid #ddd;
-      border-radius: 25px;
-      font-size: 1rem;
-      outline: none;
-      transition: border-color 0.3s;
-    }
-    .search-box:focus { border-color: #e67e22; }
-
-    .lista-itens {
-      max-height: 400px;
-      overflow-y: auto;
-      margin-top: 10px;
-    }
-    .item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 12px;
-      border-bottom: 1px solid #eee;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    .item:hover { background: #fff5ed; }
-    .item .titulo { flex: 1; }
-    .item .btn-add {
-      background: #28a745;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      padding: 4px 12px;
-      cursor: pointer;
-      font-size: 0.8rem;
-    }
-    .item .btn-add:hover { background: #1e7e34; }
-
-    .playlist-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 12px;
-      border-bottom: 1px solid #eee;
-      background: white;
-    }
-    .playlist-item .titulo { flex: 1; }
-    .playlist-item .btn-remove {
-      background: #dc3545;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      padding: 4px 10px;
-      cursor: pointer;
-      font-size: 0.8rem;
-    }
-    .playlist-item .btn-remove:hover { background: #c82333; }
-    .playlist-item .btn-up, .playlist-item .btn-down {
-      background: #6c757d;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      padding: 4px 8px;
-      cursor: pointer;
-      font-size: 0.8rem;
-      margin: 0 2px;
-    }
-    .playlist-item .btn-up:hover, .playlist-item .btn-down:hover { background: #5a6268; }
-
-    .empty-msg {
-      color: #888;
-      text-align: center;
-      padding: 20px;
-    }
-
-    .acoes {
-      margin-top: 15px;
+    .control-group {
+      margin-bottom: 15px;
       display: flex;
       flex-wrap: wrap;
+      align-items: center;
       gap: 10px;
     }
-    .acoes button {
-      padding: 8px 18px;
-      border: none;
-      border-radius: 4px;
-      font-size: 14px;
-      cursor: pointer;
-      background: #007bff;
-      color: white;
-      transition: 0.2s;
-    }
-    .acoes button:hover { background: #0056b3; }
-    .acoes button.verde { background: #28a745; }
-    .acoes button.verde:hover { background: #1e7e34; }
-    .acoes button.laranja { background: #fd7e14; }
-    .acoes button.laranja:hover { background: #e06b0a; }
-    .acoes button.vermelho { background: #dc3545; }
-    .acoes button.vermelho:hover { background: #c82333; }
-
-    .import-area {
+    .audio-modes {
+      border-top: 1px solid #ddd;
+      padding-top: 15px;
       margin-top: 10px;
+    }
+    .controls label { font-weight: bold; }
+    .controls button {
+      cursor: pointer;
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      background: white;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    .controls button:hover { background: #e9e9e9; }
+    .btn-play { background-color: #e7f3ff !important; border-color: #007bff !important; color: #007bff; font-weight: bold; }
+    .btn-stop { background-color: #fff0f0 !important; border-color: #dc3545 !important; color: #dc3545; font-weight: bold; }
+    .btn-editar { background-color: #fff3cd !important; border-color: #ffc107 !important; color: #856404; font-weight: bold; }
+    
+    #paper {
+      background: white;
       padding: 10px;
-      border: 2px dashed #ccc;
+      margin-top: 20px;
       border-radius: 8px;
-      text-align: center;
-      cursor: pointer;
-      transition: background 0.3s;
     }
-    .import-area:hover { background: #f1f1f1; }
-    .import-area input[type="file"] {
-      display: none;
-    }
-    .import-area .label {
-      display: inline-block;
-      padding: 8px 16px;
-      background: #007bff;
-      color: white;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .import-area .label:hover { background: #0056b3; }
 
-    .status {
-      margin-top: 10px;
-      font-weight: bold;
-      color: #28a745;
+    .nav-musicas {
+      background: #f8f9fa;
+      padding: 12px 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid #ddd;
     }
-    .badge {
-      background: #e67e22;
+    .nav-musicas select {
+      padding: 8px 12px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      min-width: 200px;
+      flex: 2;
+    }
+    .nav-musicas .info-musica {
+      font-size: 0.85rem;
+      color: #555;
+      white-space: nowrap;
+    }
+    .nav-musicas .badge {
+      background: #007bff;
       color: white;
       padding: 2px 10px;
       border-radius: 12px;
       font-size: 0.8rem;
+    }
+    .nav-musicas button {
+      padding: 6px 14px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .nav-musicas button:hover { background: #0056b3; }
+    .nav-musicas .compositor-info {
+      color: #888;
+      font-size: 0.8rem;
       margin-left: 8px;
+    }
+    .nav-musicas .categoria-info {
+      color: #e67e22;
+      font-size: 0.85rem;
+      font-weight: bold;
+      margin-left: auto;
+      white-space: nowrap;
+    }
+    .nav-musicas .titulo-esquerda {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      min-width: 150px;
+    }
+
+    /* Instrumento MIDI */
+    .midi-control {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      background: #e8f4fd;
+      border-radius: 6px;
+      border: 1px solid #b8d4e8;
+    }
+    .midi-control label {
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+    .midi-control input[type="number"] {
+      width: 60px;
+      padding: 4px 6px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    .midi-control .instrument-name {
+      font-size: 0.85rem;
+      color: #555;
+      min-width: 160px;
+    }
+    .midi-control button {
+      padding: 4px 14px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .midi-control button:hover { background: #1e7e34; }
+    .midi-control .btn-instrumentos {
+      background: #6c757d;
+    }
+    .midi-control .btn-instrumentos:hover { background: #5a6268; }
+    .midi-control .info-original {
+      font-size: 0.8rem;
+      color: #888;
+    }
+
+    /* Modal de instrumentos */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      max-width: 750px;
+      width: 95%;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+    .modal-content h2 {
+      color: #2c3e50;
+      margin-top: 0;
+      text-align: center;
+    }
+    .modal-content .fechar {
+      float: right;
+      background: #e74c3c;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .modal-content .fechar:hover { background: #c0392b; }
+    .modal-content table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .modal-content th, .modal-content td {
+      border: 1px solid #ddd;
+      padding: 5px 8px;
+      text-align: left;
+    }
+    .modal-content th {
+      background: #2c3e50;
+      color: white;
+    }
+    .modal-content tr:nth-child(even) {
+      background: #f8f9fa;
+    }
+    .modal-content .destaque {
+      background: #fff3cd;
+    }
+    .modal-content .busca-instrumento {
+      width: 100%;
+      padding: 8px 12px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    .modal-content .contador {
+      color: #666;
+      font-size: 0.8rem;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .modal-content .categoria-label {
+      background: #e9ecef;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+    .modal-content tr:not(.categoria-label) {
+      cursor: pointer;
+    }
+    .modal-content tr:not(.categoria-label):hover {
+      background: #d4edda !important;
+    }
+
+    /* Editor modal */
+    .editor-modal .modal-content {
+      max-width: 900px;
+    }
+    .editor-modal textarea {
+      width: 100%;
+      height: 400px;
+      font-family: 'Consolas', monospace;
+      font-size: 14px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      resize: vertical;
+    }
+    .editor-modal .editor-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+      flex-wrap: wrap;
+    }
+    .editor-modal .editor-actions button {
+      padding: 8px 20px;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .editor-modal .editor-actions .btn-salvar {
+      background: #28a745;
+      color: white;
+    }
+    .editor-modal .editor-actions .btn-salvar:hover {
+      background: #1e7e34;
+    }
+    .editor-modal .editor-actions .btn-baixar {
+      background: #007bff;
+      color: white;
+    }
+    .editor-modal .editor-actions .btn-baixar:hover {
+      background: #0056b3;
+    }
+    .editor-modal .editor-actions .btn-copiar {
+      background: #6c757d;
+      color: white;
+    }
+    .editor-modal .editor-actions .btn-copiar:hover {
+      background: #5a6268;
+    }
+    .editor-modal .editor-actions .btn-fechar {
+      background: #dc3545;
+      color: white;
+    }
+    .editor-modal .editor-actions .btn-fechar:hover {
+      background: #c82333;
+    }
+    .editor-modal .editor-info {
+      font-size: 0.85rem;
+      color: #666;
+      margin-bottom: 10px;
     }
   </style>
 </head>
 <body>
 
+<header>
+  <h1>🎼 Partitura Interativa</h1>
+</header>
+
 <nav>
-  <a href="index.html">Início</a>
-  <a href="musicas.html">Músicas</a>
-  <a href="playlist.html">Playlist</a>
-  <a href="upload.html">Upload</a>
+  <a href="musicas.html" style="text-decoration: none; font-weight: bold;">← Voltar para o Acervo</a>
 </nav>
 
-<div class="container">
-  <h1>📋 Minha Playlist</h1>
+<main>
 
-  <div class="grid-2">
-    <!-- Painel esquerdo: Acervo + Busca -->
-    <div class="panel">
-      <h3>📚 Acervo <span class="badge" id="totalAcervo">0</span></h3>
-      <input type="text" id="buscaAcervo" class="search-box" placeholder="Buscar no acervo...">
-      <div class="lista-itens" id="listaAcervo"></div>
-      <div style="margin-top:10px;">
-        <button class="btn-add" onclick="adicionarTodosFiltrados()" style="background:#007bff;color:white;border:none;padding:6px 14px;border-radius:4px;cursor:pointer;">➕ Adicionar todos filtrados</button>
-      </div>
+  <!-- Navegação entre músicas do arquivo -->
+  <div class="nav-musicas" id="navMusicas" style="display:none;">
+    <span class="badge" id="totalMusicas">0</span>
+    <div class="titulo-esquerda">
+      <select id="listaMusicas" size="1"></select>
+      <button id="btnAnterior" title="Música anterior">◀</button>
+      <button id="btnProximo" title="Próxima música">▶</button>
+    </div>
+    <span class="info-musica" id="infoMusicaAtual"></span>
+    <span class="categoria-info" id="categoriaAtual"></span>
+  </div>
+
+  <div class="controls">
+    <div class="control-group">
+      <label>Andamento (BPM):</label>
+      <input type="number" id="tempo" value="100" min="40" max="240" style="width: 60px; padding: 5px;">
+      <label style="margin-left:20px;">Transposição:</label>
+      <button id="down">−</button>
+      <span id="transposeValue" style="font-size: 1.2em; min-width: 20px; text-align: center;">0</span>
+      <button id="up">+</button>
     </div>
 
-    <!-- Painel direito: Playlist -->
-    <div class="panel">
-      <h3>🎵 Playlist <span class="badge" id="totalPlaylist">0</span></h3>
-      <div class="lista-itens" id="listaPlaylist"></div>
-      <div class="acoes">
-        <button class="laranja" onclick="limparPlaylist()">🗑️ Limpar</button>
-        <button class="verde" onclick="salvarPlaylist()">💾 Salvar no Navegador</button>
-        <button class="btn-add" onclick="exportarM3U()">📥 Exportar .m3u</button>
-        <button class="btn-add" onclick="exportarJSON()">📥 Exportar .json</button>
-      </div>
-      <div class="import-area" onclick="document.getElementById('fileInput').click()">
-        <span class="label">📂 Importar arquivo (.abc ou .txt)</span>
-        <input type="file" id="fileInput" accept=".abc,.txt" multiple>
-        <p style="font-size:0.8rem; color:#888; margin:5px 0 0;">Arquivos .abc: extrai títulos; .txt: cada linha é um item</p>
-      </div>
-      <div id="statusImport" class="status"></div>
+    <!-- Controle MIDI Program -->
+    <div class="control-group midi-control">
+      <label>🎹 Instrumento MIDI:</label>
+      <input type="number" id="midiProgram" value="0" min="0" max="127">
+      <span class="instrument-name" id="instrumentName">Acoustic Grand Piano</span>
+      <button onclick="aplicarMIDI()">✅ Aplicar</button>
+      <button class="btn-instrumentos" onclick="abrirModalInstrumentos()">📋 Ver Instrumentos</button>
+      <span class="info-original" id="infoOriginal"></span>
     </div>
+
+    <div class="control-group audio-modes">
+      <label>Tocar:</label>
+      <button class="btn-play" id="play-all">Play</button>
+      <button id="play-chords">Só Acordes</button>
+      <button id="play-melodies">M1 + M2</button>
+      <button id="play-v1">Melodia 1</button>
+      <button id="play-v2">Melodia 2</button>
+      <button class="btn-stop" id="stop">⏹️ Parar</button>
+      <button class="btn-editar" onclick="abrirEditor()">✏️ Editar ABC</button>
+    </div>
+  </div>
+
+  <div id="paper"></div>
+
+</main>
+
+<!-- Modal de Instrumentos MIDI -->
+<div class="modal-overlay" id="modalInstrumentos">
+  <div class="modal-content">
+    <button class="fechar" onclick="fecharModalInstrumentos()">✕ Fechar</button>
+    <h2>🎹 Tabela General MIDI (0 a 127)</h2>
+    <p style="text-align:center; color:#666; font-size:0.9rem;">Clique em um instrumento para selecioná-lo.</p>
+    <input type="text" class="busca-instrumento" id="buscaInstrumento" placeholder="🔍 Buscar instrumento..." oninput="filtrarInstrumentos()">
+    <div class="contador" id="contadorInstrumentos">Mostrando 128 instrumentos</div>
+    <div id="tabelaInstrumentos"></div>
+  </div>
+</div>
+
+<!-- Modal do Editor ABC -->
+<div class="modal-overlay editor-modal" id="modalEditor">
+  <div class="modal-content">
+    <button class="fechar" onclick="fecharEditor()">✕ Fechar</button>
+    <h2>✏️ Editor ABC</h2>
+    <div class="editor-info" id="editorInfo">Editando: Música atual</div>
+    <textarea id="editorTextarea"></textarea>
+    <div class="editor-actions">
+      <button class="btn-salvar" onclick="aplicarEdicao()">✅ Aplicar e Renderizar</button>
+      <button class="btn-baixar" onclick="baixarABC()">💾 Baixar .abc</button>
+      <button class="btn-copiar" onclick="copiarABC()">📋 Copiar Código</button>
+      <button class="btn-fechar" onclick="fecharEditor()">❌ Fechar</button>
+    </div>
+    <p style="font-size:0.8rem; color:#888; margin-top:10px;">
+      <strong>Dica:</strong> Após editar, clique em "Aplicar e Renderizar" para ver as alterações na partitura. 
+      Para salvar permanentemente, baixe o arquivo .abc e substitua manualmente no GitHub.
+    </p>
   </div>
 </div>
 
 <script>
 // ============================================================
-// 1. CONFIGURAÇÃO
+// 1. MAPA DE INSTRUMENTOS MIDI (0 a 127) - General MIDI
 // ============================================================
-const STORAGE_KEY = 'nbm_playlist';
-let acervo = [];
-let playlist = [];
-
-// ============================================================
-// 2. CARREGAR ACERVO (mesmo esquema do musicas.html)
-// ============================================================
-const arquivosJson = [
-  'dados/folclore.json',
-  'dados/cantor-cristao.json',
-  'dados/evangelicas.json',
-  'dados/hinario-ccb.json',
-  'dados/enciclopedia_musica.json',
-  'dados/metodo_buga.json',
-  'dados/outros.json',
-  'dados/mpb.json'
+const instrumentosMIDI = [
+  // Piano (0-7)
+  "Acoustic Grand Piano", "Bright Acoustic Piano", "Electric Grand Piano", "Honky-tonk Piano",
+  "Electric Piano 1 (Rhodes)", "Electric Piano 2 (Chorused)", "Harpsichord (Cravo)", "Clavinet",
+  // Chromatic Percussion (8-15)
+  "Celesta", "Glockenspiel", "Music Box (Caixinha)", "Vibraphone",
+  "Marimba", "Xylophone", "Tubular Bells", "Dulcimer",
+  // Organ (16-23)
+  "Drawbar Organ", "Percussive Organ", "Rock Organ", "Church Organ (Tubos)",
+  "Reed Organ", "Accordion", "Harmonica (Gaita)", "Tango Accordion",
+  // Guitar (24-31)
+  "Acoustic Guitar (Nylon)", "Acoustic Guitar (Steel)", "Electric Guitar (Jazz)", "Electric Guitar (Clean)",
+  "Electric Guitar (Muted)", "Overdriven Guitar", "Distortion Guitar", "Guitar Harmonics",
+  // Bass (32-39)
+  "Acoustic Bass", "Electric Bass (Finger)", "Electric Bass (Pick)", "Fretless Bass",
+  "Slap Bass 1", "Slap Bass 2", "Synth Bass 1", "Synth Bass 2",
+  // Strings (40-47)
+  "Violin", "Viola", "Cello", "Contrabass",
+  "Tremolo Strings", "Pizzicato Strings", "Orchestral Harp", "Timpani",
+  // Ensemble (48-55)
+  "String Ensemble 1", "String Ensemble 2", "Synth Strings 1", "Synth Strings 2",
+  "Choir Aahs", "Voice Oohs", "Synth Voice", "Orchestra Hit",
+  // Brass (56-63)
+  "Trumpet", "Trombone", "Tuba", "Muted Trumpet",
+  "French Horn (Trompa)", "Brass Section", "Synth Brass 1", "Synth Brass 2",
+  // Reed (64-71)
+  "Soprano Sax", "Alto Sax", "Tenor Sax", "Baritone Sax",
+  "Oboe", "English Horn", "Bassoon (Fagote)", "Clarinet",
+  // Pipe (72-79)
+  "Piccolo", "Flute", "Recorder (Flauta Doce)", "Pan Flute",
+  "Blown Bottle", "Shakuhachi", "Whistle (Apito)", "Ocarina",
+  // Synth Lead (80-87)
+  "Lead 1 (Square)", "Lead 2 (Sawtooth)", "Lead 3 (Calliope)", "Lead 4 (Chiff)",
+  "Lead 5 (Charang)", "Lead 6 (Voice)", "Lead 7 (Fifths)", "Lead 8 (Bass+Lead)",
+  // Synth Pad (88-95)
+  "Pad 1 (New Age)", "Pad 2 (Warm)", "Pad 3 (Polysynth)", "Pad 4 (Choir)",
+  "Pad 5 (Bowed)", "Pad 6 (Metallic)", "Pad 7 (Halo)", "Pad 8 (Sweep)",
+  // Synth Effects (96-103)
+  "FX 1 (Rain)", "FX 2 (Soundtrack)", "FX 3 (Crystal)", "FX 4 (Atmosphere)",
+  "FX 5 (Brightness)", "FX 6 (Goblins)", "FX 7 (Echoes)", "FX 8 (Sci-fi)",
+  // Ethnic (104-111)
+  "Sitar", "Banjo", "Shamisen", "Koto",
+  "Kalimba", "Bagpipe (Gaita de Foles)", "Fiddle (Rabeca)", "Shanai",
+  // Percussive (112-119)
+  "Tinkle Bell", "Agogo", "Steel Drums", "Woodblock",
+  "Taiko Drum", "Melodic Tom", "Synth Drum", "Reverse Cymbal",
+  // Sound Effects (120-127)
+  "Guitar Fret Noise", "Breath Noise", "Seashore (Mar)", "Bird Tweet",
+  "Telephone Ring", "Helicopter", "Applause (Palmas)", "Gunshot"
 ];
 
-async function carregarAcervo() {
-  try {
-    const promessas = arquivosJson.map(url =>
-      fetch(url)
-        .then(res => {
-          if (!res.ok) throw new Error(`Não encontrado: ${url}`);
-          return res.json();
-        })
-        .catch(() => [])
-    );
-    const resultados = await Promise.all(promessas);
-    acervo = resultados.flat().filter(m => m && m.titulo && m.categoria);
-    document.getElementById('totalAcervo').textContent = acervo.length;
-    renderizarAcervo('');
-  } catch (e) {
-    console.error(e);
+// Categorias para exibição
+const categorias = [
+  { inicio: 0, fim: 7, nome: "🎹 Piano" },
+  { inicio: 8, fim: 15, nome: "🔔 Chromatic Percussion" },
+  { inicio: 16, fim: 23, nome: "🎵 Organ" },
+  { inicio: 24, fim: 31, nome: "🎸 Guitar" },
+  { inicio: 32, fim: 39, nome: "🎸 Bass" },
+  { inicio: 40, fim: 47, nome: "🎻 Strings" },
+  { inicio: 48, fim: 55, nome: "🎻 Ensemble" },
+  { inicio: 56, fim: 63, nome: "🎺 Brass" },
+  { inicio: 64, fim: 71, nome: "🎷 Reed" },
+  { inicio: 72, fim: 79, nome: "🎵 Pipe" },
+  { inicio: 80, fim: 87, nome: "🎹 Synth Lead" },
+  { inicio: 88, fim: 95, nome: "🎹 Synth Pad" },
+  { inicio: 96, fim: 103, nome: "🔊 Synth Effects" },
+  { inicio: 104, fim: 111, nome: "🌍 Ethnic" },
+  { inicio: 112, fim: 119, nome: "🥁 Percussive" },
+  { inicio: 120, fim: 127, nome: "🎬 Sound Effects" }
+];
+
+function getCategoria(num) {
+  for (const cat of categorias) {
+    if (num >= cat.inicio && num <= cat.fim) {
+      return cat.nome;
+    }
   }
+  return '';
 }
 
-// ============================================================
-// 3. PLAYLIST - localStorage
-// ============================================================
-function carregarPlaylist() {
-  const data = localStorage.getItem(STORAGE_KEY);
-  if (data) {
-    try {
-      playlist = JSON.parse(data);
-      if (!Array.isArray(playlist)) playlist = [];
-    } catch {
-      playlist = [];
-    }
+function getInstrumentName(program) {
+  if (program >= 0 && program < instrumentosMIDI.length) {
+    return instrumentosMIDI[program];
+  }
+  return `Programa ${program}`;
+}
+
+// Atualiza o nome do instrumento quando o número muda
+document.getElementById('midiProgram').addEventListener('input', function() {
+  const val = parseInt(this.value);
+  if (!isNaN(val) && val >= 0 && val <= 127) {
+    document.getElementById('instrumentName').textContent = getInstrumentName(val);
   } else {
-    playlist = [];
+    document.getElementById('instrumentName').textContent = 'Acoustic Grand Piano (padrão)';
   }
-  renderizarPlaylist();
-}
-
-function salvarPlaylist() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(playlist));
-  document.getElementById('statusImport').textContent = '✅ Playlist salva no navegador!';
-  document.getElementById('statusImport').style.color = '#28a745';
-  setTimeout(() => { document.getElementById('statusImport').textContent = ''; }, 3000);
-}
-
-function limparPlaylist() {
-  if (playlist.length === 0) return;
-  if (confirm('Deseja limpar toda a playlist?')) {
-    playlist = [];
-    renderizarPlaylist();
-    salvarPlaylist();
-  }
-}
-
-// ============================================================
-// 4. RENDERIZAR ACERVO (com busca)
-// ============================================================
-function renderizarAcervo(filtro) {
-  const container = document.getElementById('listaAcervo');
-  const termo = filtro.toLowerCase().trim();
-  const filtrados = acervo.filter(m =>
-    m.titulo.toLowerCase().includes(termo) ||
-    (m.compositor && m.compositor.toLowerCase().includes(termo)) ||
-    m.categoria.toLowerCase().includes(termo)
-  );
-
-  if (filtrados.length === 0) {
-    container.innerHTML = '<div class="empty-msg">Nenhuma música encontrada</div>';
-    return;
-  }
-
-  container.innerHTML = filtrados.map(m => `
-    <div class="item" data-titulo="${m.titulo}" data-path="${m.path}">
-      <span class="titulo"><strong>${m.titulo}</strong> <span style="color:#888;font-size:0.8rem;">${m.compositor || ''}</span></span>
-      <button class="btn-add" onclick="adicionarItem('${m.titulo}', '${m.path}')">➕</button>
-    </div>
-  `).join('');
-}
-
-// ============================================================
-// 5. RENDERIZAR PLAYLIST
-// ============================================================
-function renderizarPlaylist() {
-  const container = document.getElementById('listaPlaylist');
-  document.getElementById('totalPlaylist').textContent = playlist.length;
-
-  if (playlist.length === 0) {
-    container.innerHTML = '<div class="empty-msg">Nenhuma música na playlist</div>';
-    return;
-  }
-
-  container.innerHTML = playlist.map((item, index) => `
-    <div class="playlist-item" data-index="${index}">
-      <span class="titulo"><strong>${item.titulo}</strong> <span style="color:#888;font-size:0.8rem;">${item.path || ''}</span></span>
-      <div>
-        <button class="btn-up" onclick="moverItem(${index}, -1)" ${index === 0 ? 'disabled' : ''}>▲</button>
-        <button class="btn-down" onclick="moverItem(${index}, 1)" ${index === playlist.length-1 ? 'disabled' : ''}>▼</button>
-        <button class="btn-remove" onclick="removerItem(${index})">✕</button>
-      </div>
-    </div>
-  `).join('');
-}
-
-// ============================================================
-// 6. MANIPULAÇÃO DA PLAYLIST
-// ============================================================
-function adicionarItem(titulo, path) {
-  // Evita duplicatas (pode remover se quiser permitir repetição)
-  if (playlist.some(item => item.titulo === titulo && item.path === path)) {
-    document.getElementById('statusImport').textContent = '⚠️ Música já está na playlist.';
-    document.getElementById('statusImport').style.color = '#fd7e14';
-    setTimeout(() => { document.getElementById('statusImport').textContent = ''; }, 2000);
-    return;
-  }
-  playlist.push({ titulo, path });
-  renderizarPlaylist();
-  salvarPlaylist();
-  document.getElementById('statusImport').textContent = `✅ "${titulo}" adicionado!`;
-  document.getElementById('statusImport').style.color = '#28a745';
-  setTimeout(() => { document.getElementById('statusImport').textContent = ''; }, 1500);
-}
-
-function removerItem(index) {
-  const removido = playlist[index];
-  playlist.splice(index, 1);
-  renderizarPlaylist();
-  salvarPlaylist();
-  document.getElementById('statusImport').textContent = `🗑️ "${removido.titulo}" removido.`;
-  document.getElementById('statusImport').style.color = '#dc3545';
-  setTimeout(() => { document.getElementById('statusImport').textContent = ''; }, 1500);
-}
-
-function moverItem(index, direcao) {
-  const novoIndex = index + direcao;
-  if (novoIndex < 0 || novoIndex >= playlist.length) return;
-  const [item] = playlist.splice(index, 1);
-  playlist.splice(novoIndex, 0, item);
-  renderizarPlaylist();
-  salvarPlaylist();
-}
-
-function adicionarTodosFiltrados() {
-  const busca = document.getElementById('buscaAcervo').value;
-  const termo = busca.toLowerCase().trim();
-  const filtrados = acervo.filter(m =>
-    m.titulo.toLowerCase().includes(termo) ||
-    (m.compositor && m.compositor.toLowerCase().includes(termo)) ||
-    m.categoria.toLowerCase().includes(termo)
-  );
-  let adicionados = 0;
-  filtrados.forEach(m => {
-    if (!playlist.some(p => p.titulo === m.titulo && p.path === m.path)) {
-      playlist.push({ titulo: m.titulo, path: m.path });
-      adicionados++;
-    }
-  });
-  if (adicionados > 0) {
-    renderizarPlaylist();
-    salvarPlaylist();
-    document.getElementById('statusImport').textContent = `✅ ${adicionados} músicas adicionadas.`;
-    document.getElementById('statusImport').style.color = '#28a745';
-    setTimeout(() => { document.getElementById('statusImport').textContent = ''; }, 2000);
-  } else {
-    document.getElementById('statusImport').textContent = '⚠️ Nenhuma nova música para adicionar.';
-    document.getElementById('statusImport').style.color = '#fd7e14';
-    setTimeout(() => { document.getElementById('statusImport').textContent = ''; }, 2000);
-  }
-}
-
-// ============================================================
-// 7. IMPORTAR ARQUIVOS (.abc ou .txt)
-// ============================================================
-document.getElementById('fileInput').addEventListener('change', function(e) {
-  const files = e.target.files;
-  if (!files || files.length === 0) return;
-
-  let totalItens = 0;
-  let promises = [];
-
-  for (let file of files) {
-    const reader = new FileReader();
-    const promise = new Promise((resolve) => {
-      reader.onload = function(ev) {
-        const content = ev.target.result;
-        const nomeArquivo = file.name;
-
-        if (nomeArquivo.toLowerCase().endsWith('.abc')) {
-          // Extrai todos os títulos (T:) do arquivo ABC
-          const titulos = extrairTitulosABC(content);
-          titulos.forEach(t => {
-            // Verifica duplicata
-            if (!playlist.some(p => p.titulo === t)) {
-              playlist.push({ titulo: t, path: nomeArquivo });
-              totalItens++;
-            }
-          });
-        } else if (nomeArquivo.toLowerCase().endsWith('.txt')) {
-          // Cada linha é um item
-          const linhas = content.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-          linhas.forEach(t => {
-            if (!playlist.some(p => p.titulo === t)) {
-              playlist.push({ titulo: t, path: nomeArquivo });
-              totalItens++;
-            }
-          });
-        } else {
-          alert(`Arquivo não suportado: ${nomeArquivo}`);
-        }
-        resolve();
-      };
-      reader.readAsText(file);
-    });
-    promises.push(promise);
-  }
-
-  Promise.all(promises).then(() => {
-    if (totalItens > 0) {
-      renderizarPlaylist();
-      salvarPlaylist();
-      document.getElementById('statusImport').textContent = `✅ ${totalItens} itens importados.`;
-      document.getElementById('statusImport').style.color = '#28a745';
-    } else {
-      document.getElementById('statusImport').textContent = '⚠️ Nenhum item novo importado.';
-      document.getElementById('statusImport').style.color = '#fd7e14';
-    }
-    setTimeout(() => { document.getElementById('statusImport').textContent = ''; }, 3000);
-    // Limpa o input para permitir reimportar o mesmo arquivo
-    document.getElementById('fileInput').value = '';
-  });
 });
 
-function extrairTitulosABC(texto) {
-  const titulos = [];
+// ============================================================
+// 2. VARIÁVEIS GLOBAIS
+// ============================================================
+let musicas = [];
+let musicaSelecionada = 0;
+let visualObj = null;
+let synthControl = null;
+let transposeValue = 0;
+let audioContext = null;
+let midiOriginal = null;
+let categoriaGlobal = '';
+let codigoOriginal = '';
+
+// ============================================================
+// 3. FUNÇÕES AUXILIARES
+// ============================================================
+function extrairCampo(bloco, campo) {
+  const regex = new RegExp('^' + campo + ':(.*)$', 'm');
+  const match = bloco.match(regex);
+  return match ? match[1].trim() : '';
+}
+
+function limparTitulo(x, titulo) {
+  const padrao = new RegExp('^' + x.padStart(3, '0') + '\\s*[-–]\\s*');
+  const padraoSemZero = new RegExp('^' + x + '\\s*[-–]\\s*');
+  let limpo = titulo;
+  if (padrao.test(titulo)) limpo = titulo.replace(padrao, '');
+  else if (padraoSemZero.test(titulo)) limpo = titulo.replace(padraoSemZero, '');
+  return limpo;
+}
+
+// ============================================================
+// 4. EXTRAIR MÚSICAS DO ARQUIVO ABC
+// ============================================================
+function extrairMusicas(texto) {
   const blocos = texto.split(/\n(?=X:\d+)/);
+  const lista = [];
+  
   blocos.forEach(bloco => {
-    const match = bloco.match(/^T:(.*)$/m);
-    if (match) {
-      titulos.push(match[1].trim());
+    const x = extrairCampo(bloco, 'X');
+    if (!x) return;
+    const tituloRaw = extrairCampo(bloco, 'T') || `Música ${x}`;
+    const compositor = extrairCampo(bloco, 'C') || 
+                       extrairCampo(bloco, 'O') || 
+                       extrairCampo(bloco, 'S') || 
+                       'Desconhecido';
+    const tituloLimpo = limparTitulo(x, tituloRaw);
+    
+    const midiMatch = bloco.match(/^%%MIDI\s+program\s+(\d+)/m);
+    const midiProgram = midiMatch ? parseInt(midiMatch[1], 10) : null;
+    
+    lista.push({
+      x: x,
+      titulo: `${x} - ${tituloLimpo}`,
+      tituloLimpo: tituloLimpo,
+      compositor: compositor,
+      codigo: bloco.trim(),
+      midiProgram: midiProgram,
+      categoria: categoriaGlobal
+    });
+  });
+  lista.sort((a, b) => parseInt(a.x, 10) - parseInt(b.x, 10));
+  return lista;
+}
+
+// ============================================================
+// 5. RENDERIZAR UMA MÚSICA ESPECÍFICA
+// ============================================================
+function renderizarMusica(indice) {
+  if (!musicas.length || indice < 0 || indice >= musicas.length) return;
+  musicaSelecionada = indice;
+  const musica = musicas[indice];
+  const bpm = document.getElementById("tempo").value;
+
+  // Armazena o código original para o editor
+  codigoOriginal = musica.codigo;
+
+  let codigo = musica.codigo;
+
+  // --- TRATAMENTO DO Q: (ANDAMENTO) ---
+  const hasQ = /^Q:.*/m.test(codigo);
+  if (!hasQ) {
+    codigo = codigo.replace(/^Q:.*$/gm, "");
+    codigo = codigo.replace(/^\s*[\r\n]/gm, "");
+    const kMatch = codigo.match(/^(K:.*)$/m);
+    if (kMatch) {
+      codigo = codigo.replace(/^(K:.*)$/m, `$1\nQ:${bpm}`);
+    } else {
+      const tMatch = codigo.match(/^(T:.*)$/m);
+      if (tMatch) {
+        codigo = codigo.replace(/^(T:.*)$/m, `$1\nQ:${bpm}`);
+      } else {
+        codigo = `Q:${bpm}\n` + codigo;
+      }
     }
+  }
+
+  // --- TRATAMENTO DO %%MIDI program ---
+  codigo = codigo.replace(/^%%MIDI\s+program\s+\d+.*$/gm, "");
+  codigo = codigo.replace(/^\s*[\r\n]/gm, "");
+
+  let midiVal = parseInt(document.getElementById('midiProgram').value);
+  if (isNaN(midiVal) || midiVal < 0 || midiVal > 127) {
+    midiVal = 0;
+    document.getElementById('midiProgram').value = 0;
+    document.getElementById('instrumentName').textContent = 'Acoustic Grand Piano';
+  }
+
+  const kMatch2 = codigo.match(/^(K:.*)$/m);
+  if (kMatch2) {
+    codigo = codigo.replace(/^(K:.*)$/m, `$1\n%%MIDI program ${midiVal}`);
+  } else {
+    const qMatch = codigo.match(/^(Q:.*)$/m);
+    if (qMatch) {
+      codigo = codigo.replace(/^(Q:.*)$/m, `$1\n%%MIDI program ${midiVal}`);
+    } else {
+      codigo = `%%MIDI program ${midiVal}\n` + codigo;
+    }
+  }
+
+  // Renderiza
+  const paperDiv = document.getElementById("paper");
+  paperDiv.innerHTML = "";
+
+  const visual = ABCJS.renderAbc("paper", codigo, {
+    responsive: "resize",
+    visualTranspose: transposeValue
   });
-  return titulos;
+
+  visualObj = visual && visual.length > 0 ? visual[0] : null;
+
+  document.getElementById("infoMusicaAtual").textContent = musica.titulo;
+  document.getElementById("categoriaAtual").textContent = musica.categoria;
+  document.getElementById("listaMusicas").value = indice;
+
+  if (musica.midiProgram !== null && musica.midiProgram !== undefined) {
+    document.getElementById('midiProgram').value = musica.midiProgram;
+    document.getElementById('instrumentName').textContent = getInstrumentName(musica.midiProgram);
+    document.getElementById('infoOriginal').textContent = `(Original: ${musica.midiProgram} - ${getInstrumentName(musica.midiProgram)})`;
+    midiOriginal = musica.midiProgram;
+  } else {
+    if (midiOriginal === null) {
+      if (!document.getElementById('midiProgram').value || document.getElementById('midiProgram').value === '0') {
+        document.getElementById('midiProgram').value = 0;
+        document.getElementById('instrumentName').textContent = 'Acoustic Grand Piano';
+        document.getElementById('infoOriginal').textContent = '(Sem instrumento definido - Piano padrão)';
+      }
+    }
+  }
+
+  stop();
 }
 
 // ============================================================
-// 8. EXPORTAR PLAYLIST
+// 6. APLICAR MIDI
 // ============================================================
-function exportarM3U() {
-  if (playlist.length === 0) {
-    alert('Playlist vazia. Adicione músicas primeiro.');
-    return;
+function aplicarMIDI() {
+  if (musicas.length === 0) return;
+  let val = parseInt(document.getElementById('midiProgram').value);
+  if (isNaN(val) || val < 0 || val > 127) {
+    val = 0;
+    document.getElementById('midiProgram').value = 0;
+    document.getElementById('instrumentName').textContent = 'Acoustic Grand Piano';
   }
-  let conteudo = '#EXTM3U\n';
-  playlist.forEach(item => {
-    // Tenta montar um caminho razoável: se tiver path, usa; senão, usa o título
-    const path = item.path || `${item.titulo}.abc`;
-    conteudo += `#EXTINF:-1,${item.titulo}\n${path}\n`;
-  });
-  baixarArquivo(conteudo, 'playlist.m3u', 'audio/x-mpegurl');
+  document.getElementById('instrumentName').textContent = getInstrumentName(val);
+  renderizarMusica(musicaSelecionada);
+  const btn = document.querySelector('.midi-control button:first-of-type');
+  const originalText = btn.textContent;
+  btn.textContent = '✅ Aplicado!';
+  btn.style.background = '#28a745';
+  setTimeout(() => {
+    btn.textContent = originalText;
+    btn.style.background = '#28a745';
+  }, 1500);
 }
 
-function exportarJSON() {
-  if (playlist.length === 0) {
-    alert('Playlist vazia. Adicione músicas primeiro.');
+// ============================================================
+// 7. EDITOR ABC
+// ============================================================
+function abrirEditor() {
+  if (!musicas.length) {
+    alert('Nenhuma música carregada.');
     return;
   }
-  const json = JSON.stringify(playlist, null, 2);
-  baixarArquivo(json, 'playlist.json', 'application/json');
+  const musica = musicas[musicaSelecionada];
+  document.getElementById('editorInfo').textContent = `Editando: ${musica.titulo} (X:${musica.x})`;
+  document.getElementById('editorTextarea').value = codigoOriginal || musica.codigo;
+  document.getElementById('modalEditor').style.display = 'flex';
 }
 
-function baixarArquivo(conteudo, nome, tipo) {
-  const blob = new Blob([conteudo], { type: tipo });
+function fecharEditor() {
+  document.getElementById('modalEditor').style.display = 'none';
+}
+
+function aplicarEdicao() {
+  const novoCodigo = document.getElementById('editorTextarea').value;
+  if (!novoCodigo.trim()) {
+    alert('O código não pode estar vazio.');
+    return;
+  }
+  // Atualiza o código da música atual
+  musicas[musicaSelecionada].codigo = novoCodigo;
+  codigoOriginal = novoCodigo;
+  // Re-renderiza
+  renderizarMusica(musicaSelecionada);
+  fecharEditor();
+  alert('✅ Código aplicado! A partitura foi atualizada.');
+}
+
+function baixarABC() {
+  const codigo = document.getElementById('editorTextarea').value;
+  if (!codigo.trim()) {
+    alert('Não há código para baixar.');
+    return;
+  }
+  const musica = musicas[musicaSelecionada];
+  const nomeArquivo = `${musica.x}.abc`;
+  const blob = new Blob([codigo], { type: 'text/plain' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = nome;
+  a.download = nomeArquivo;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
 
-// ============================================================
-// 9. EVENTOS DE BUSCA
-// ============================================================
-document.getElementById('buscaAcervo').addEventListener('input', function() {
-  renderizarAcervo(this.value);
-});
+function copiarABC() {
+  const codigo = document.getElementById('editorTextarea').value;
+  if (!codigo.trim()) {
+    alert('Não há código para copiar.');
+    return;
+  }
+  navigator.clipboard.writeText(codigo).then(() => {
+    alert('✅ Código copiado para a área de transferência!');
+  }).catch(() => {
+    alert('Erro ao copiar. Selecione manualmente e copie.');
+  });
+}
 
 // ============================================================
-// 10. INICIALIZAÇÃO
+// 8. MODAL DE INSTRUMENTOS
 // ============================================================
-window.onload = function() {
-  carregarAcervo();
-  carregarPlaylist();
-};
+function abrirModalInstrumentos() {
+  const modal = document.getElementById('modalInstrumentos');
+  modal.style.display = 'flex';
+  gerarTabelaInstrumentos('');
+}
+
+function fecharModalInstrumentos() {
+  document.getElementById('modalInstrumentos').style.display = 'none';
+}
+
+function gerarTabelaInstrumentos(filtro) {
+  const container = document.getElementById('tabelaInstrumentos');
+  const termo = filtro.toLowerCase().trim();
+  let html = '<table>';
+  html += '<tr><th>Nº</th><th>Instrumento</th><th>Categoria</th></tr>';
+  
+  let count = 0;
+  let ultimaCategoria = '';
+  for (let i = 0; i < instrumentosMIDI.length; i++) {
+    const nome = instrumentosMIDI[i];
+    const cat = getCategoria(i);
+    if (termo === '' || nome.toLowerCase().includes(termo) || i.toString().includes(termo)) {
+      if (cat !== ultimaCategoria) {
+        ultimaCategoria = cat;
+        html += `<tr class="categoria-label"><td colspan="3">${cat}</td></tr>`;
+      }
+      const destaque = i === parseInt(document.getElementById('midiProgram').value) ? 'destaque' : '';
+      html += `<tr class="${destaque}" data-midi="${i}"><td><strong>${i}</strong></td><td>${nome}</td><td style="font-size:0.75rem;color:#888;">${cat}</td></tr>`;
+      count++;
+    }
+  }
+  html += '</table>';
+  container.innerHTML = html;
+  document.getElementById('contadorInstrumentos').textContent = `Mostrando ${count} de ${instrumentosMIDI.length} instrumentos`;
+  
+  container.querySelectorAll('tr:not(.categoria-label)').forEach(tr => {
+    tr.addEventListener('click', function() {
+      const num = parseInt(this.dataset.midi);
+      if (!isNaN(num)) {
+        document.getElementById('midiProgram').value = num;
+        document.getElementById('instrumentName').textContent = getInstrumentName(num);
+        fecharModalInstrumentos();
+        aplicarMIDI();
+      }
+    });
+  });
+}
+
+function filtrarInstrumentos() {
+  const filtro = document.getElementById('buscaInstrumento').value;
+  gerarTabelaInstrumentos(filtro);
+}
+
+window.onclick = function(event) {
+  const modal = document.getElementById('modalInstrumentos');
+  if (event.target === modal) {
+    modal.style.display = 'none';
+  }
+  const editorModal = document.getElementById('modalEditor');
+  if (event.target === editorModal) {
+    editorModal.style.display = 'none';
+  }
+}
+
+// ============================================================
+// 9. POPULAR SELECT
+// ============================================================
+function popularSelect(selecionarNum = null) {
+  const select = document.getElementById("listaMusicas");
+  select.innerHTML = "";
+  
+  musicas.forEach((m) => {
+    const option = document.createElement("option");
+    option.value = musicas.indexOf(m);
+    const midiInfo = m.midiProgram !== null ? ` 🎹${m.midiProgram}` : '';
+    option.textContent = `${m.x} - ${m.tituloLimpo} (${m.compositor})${midiInfo}`;
+    select.appendChild(option);
+  });
+
+  if (musicas.length === 0) {
+    document.getElementById("paper").innerHTML = "<p style='color:red;'>Nenhuma música encontrada no arquivo.</p>";
+    visualObj = null;
+    return;
+  }
+
+  let idxSelecionado = 0;
+  if (selecionarNum) {
+    const encontrado = musicas.findIndex(m => m.x === selecionarNum);
+    if (encontrado !== -1) {
+      idxSelecionado = encontrado;
+    }
+  }
+  select.selectedIndex = idxSelecionado;
+  renderizarMusica(Number(select.value));
+}
+
+// ============================================================
+// 10. CARREGAR ARQUIVO
+// ============================================================
+const params = new URLSearchParams(window.location.search);
+const file = params.get("file") || "exemplo.abc";
+const numParam = params.get("num") || null;
+const categoriaParam = params.get("categoria") || "Músicas";
+
+categoriaGlobal = categoriaParam;
+
+fetch(file)
+  .then(r => {
+    if (!r.ok) throw new Error("Arquivo não encontrado");
+    return r.text();
+  })
+  .then(text => {
+    musicas = extrairMusicas(text);
+    if (musicas.length === 0) {
+      document.getElementById("paper").innerHTML = "<p style='color:red;'>Nenhuma música encontrada no arquivo.</p>";
+      return;
+    }
+
+    document.getElementById("navMusicas").style.display = "flex";
+    document.getElementById("totalMusicas").textContent = musicas.length;
+
+    popularSelect(numParam);
+
+    document.getElementById("listaMusicas").addEventListener("change", function() {
+      renderizarMusica(Number(this.value));
+    });
+
+    document.getElementById("btnAnterior").addEventListener("click", function() {
+      const atual = Number(document.getElementById("listaMusicas").value);
+      const idx = musicas.findIndex((_, i) => i === atual);
+      if (idx > 0) {
+        const novoIdx = idx - 1;
+        document.getElementById("listaMusicas").value = novoIdx;
+        renderizarMusica(novoIdx);
+      }
+    });
+
+    document.getElementById("btnProximo").addEventListener("click", function() {
+      const atual = Number(document.getElementById("listaMusicas").value);
+      const idx = musicas.findIndex((_, i) => i === atual);
+      if (idx < musicas.length - 1) {
+        const novoIdx = idx + 1;
+        document.getElementById("listaMusicas").value = novoIdx;
+        renderizarMusica(novoIdx);
+      }
+    });
+
+  })
+  .catch(err => {
+    document.getElementById("paper").innerHTML = "<p style='color:red'>Erro ao carregar partitura: " + err.message + "</p>";
+  });
+
+// ============================================================
+// 11. CONTROLES DE ÁUDIO E TRANSPOSIÇÃO
+// ============================================================
+function processAndRender() {
+  if (musicas.length === 0) return;
+  renderizarMusica(musicaSelecionada);
+}
+
+document.getElementById("up").onclick = () => { transposeValue++; updateUI(); };
+document.getElementById("down").onclick = () => { transposeValue--; updateUI(); };
+document.getElementById("tempo").oninput = updateUI;
+
+function updateUI() {
+  document.getElementById("transposeValue").textContent = transposeValue;
+  processAndRender();
+}
+
+async function play(options = {}) {
+  if (!visualObj) return;
+  stop();
+  if (!audioContext) {
+    window.AudioContext = window.AudioContext || window.webkitAudioContext;
+    audioContext = new AudioContext();
+  }
+  const bpm = parseInt(document.getElementById("tempo").value, 10);
+  synthControl = new ABCJS.synth.CreateSynth();
+  try {
+    await audioContext.resume();
+    await synthControl.init({
+      visualObj: visualObj,
+      audioContext: audioContext,
+      millisecondsPerMeasure: visualObj.millisecondsPerMeasure(),
+      options: {
+        qpm: bpm,
+        midiTranspose: transposeValue,
+        ...options
+      }
+    });
+    await synthControl.prime();
+    synthControl.start();
+  } catch (e) {
+    console.error("Erro no áudio:", e);
+  }
+}
+
+function stop() {
+  if (synthControl) {
+    synthControl.stop();
+    synthControl = null;
+  }
+}
+
+document.getElementById("play-all").onclick = () => play({});
+document.getElementById("play-chords").onclick = () => play({ voicesOff: true });
+document.getElementById("play-melodies").onclick = () => play({ chordsOff: true });
+document.getElementById("play-v1").onclick = () => play({ chordsOff: true, voicesOff: [1] });
+document.getElementById("play-v2").onclick = () => play({ chordsOff: true, voicesOff: [0] });
+document.getElementById("stop").onclick = stop;
 </script>
 
 </body>
