@@ -442,6 +442,72 @@
       font-size: 0.9rem;
       min-height: 1.5em;
     }
+
+    /* Modal: Converter para JSON */
+    .converter-modal .modal-content {
+      max-width: 750px;
+    }
+    .converter-modal textarea {
+      width: 100%;
+      height: 200px;
+      font-family: 'Consolas', monospace;
+      font-size: 14px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      resize: vertical;
+    }
+    .converter-modal .converter-preview {
+      background: #f8f9fa;
+      padding: 10px;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+      margin-top: 10px;
+      display: none;
+    }
+    .converter-modal .converter-preview pre {
+      white-space: pre-wrap;
+      max-height: 200px;
+      overflow: auto;
+      background: white;
+      padding: 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      margin: 0;
+    }
+    .converter-modal .converter-acoes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 10px 0;
+      align-items: center;
+    }
+    .converter-modal .converter-acoes .import-label {
+      background: #007bff;
+      color: white;
+      padding: 6px 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .converter-modal .converter-acoes .import-label:hover { background: #0056b3; }
+    .converter-modal .converter-acoes input[type="file"] { display: none; }
+    .converter-modal .nome-arquivo-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.9rem;
+      flex-wrap: wrap;
+    }
+    .converter-modal .nome-arquivo-group input {
+      padding: 4px 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      width: 180px;
+    }
+    .converter-modal .nome-arquivo-group span {
+      color: #888;
+    }
   </style>
 </head>
 <body>
@@ -523,11 +589,11 @@
       </label>
       <button class="btn btn-verde" onclick="salvarPlaylist()">💾 Salvar</button>
       <button class="btn btn-laranja" onclick="limparPlaylist()">🗑️ Limpar</button>
-      <!-- 4 BOTÕES DE EXPORTAÇÃO -->
       <button class="btn" onclick="exportarMusicasABC()">📥 ABC (músicas)</button>
       <button class="btn" onclick="exportarMusicasTXT()">📥 TXT (músicas)</button>
       <button class="btn" onclick="exportarListaJSON()">📥 JSON (lista)</button>
       <button class="btn" onclick="exportarListaTXT()">📥 TXT (lista)</button>
+      <button class="btn" onclick="abrirConverter()" style="background:#17a2b8;">📥 Converter para JSON</button>
     </div>
     <div class="playlist-status" id="statusPlaylist"></div>
   </div>
@@ -563,6 +629,39 @@
       <strong>Dica:</strong> Após editar, clique em "Aplicar e Renderizar" para ver as alterações na partitura. 
       Para salvar permanentemente, baixe o arquivo .abc e substitua manualmente no GitHub.
     </p>
+  </div>
+</div>
+
+<!-- Modal: Converter para JSON -->
+<div class="modal-overlay converter-modal" id="modalConverter">
+  <div class="modal-content">
+    <button class="fechar" onclick="fecharConverter()">✕ Fechar</button>
+    <h2>📥 Converter Lista para JSON</h2>
+    <p style="color:#666; font-size:0.9rem;">Cole ou importe uma lista de músicas no formato: <code>Número - Título (Categoria)</code></p>
+
+    <textarea id="converterTexto" placeholder="1540 - A Alegria (Evangélicas)&#10;2 - Around the world (Enciclopédia de Música)&#10;4 - The Banshee (Enciclopédia de Música)"></textarea>
+
+    <div class="converter-acoes">
+      <label class="import-label">📂 Importar .txt
+        <input type="file" id="converterFileInput" accept=".txt">
+      </label>
+      <button class="btn btn-verde" onclick="converterTextoParaJSON()">🔄 Converter</button>
+    </div>
+
+    <div class="converter-preview" id="converterResultado">
+      <strong>JSON gerado:</strong>
+      <pre id="converterJSONPreview"></pre>
+      <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:8px; align-items:center;">
+        <div class="nome-arquivo-group">
+          <label>Nome do arquivo:</label>
+          <input type="text" id="converterNomeArquivo" value="playlist_convertida">
+          <span>.json</span>
+        </div>
+        <button class="btn" onclick="baixarJSONConvertido()">💾 Baixar JSON</button>
+        <button class="btn btn-verde" onclick="importarJSONParaPlaylist()">📥 Importar para Playlist</button>
+      </div>
+    </div>
+    <div id="converterStatus" class="playlist-status"></div>
   </div>
 </div>
 
@@ -657,6 +756,7 @@ let audioContext = null;
 let midiOriginal = null;
 let categoriaGlobal = '';
 let codigoOriginal = '';
+let jsonConvertido = null;
 
 // ============================================================
 // 3. PLAYLIST (localStorage)
@@ -864,7 +964,6 @@ function exportarMusicasABC() {
   let conteudo = '';
   let encontradas = 0;
   playlist.forEach(item => {
-    // Tenta encontrar a música no array atual (musicas)
     let codigo = null;
     if (item.num) {
       const encontrada = musicas.find(m => m.x === item.num);
@@ -874,7 +973,6 @@ function exportarMusicasABC() {
       conteudo += codigo + '\n\n';
       encontradas++;
     } else {
-      // Placeholder
       conteudo += `X:${item.num || '?'}\nT:${item.titulo}\nC:${item.categoria || ''}\nM:4/4\nL:1/8\nK:C\n| C4 |\n\n`;
     }
   });
@@ -908,29 +1006,152 @@ function exportarMusicasTXT() {
   setTimeout(() => { document.getElementById('statusPlaylist').textContent = ''; }, 3000);
 }
 
-// --- 7.3 Exportar lista em JSON ---
+// --- 7.3 Exportar lista em JSON (com renomeação) ---
 function exportarListaJSON() {
   if (playlist.length === 0) { alert('Playlist vazia.'); return; }
+  const nome = prompt('Digite o nome do arquivo (sem extensão):', 'playlist_lista');
+  if (nome === null) return;
   const json = JSON.stringify(playlist, null, 2);
-  baixarArquivo(json, 'playlist_lista.json', 'application/json');
+  baixarArquivo(json, `${nome || 'playlist_lista'}.json`, 'application/json');
   document.getElementById('statusPlaylist').textContent = `✅ Lista exportada em JSON.`;
   document.getElementById('statusPlaylist').style.color = '#28a745';
   setTimeout(() => { document.getElementById('statusPlaylist').textContent = ''; }, 2000);
 }
 
-// --- 7.4 Exportar lista em TXT ---
+// --- 7.4 Exportar lista em TXT (com renomeação) ---
 function exportarListaTXT() {
   if (playlist.length === 0) { alert('Playlist vazia.'); return; }
+  const nome = prompt('Digite o nome do arquivo (sem extensão):', 'playlist_lista');
+  if (nome === null) return;
   const linhas = playlist.map(item => `${item.titulo} (${item.categoria || ''})`);
   const conteudo = linhas.join('\n');
-  baixarArquivo(conteudo, 'playlist_lista.txt', 'text/plain');
+  baixarArquivo(conteudo, `${nome || 'playlist_lista'}.txt`, 'text/plain');
   document.getElementById('statusPlaylist').textContent = `✅ Lista exportada em TXT.`;
   document.getElementById('statusPlaylist').style.color = '#28a745';
   setTimeout(() => { document.getElementById('statusPlaylist').textContent = ''; }, 2000);
 }
 
 // ============================================================
-// 8. FUNÇÕES AUXILIARES
+// 8. MODAL: CONVERTER TEXTO PARA JSON
+// ============================================================
+function abrirConverter() {
+  document.getElementById('modalConverter').style.display = 'flex';
+  document.getElementById('converterTexto').value = '';
+  document.getElementById('converterResultado').style.display = 'none';
+  document.getElementById('converterStatus').textContent = '';
+  jsonConvertido = null;
+}
+
+function fecharConverter() {
+  document.getElementById('modalConverter').style.display = 'none';
+}
+
+// Importar arquivo .txt
+document.getElementById('converterFileInput').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    document.getElementById('converterTexto').value = ev.target.result;
+    document.getElementById('converterStatus').textContent = `📂 Arquivo "${file.name}" carregado.`;
+    document.getElementById('converterStatus').style.color = '#28a745';
+    setTimeout(() => { document.getElementById('converterStatus').textContent = ''; }, 2000);
+  };
+  reader.readAsText(file);
+  this.value = '';
+});
+
+function converterTextoParaJSON() {
+  const texto = document.getElementById('converterTexto').value;
+  if (!texto.trim()) {
+    document.getElementById('converterStatus').textContent = '⚠️ Cole ou importe uma lista de músicas.';
+    document.getElementById('converterStatus').style.color = '#fd7e14';
+    return;
+  }
+
+  const linhas = texto.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+  const resultados = [];
+  let erros = 0;
+
+  linhas.forEach(linha => {
+    // Formato: "Número - Título (Categoria)"
+    const match = linha.match(/^(\d+)\s*[-–]\s*(.+?)\s*\((.+?)\)\s*$/);
+    if (match) {
+      const num = match[1];
+      const titulo = match[2].trim();
+      const categoria = match[3].trim();
+      const file = `musicas/${categoria}/${num}.abc`;
+      resultados.push({ titulo: `${num} - ${titulo}`, file, num, categoria });
+    } else {
+      // Tenta extrair apenas número e título sem categoria
+      const match2 = linha.match(/^(\d+)\s*[-–]\s*(.+?)$/);
+      if (match2) {
+        const num = match2[1];
+        const titulo = match2[2].trim();
+        const categoria = 'Músicas';
+        const file = `musicas/${categoria}/${num}.abc`;
+        resultados.push({ titulo: `${num} - ${titulo}`, file, num, categoria });
+      } else {
+        erros++;
+        console.warn('Linha ignorada:', linha);
+      }
+    }
+  });
+
+  if (resultados.length === 0) {
+    document.getElementById('converterStatus').textContent = '⚠️ Nenhuma música válida encontrada. Use o formato: Número - Título (Categoria)';
+    document.getElementById('converterStatus').style.color = '#fd7e14';
+    return;
+  }
+
+  jsonConvertido = resultados;
+  const jsonStr = JSON.stringify(resultados, null, 2);
+  document.getElementById('converterJSONPreview').textContent = jsonStr;
+  document.getElementById('converterResultado').style.display = 'block';
+  document.getElementById('converterStatus').textContent = `✅ ${resultados.length} músicas convertidas. ${erros > 0 ? erros + ' linha(s) ignorada(s).' : ''}`;
+  document.getElementById('converterStatus').style.color = '#28a745';
+}
+
+function baixarJSONConvertido() {
+  if (!jsonConvertido || jsonConvertido.length === 0) {
+    alert('Nenhum JSON gerado. Converta primeiro.');
+    return;
+  }
+  const nome = document.getElementById('converterNomeArquivo').value.trim() || 'playlist_convertida';
+  const jsonStr = JSON.stringify(jsonConvertido, null, 2);
+  baixarArquivo(jsonStr, `${nome}.json`, 'application/json');
+  document.getElementById('converterStatus').textContent = `✅ Arquivo "${nome}.json" baixado.`;
+  document.getElementById('converterStatus').style.color = '#28a745';
+  setTimeout(() => { document.getElementById('converterStatus').textContent = ''; }, 2000);
+}
+
+function importarJSONParaPlaylist() {
+  if (!jsonConvertido || jsonConvertido.length === 0) {
+    alert('Nenhum JSON gerado. Converta primeiro.');
+    return;
+  }
+  let adicionados = 0;
+  jsonConvertido.forEach(item => {
+    if (!playlist.some(p => p.titulo === item.titulo && p.file === item.file)) {
+      playlist.push({ titulo: item.titulo, file: item.file, num: item.num, categoria: item.categoria });
+      adicionados++;
+    }
+  });
+  if (adicionados > 0) {
+    salvarPlaylist();
+    document.getElementById('converterStatus').textContent = `✅ ${adicionados} músicas adicionadas à playlist.`;
+    document.getElementById('converterStatus').style.color = '#28a745';
+    setTimeout(() => { document.getElementById('converterStatus').textContent = ''; }, 3000);
+    fecharConverter();
+  } else {
+    document.getElementById('converterStatus').textContent = '⚠️ Nenhuma música nova para adicionar.';
+    document.getElementById('converterStatus').style.color = '#fd7e14';
+    setTimeout(() => { document.getElementById('converterStatus').textContent = ''; }, 2000);
+  }
+}
+
+// ============================================================
+// 9. FUNÇÕES AUXILIARES
 // ============================================================
 function baixarArquivo(conteudo, nome, tipo) {
   const blob = new Blob([conteudo], { type: tipo });
@@ -945,7 +1166,7 @@ function baixarArquivo(conteudo, nome, tipo) {
 }
 
 // ============================================================
-// 9. FUNÇÕES EXISTENTES (MIDI, EDITOR, NAVEGAÇÃO COM BUSCA)
+// 10. FUNÇÕES EXISTENTES (MIDI, EDITOR, NAVEGAÇÃO COM BUSCA)
 // ============================================================
 function extrairCampo(bloco, campo) {
   const regex = new RegExp('^' + campo + ':(.*)$', 'm');
@@ -1023,7 +1244,6 @@ function renderizarMusica(indice) {
   document.getElementById("categoriaAtual").textContent = musica.categoria;
   // Atualiza o select para refletir a música atual
   const select = document.getElementById("listaMusicas");
-  // Se a música atual está no select, seleciona
   const options = select.options;
   for (let i = 0; i < options.length; i++) {
     if (parseInt(options[i].value) === indice) {
@@ -1258,6 +1478,7 @@ document.getElementById("stop").onclick = stop;
 window.onclick = function(event) {
   if (event.target === document.getElementById('modalInstrumentos')) fecharModalInstrumentos();
   if (event.target === document.getElementById('modalEditor')) fecharEditor();
+  if (event.target === document.getElementById('modalConverter')) fecharConverter();
 };
 </script>
 
