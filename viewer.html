@@ -2,11 +2,12 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>🎼 Partitura Interativa com Playlist</title>
+  <title>🎼 Partitura Interativa</title>
 
   <link rel="stylesheet" href="style.css">
 
   <script src="https://cdn.jsdelivr.net/npm/abcjs@6.2.3/dist/abcjs-basic-min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-DP3HN6DMXQ"></script>
   <script>
@@ -17,7 +18,7 @@
   </script>
 
   <style>
-    /* Estilos existentes (controles, MIDI, editor) */
+    /* ESTILOS EXISTENTES (CONTROLES, NAV, MIDI, MODAIS) */
     .controls {
       margin: 20px 0;
       padding: 15px;
@@ -51,7 +52,7 @@
     .btn-stop { background-color: #fff0f0 !important; border-color: #dc3545 !important; color: #dc3545; font-weight: bold; }
     .btn-editar { background-color: #fff3cd !important; border-color: #ffc107 !important; color: #856404; font-weight: bold; }
     .btn-playlist { background-color: #d4edda !important; border-color: #28a745 !important; color: #155724; font-weight: bold; }
-
+    
     #paper {
       background: white;
       padding: 10px;
@@ -118,6 +119,15 @@
       gap: 8px;
       flex: 1;
       min-width: 150px;
+    }
+    /* Campo de busca na navegação */
+    .nav-musicas .busca-musica {
+      padding: 6px 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+      min-width: 150px;
+      flex: 1;
     }
 
     /* Instrumento MIDI */
@@ -312,7 +322,7 @@
       margin-bottom: 10px;
     }
 
-    /* Playlist fixa */
+    /* --- PLAYLIST FIXA (sem modal) --- */
     .playlist-section {
       margin-top: 25px;
       padding: 15px;
@@ -437,7 +447,7 @@
 <body>
 
 <header>
-  <h1>🎼 Partitura Interativa com Playlist</h1>
+  <h1>🎼 Partitura Interativa</h1>
 </header>
 
 <nav>
@@ -446,10 +456,11 @@
 
 <main>
 
-  <!-- Navegação entre músicas do arquivo -->
+  <!-- Navegação entre músicas do arquivo (COM CAMPO DE BUSCA) -->
   <div class="nav-musicas" id="navMusicas" style="display:none;">
     <span class="badge" id="totalMusicas">0</span>
     <div class="titulo-esquerda">
+      <input type="text" class="busca-musica" id="buscaMusicaNav" placeholder="🔍 Buscar música...">
       <select id="listaMusicas" size="1"></select>
       <button id="btnAnterior" title="Música anterior">◀</button>
       <button id="btnProximo" title="Próxima música">▶</button>
@@ -512,9 +523,11 @@
       </label>
       <button class="btn btn-verde" onclick="salvarPlaylist()">💾 Salvar</button>
       <button class="btn btn-laranja" onclick="limparPlaylist()">🗑️ Limpar</button>
-      <button class="btn" onclick="exportarTXT()">📥 .txt</button>
-      <button class="btn" onclick="exportarABC()">📥 .abc</button>
-      <button class="btn" onclick="exportarJSON()">📥 .json</button>
+      <!-- 4 BOTÕES DE EXPORTAÇÃO -->
+      <button class="btn" onclick="exportarMusicasABC()">📥 ABC (músicas)</button>
+      <button class="btn" onclick="exportarMusicasTXT()">📥 TXT (músicas)</button>
+      <button class="btn" onclick="exportarListaJSON()">📥 JSON (lista)</button>
+      <button class="btn" onclick="exportarListaTXT()">📥 TXT (lista)</button>
     </div>
     <div class="playlist-status" id="statusPlaylist"></div>
   </div>
@@ -672,6 +685,9 @@ function salvarPlaylist() {
   setTimeout(() => { document.getElementById('statusPlaylist').textContent = ''; }, 2000);
 }
 
+// ============================================================
+// 4. ADICIONAR À PLAYLIST (COM FEEDBACK)
+// ============================================================
 function adicionarAtualPlaylist() {
   if (!musicas.length) {
     alert('Nenhuma música carregada.');
@@ -728,7 +744,7 @@ function carregarPlaylistItem(index) {
 }
 
 // ============================================================
-// 4. UI DA PLAYLIST
+// 5. UI DA PLAYLIST
 // ============================================================
 function atualizarPlaylistUI() {
   const container = document.getElementById('playlistItems');
@@ -755,7 +771,7 @@ function atualizarPlaylistUI() {
 }
 
 // ============================================================
-// 5. IMPORTAR ARQUIVOS (ABC, TXT, JSON)
+// 6. IMPORTAR ARQUIVOS (ABC, TXT, JSON)
 // ============================================================
 document.getElementById('fileInputPlaylist').addEventListener('change', function(e) {
   const files = e.target.files;
@@ -839,33 +855,83 @@ function extrairTitulosABC(texto) {
 }
 
 // ============================================================
-// 6. EXPORTAR PLAYLIST (TXT, ABC, JSON)
+// 7. EXPORTAÇÕES (4 BOTÕES)
 // ============================================================
-function exportarTXT() {
+
+// --- 7.1 Exportar músicas em ABC (código real) ---
+function exportarMusicasABC() {
+  if (playlist.length === 0) { alert('Playlist vazia.'); return; }
+  let conteudo = '';
+  let encontradas = 0;
+  playlist.forEach(item => {
+    // Tenta encontrar a música no array atual (musicas)
+    let codigo = null;
+    if (item.num) {
+      const encontrada = musicas.find(m => m.x === item.num);
+      if (encontrada) codigo = encontrada.codigo;
+    }
+    if (codigo) {
+      conteudo += codigo + '\n\n';
+      encontradas++;
+    } else {
+      // Placeholder
+      conteudo += `X:${item.num || '?'}\nT:${item.titulo}\nC:${item.categoria || ''}\nM:4/4\nL:1/8\nK:C\n| C4 |\n\n`;
+    }
+  });
+  baixarArquivo(conteudo, 'playlist_musicas.abc', 'text/plain');
+  document.getElementById('statusPlaylist').textContent = `✅ ${encontradas} de ${playlist.length} músicas exportadas em ABC.`;
+  document.getElementById('statusPlaylist').style.color = '#28a745';
+  setTimeout(() => { document.getElementById('statusPlaylist').textContent = ''; }, 3000);
+}
+
+// --- 7.2 Exportar músicas em TXT (código real) ---
+function exportarMusicasTXT() {
+  if (playlist.length === 0) { alert('Playlist vazia.'); return; }
+  let conteudo = '';
+  let encontradas = 0;
+  playlist.forEach(item => {
+    let codigo = null;
+    if (item.num) {
+      const encontrada = musicas.find(m => m.x === item.num);
+      if (encontrada) codigo = encontrada.codigo;
+    }
+    if (codigo) {
+      conteudo += `=== ${item.titulo} ===\n${codigo}\n\n`;
+      encontradas++;
+    } else {
+      conteudo += `=== ${item.titulo} ===\n(Código não disponível)\n\n`;
+    }
+  });
+  baixarArquivo(conteudo, 'playlist_musicas.txt', 'text/plain');
+  document.getElementById('statusPlaylist').textContent = `✅ ${encontradas} de ${playlist.length} músicas exportadas em TXT.`;
+  document.getElementById('statusPlaylist').style.color = '#28a745';
+  setTimeout(() => { document.getElementById('statusPlaylist').textContent = ''; }, 3000);
+}
+
+// --- 7.3 Exportar lista em JSON ---
+function exportarListaJSON() {
+  if (playlist.length === 0) { alert('Playlist vazia.'); return; }
+  const json = JSON.stringify(playlist, null, 2);
+  baixarArquivo(json, 'playlist_lista.json', 'application/json');
+  document.getElementById('statusPlaylist').textContent = `✅ Lista exportada em JSON.`;
+  document.getElementById('statusPlaylist').style.color = '#28a745';
+  setTimeout(() => { document.getElementById('statusPlaylist').textContent = ''; }, 2000);
+}
+
+// --- 7.4 Exportar lista em TXT ---
+function exportarListaTXT() {
   if (playlist.length === 0) { alert('Playlist vazia.'); return; }
   const linhas = playlist.map(item => `${item.titulo} (${item.categoria || ''})`);
   const conteudo = linhas.join('\n');
-  baixarArquivo(conteudo, 'playlist.txt', 'text/plain');
+  baixarArquivo(conteudo, 'playlist_lista.txt', 'text/plain');
+  document.getElementById('statusPlaylist').textContent = `✅ Lista exportada em TXT.`;
+  document.getElementById('statusPlaylist').style.color = '#28a745';
+  setTimeout(() => { document.getElementById('statusPlaylist').textContent = ''; }, 2000);
 }
 
-function exportarABC() {
-  if (playlist.length === 0) { alert('Playlist vazia.'); return; }
-  let conteudo = '';
-  playlist.forEach((item, idx) => {
-    const num = item.num || (idx + 1);
-    const titulo = item.titulo || 'Sem título';
-    const categoria = item.categoria || '';
-    conteudo += `X:${num}\nT:${titulo}\nC:${categoria}\nM:4/4\nL:1/8\nK:C\n%%MIDI program 0\nQ:100\n| C4 |\n\n`;
-  });
-  baixarArquivo(conteudo, 'playlist.abc', 'text/plain');
-}
-
-function exportarJSON() {
-  if (playlist.length === 0) { alert('Playlist vazia.'); return; }
-  const json = JSON.stringify(playlist, null, 2);
-  baixarArquivo(json, 'playlist.json', 'application/json');
-}
-
+// ============================================================
+// 8. FUNÇÕES AUXILIARES
+// ============================================================
 function baixarArquivo(conteudo, nome, tipo) {
   const blob = new Blob([conteudo], { type: tipo });
   const url = URL.createObjectURL(blob);
@@ -879,7 +945,7 @@ function baixarArquivo(conteudo, nome, tipo) {
 }
 
 // ============================================================
-// 7. FUNÇÕES EXISTENTES (MIDI, EDITOR, NAVEGAÇÃO, ETC.)
+// 9. FUNÇÕES EXISTENTES (MIDI, EDITOR, NAVEGAÇÃO COM BUSCA)
 // ============================================================
 function extrairCampo(bloco, campo) {
   const regex = new RegExp('^' + campo + ':(.*)$', 'm');
@@ -916,6 +982,7 @@ function extrairMusicas(texto) {
   return lista;
 }
 
+// --- Renderizar com busca ---
 function renderizarMusica(indice) {
   if (!musicas.length || indice < 0 || indice >= musicas.length) return;
   musicaSelecionada = indice;
@@ -954,7 +1021,16 @@ function renderizarMusica(indice) {
 
   document.getElementById("infoMusicaAtual").textContent = musica.titulo;
   document.getElementById("categoriaAtual").textContent = musica.categoria;
-  document.getElementById("listaMusicas").value = indice;
+  // Atualiza o select para refletir a música atual
+  const select = document.getElementById("listaMusicas");
+  // Se a música atual está no select, seleciona
+  const options = select.options;
+  for (let i = 0; i < options.length; i++) {
+    if (parseInt(options[i].value) === indice) {
+      select.selectedIndex = i;
+      break;
+    }
+  }
 
   if (musica.midiProgram !== null && musica.midiProgram !== undefined) {
     document.getElementById('midiProgram').value = musica.midiProgram;
@@ -1060,26 +1136,49 @@ function filtrarInstrumentos() {
   gerarTabelaInstrumentos(filtro);
 }
 
-// --- Navegação ---
+// --- Navegação com busca ---
 function popularSelect(selecionarNum = null) {
   const select = document.getElementById("listaMusicas");
+  const busca = document.getElementById('buscaMusicaNav').value.toLowerCase().trim();
   select.innerHTML = "";
-  musicas.forEach((m) => {
+  const filtradas = musicas.filter(m => {
+    const titulo = m.titulo.toLowerCase();
+    const num = m.x;
+    return titulo.includes(busca) || num.includes(busca);
+  });
+  filtradas.forEach((m) => {
     const option = document.createElement("option");
     option.value = musicas.indexOf(m);
     const midiInfo = m.midiProgram !== null ? ` 🎹${m.midiProgram}` : '';
     option.textContent = `${m.x} - ${m.tituloLimpo} (${m.compositor})${midiInfo}`;
     select.appendChild(option);
   });
-  if (musicas.length === 0) { document.getElementById("paper").innerHTML = "<p style='color:red;'>Nenhuma música encontrada no arquivo.</p>"; visualObj = null; return; }
+  if (filtradas.length === 0) {
+    document.getElementById("paper").innerHTML = "<p style='color:red;'>Nenhuma música encontrada com esse filtro.</p>";
+    visualObj = null;
+    return;
+  }
   let idxSelecionado = 0;
   if (selecionarNum) {
     const encontrado = musicas.findIndex(m => m.x === selecionarNum);
-    if (encontrado !== -1) idxSelecionado = encontrado;
+    if (encontrado !== -1 && filtradas.some(m => musicas.indexOf(m) === encontrado)) {
+      idxSelecionado = filtradas.findIndex(m => musicas.indexOf(m) === encontrado);
+    }
   }
-  select.selectedIndex = idxSelecionado;
-  renderizarMusica(Number(select.value));
+  if (idxSelecionado < filtradas.length) {
+    select.selectedIndex = idxSelecionado;
+    renderizarMusica(Number(select.value));
+  } else if (filtradas.length > 0) {
+    select.selectedIndex = 0;
+    renderizarMusica(Number(select.value));
+  }
 }
+
+// Evento de busca
+document.getElementById('buscaMusicaNav').addEventListener('input', function() {
+  const numParam = musicas.length > 0 ? musicas[musicaSelecionada]?.x : null;
+  popularSelect(numParam);
+});
 
 // --- Carregar arquivo ---
 const params = new URLSearchParams(window.location.search);
@@ -1099,18 +1198,25 @@ fetch(file)
     document.getElementById("navMusicas").style.display = "flex";
     document.getElementById("totalMusicas").textContent = musicas.length;
     popularSelect(numParam);
-    document.getElementById("listaMusicas").addEventListener("change", function() { renderizarMusica(Number(this.value)); });
+    document.getElementById("listaMusicas").addEventListener("change", function() {
+      renderizarMusica(Number(this.value));
+    });
     document.getElementById("btnAnterior").addEventListener("click", function() {
-      const atual = Number(document.getElementById("listaMusicas").value);
-      const idx = musicas.findIndex((_, i) => i === atual);
-      if (idx > 0) { const novoIdx = idx - 1; document.getElementById("listaMusicas").value = novoIdx; renderizarMusica(novoIdx); }
+      const select = document.getElementById("listaMusicas");
+      const idx = select.selectedIndex;
+      if (idx > 0) {
+        select.selectedIndex = idx - 1;
+        renderizarMusica(Number(select.value));
+      }
     });
     document.getElementById("btnProximo").addEventListener("click", function() {
-      const atual = Number(document.getElementById("listaMusicas").value);
-      const idx = musicas.findIndex((_, i) => i === atual);
-      if (idx < musicas.length - 1) { const novoIdx = idx + 1; document.getElementById("listaMusicas").value = novoIdx; renderizarMusica(novoIdx); }
+      const select = document.getElementById("listaMusicas");
+      const idx = select.selectedIndex;
+      if (idx < select.options.length - 1) {
+        select.selectedIndex = idx + 1;
+        renderizarMusica(Number(select.value));
+      }
     });
-    // Atualiza UI da playlist após carregar
     atualizarPlaylistUI();
   })
   .catch(err => { document.getElementById("paper").innerHTML = "<p style='color:red'>Erro ao carregar partitura: " + err.message + "</p>"; });
