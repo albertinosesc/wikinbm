@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>🎼 Partitura Interativa</title>
+  <title>🎼 Partitura Interativa com Playlist</title>
 
   <link rel="stylesheet" href="style.css">
 
@@ -17,7 +17,7 @@
   </script>
 
   <style>
-    /* Estilos existentes (controles, MIDI, editor, etc.) */
+    /* Estilos existentes (controles, MIDI, editor) */
     .controls {
       margin: 20px 0;
       padding: 15px;
@@ -51,7 +51,7 @@
     .btn-stop { background-color: #fff0f0 !important; border-color: #dc3545 !important; color: #dc3545; font-weight: bold; }
     .btn-editar { background-color: #fff3cd !important; border-color: #ffc107 !important; color: #856404; font-weight: bold; }
     .btn-playlist { background-color: #d4edda !important; border-color: #28a745 !important; color: #155724; font-weight: bold; }
-    
+
     #paper {
       background: white;
       padding: 10px;
@@ -312,7 +312,7 @@
       margin-bottom: 10px;
     }
 
-    /* --- PLAYLIST FIXA (sem modal) --- */
+    /* Playlist fixa */
     .playlist-section {
       margin-top: 25px;
       padding: 15px;
@@ -437,7 +437,7 @@
 <body>
 
 <header>
-  <h1>🎼 Partitura Interativa</h1>
+  <h1>🎼 Partitura Interativa com Playlist</h1>
 </header>
 
 <nav>
@@ -488,6 +488,7 @@
       <button class="btn-stop" id="stop">⏹️ Parar</button>
       <button class="btn-editar" onclick="abrirEditor()">✏️ Editar ABC</button>
       <button class="btn-playlist" onclick="adicionarAtualPlaylist()">➕ Adicionar à Playlist</button>
+      <span id="feedbackAdicionar" style="font-size:0.9rem; margin-left:8px; font-weight:bold;"></span>
     </div>
   </div>
 
@@ -507,10 +508,12 @@
 
     <div class="playlist-acoes">
       <label class="import-label">📂 Importar
-        <input type="file" id="fileInputPlaylist" accept=".abc,.txt" multiple>
+        <input type="file" id="fileInputPlaylist" accept=".abc,.txt,.json" multiple>
       </label>
       <button class="btn btn-verde" onclick="salvarPlaylist()">💾 Salvar</button>
       <button class="btn btn-laranja" onclick="limparPlaylist()">🗑️ Limpar</button>
+      <button class="btn" onclick="exportarTXT()">📥 .txt</button>
+      <button class="btn" onclick="exportarABC()">📥 .abc</button>
       <button class="btn" onclick="exportarJSON()">📥 .json</button>
     </div>
     <div class="playlist-status" id="statusPlaylist"></div>
@@ -680,19 +683,20 @@ function adicionarAtualPlaylist() {
   const titulo = musica.titulo;
   const categoria = musica.categoria || 'Músicas';
   const num = musica.x;
+  const feedback = document.getElementById('feedbackAdicionar');
 
   if (playlist.some(item => item.file === file && item.num === num)) {
-    document.getElementById('statusPlaylist').textContent = '⚠️ Música já está na playlist.';
-    document.getElementById('statusPlaylist').style.color = '#fd7e14';
-    setTimeout(() => { document.getElementById('statusPlaylist').textContent = ''; }, 2000);
+    feedback.textContent = '⚠️ Já está na playlist.';
+    feedback.style.color = '#fd7e14';
+    setTimeout(() => { feedback.textContent = ''; }, 2000);
     return;
   }
 
   playlist.push({ titulo, file, num, categoria });
   salvarPlaylist();
-  document.getElementById('statusPlaylist').textContent = `✅ "${titulo}" adicionado!`;
-  document.getElementById('statusPlaylist').style.color = '#28a745';
-  setTimeout(() => { document.getElementById('statusPlaylist').textContent = ''; }, 2000);
+  feedback.textContent = '✅ Adicionado!';
+  feedback.style.color = '#28a745';
+  setTimeout(() => { feedback.textContent = ''; }, 2000);
 }
 
 function limparPlaylist() {
@@ -751,7 +755,7 @@ function atualizarPlaylistUI() {
 }
 
 // ============================================================
-// 5. IMPORTAR ARQUIVOS PARA PLAYLIST
+// 5. IMPORTAR ARQUIVOS (ABC, TXT, JSON)
 // ============================================================
 document.getElementById('fileInputPlaylist').addEventListener('change', function(e) {
   const files = e.target.files;
@@ -781,6 +785,27 @@ document.getElementById('fileInputPlaylist').addEventListener('change', function
               total++;
             }
           });
+        } else if (nome.toLowerCase().endsWith('.json')) {
+          try {
+            const dados = JSON.parse(content);
+            if (Array.isArray(dados)) {
+              dados.forEach(item => {
+                if (item.titulo) {
+                  if (!playlist.some(p => p.titulo === item.titulo && p.file === item.file)) {
+                    playlist.push({
+                      titulo: item.titulo,
+                      file: item.file || nome,
+                      num: item.num || '',
+                      categoria: item.categoria || 'Importado'
+                    });
+                    total++;
+                  }
+                }
+              });
+            }
+          } catch (e) {
+            alert('Erro ao ler JSON: ' + e.message);
+          }
         }
         resolve();
       };
@@ -814,8 +839,27 @@ function extrairTitulosABC(texto) {
 }
 
 // ============================================================
-// 6. EXPORTAR PLAYLIST (APENAS JSON)
+// 6. EXPORTAR PLAYLIST (TXT, ABC, JSON)
 // ============================================================
+function exportarTXT() {
+  if (playlist.length === 0) { alert('Playlist vazia.'); return; }
+  const linhas = playlist.map(item => `${item.titulo} (${item.categoria || ''})`);
+  const conteudo = linhas.join('\n');
+  baixarArquivo(conteudo, 'playlist.txt', 'text/plain');
+}
+
+function exportarABC() {
+  if (playlist.length === 0) { alert('Playlist vazia.'); return; }
+  let conteudo = '';
+  playlist.forEach((item, idx) => {
+    const num = item.num || (idx + 1);
+    const titulo = item.titulo || 'Sem título';
+    const categoria = item.categoria || '';
+    conteudo += `X:${num}\nT:${titulo}\nC:${categoria}\nM:4/4\nL:1/8\nK:C\n%%MIDI program 0\nQ:100\n| C4 |\n\n`;
+  });
+  baixarArquivo(conteudo, 'playlist.abc', 'text/plain');
+}
+
 function exportarJSON() {
   if (playlist.length === 0) { alert('Playlist vazia.'); return; }
   const json = JSON.stringify(playlist, null, 2);
