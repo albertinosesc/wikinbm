@@ -17,6 +17,7 @@
   </script>
 
   <style>
+    /* Estilos existentes... */
     .controls {
       margin: 20px 0;
       padding: 15px;
@@ -48,6 +49,7 @@
     .controls button:hover { background: #e9e9e9; }
     .btn-play { background-color: #e7f3ff !important; border-color: #007bff !important; color: #007bff; font-weight: bold; }
     .btn-stop { background-color: #fff0f0 !important; border-color: #dc3545 !important; color: #dc3545; font-weight: bold; }
+    .btn-editar { background-color: #fff3cd !important; border-color: #ffc107 !important; color: #856404; font-weight: bold; }
     
     #paper {
       background: white;
@@ -247,6 +249,67 @@
     .modal-content tr:not(.categoria-label):hover {
       background: #d4edda !important;
     }
+
+    /* Editor modal */
+    .editor-modal .modal-content {
+      max-width: 900px;
+    }
+    .editor-modal textarea {
+      width: 100%;
+      height: 400px;
+      font-family: 'Consolas', monospace;
+      font-size: 14px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      resize: vertical;
+    }
+    .editor-modal .editor-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+      flex-wrap: wrap;
+    }
+    .editor-modal .editor-actions button {
+      padding: 8px 20px;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .editor-modal .editor-actions .btn-salvar {
+      background: #28a745;
+      color: white;
+    }
+    .editor-modal .editor-actions .btn-salvar:hover {
+      background: #1e7e34;
+    }
+    .editor-modal .editor-actions .btn-baixar {
+      background: #007bff;
+      color: white;
+    }
+    .editor-modal .editor-actions .btn-baixar:hover {
+      background: #0056b3;
+    }
+    .editor-modal .editor-actions .btn-copiar {
+      background: #6c757d;
+      color: white;
+    }
+    .editor-modal .editor-actions .btn-copiar:hover {
+      background: #5a6268;
+    }
+    .editor-modal .editor-actions .btn-fechar {
+      background: #dc3545;
+      color: white;
+    }
+    .editor-modal .editor-actions .btn-fechar:hover {
+      background: #c82333;
+    }
+    .editor-modal .editor-info {
+      font-size: 0.85rem;
+      color: #666;
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 <body>
@@ -301,6 +364,7 @@
       <button id="play-v1">Melodia 1</button>
       <button id="play-v2">Melodia 2</button>
       <button class="btn-stop" id="stop">⏹️ Parar</button>
+      <button class="btn-editar" onclick="abrirEditor()">✏️ Editar ABC</button>
     </div>
   </div>
 
@@ -317,6 +381,26 @@
     <input type="text" class="busca-instrumento" id="buscaInstrumento" placeholder="🔍 Buscar instrumento..." oninput="filtrarInstrumentos()">
     <div class="contador" id="contadorInstrumentos">Mostrando 128 instrumentos</div>
     <div id="tabelaInstrumentos"></div>
+  </div>
+</div>
+
+<!-- Modal do Editor ABC -->
+<div class="modal-overlay editor-modal" id="modalEditor">
+  <div class="modal-content">
+    <button class="fechar" onclick="fecharEditor()">✕ Fechar</button>
+    <h2>✏️ Editor ABC</h2>
+    <div class="editor-info" id="editorInfo">Editando: Música atual</div>
+    <textarea id="editorTextarea"></textarea>
+    <div class="editor-actions">
+      <button class="btn-salvar" onclick="aplicarEdicao()">✅ Aplicar e Renderizar</button>
+      <button class="btn-baixar" onclick="baixarABC()">💾 Baixar .abc</button>
+      <button class="btn-copiar" onclick="copiarABC()">📋 Copiar Código</button>
+      <button class="btn-fechar" onclick="fecharEditor()">❌ Fechar</button>
+    </div>
+    <p style="font-size:0.8rem; color:#888; margin-top:10px;">
+      <strong>Dica:</strong> Após editar, clique em "Aplicar e Renderizar" para ver as alterações na partitura. 
+      Para salvar permanentemente, baixe o arquivo .abc e substitua manualmente no GitHub.
+    </p>
   </div>
 </div>
 
@@ -432,6 +516,7 @@ let transposeValue = 0;
 let audioContext = null;
 let midiOriginal = null;
 let categoriaGlobal = '';
+let codigoOriginal = '';
 
 // ============================================================
 // 3. FUNÇÕES AUXILIARES
@@ -468,7 +553,6 @@ function extrairMusicas(texto) {
                        'Desconhecido';
     const tituloLimpo = limparTitulo(x, tituloRaw);
     
-    // Verifica se já tem %%MIDI program
     const midiMatch = bloco.match(/^%%MIDI\s+program\s+(\d+)/m);
     const midiProgram = midiMatch ? parseInt(midiMatch[1], 10) : null;
     
@@ -479,7 +563,7 @@ function extrairMusicas(texto) {
       compositor: compositor,
       codigo: bloco.trim(),
       midiProgram: midiProgram,
-      categoria: categoriaGlobal // Usa a categoria vinda do JSON via URL
+      categoria: categoriaGlobal
     });
   });
   lista.sort((a, b) => parseInt(a.x, 10) - parseInt(b.x, 10));
@@ -494,6 +578,9 @@ function renderizarMusica(indice) {
   musicaSelecionada = indice;
   const musica = musicas[indice];
   const bpm = document.getElementById("tempo").value;
+
+  // Armazena o código original para o editor
+  codigoOriginal = musica.codigo;
 
   let codigo = musica.codigo;
 
@@ -516,11 +603,9 @@ function renderizarMusica(indice) {
   }
 
   // --- TRATAMENTO DO %%MIDI program ---
-  // Remove qualquer %%MIDI program existente
   codigo = codigo.replace(/^%%MIDI\s+program\s+\d+.*$/gm, "");
   codigo = codigo.replace(/^\s*[\r\n]/gm, "");
 
-  // Pega o valor do campo MIDI (se inválido, usa o valor atual ou 0)
   let midiVal = parseInt(document.getElementById('midiProgram').value);
   if (isNaN(midiVal) || midiVal < 0 || midiVal > 127) {
     midiVal = 0;
@@ -528,7 +613,6 @@ function renderizarMusica(indice) {
     document.getElementById('instrumentName').textContent = 'Acoustic Grand Piano';
   }
 
-  // Insere o %%MIDI program
   const kMatch2 = codigo.match(/^(K:.*)$/m);
   if (kMatch2) {
     codigo = codigo.replace(/^(K:.*)$/m, `$1\n%%MIDI program ${midiVal}`);
@@ -552,18 +636,16 @@ function renderizarMusica(indice) {
 
   visualObj = visual && visual.length > 0 ? visual[0] : null;
 
-  // Atualiza informações - título e categoria
+  document.getElementById("infoMusicaAtual").textContent = musica.titulo;
   document.getElementById("categoriaAtual").textContent = musica.categoria;
   document.getElementById("listaMusicas").value = indice;
 
-  // Atualiza o campo MIDI com o valor da música
   if (musica.midiProgram !== null && musica.midiProgram !== undefined) {
     document.getElementById('midiProgram').value = musica.midiProgram;
     document.getElementById('instrumentName').textContent = getInstrumentName(musica.midiProgram);
     document.getElementById('infoOriginal').textContent = `(Original: ${musica.midiProgram} - ${getInstrumentName(musica.midiProgram)})`;
     midiOriginal = musica.midiProgram;
   } else {
-    // Se não tem MIDI, mantém o valor atual ou 0
     if (midiOriginal === null) {
       if (!document.getElementById('midiProgram').value || document.getElementById('midiProgram').value === '0') {
         document.getElementById('midiProgram').value = 0;
@@ -577,7 +659,7 @@ function renderizarMusica(indice) {
 }
 
 // ============================================================
-// 6. APLICAR MIDI (CONFIRMAR SELEÇÃO)
+// 6. APLICAR MIDI
 // ============================================================
 function aplicarMIDI() {
   if (musicas.length === 0) return;
@@ -600,7 +682,72 @@ function aplicarMIDI() {
 }
 
 // ============================================================
-// 7. MODAL DE INSTRUMENTOS
+// 7. EDITOR ABC
+// ============================================================
+function abrirEditor() {
+  if (!musicas.length) {
+    alert('Nenhuma música carregada.');
+    return;
+  }
+  const musica = musicas[musicaSelecionada];
+  document.getElementById('editorInfo').textContent = `Editando: ${musica.titulo} (X:${musica.x})`;
+  document.getElementById('editorTextarea').value = codigoOriginal || musica.codigo;
+  document.getElementById('modalEditor').style.display = 'flex';
+}
+
+function fecharEditor() {
+  document.getElementById('modalEditor').style.display = 'none';
+}
+
+function aplicarEdicao() {
+  const novoCodigo = document.getElementById('editorTextarea').value;
+  if (!novoCodigo.trim()) {
+    alert('O código não pode estar vazio.');
+    return;
+  }
+  // Atualiza o código da música atual
+  musicas[musicaSelecionada].codigo = novoCodigo;
+  codigoOriginal = novoCodigo;
+  // Re-renderiza
+  renderizarMusica(musicaSelecionada);
+  fecharEditor();
+  alert('✅ Código aplicado! A partitura foi atualizada.');
+}
+
+function baixarABC() {
+  const codigo = document.getElementById('editorTextarea').value;
+  if (!codigo.trim()) {
+    alert('Não há código para baixar.');
+    return;
+  }
+  const musica = musicas[musicaSelecionada];
+  const nomeArquivo = `${musica.x}.abc`;
+  const blob = new Blob([codigo], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = nomeArquivo;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function copiarABC() {
+  const codigo = document.getElementById('editorTextarea').value;
+  if (!codigo.trim()) {
+    alert('Não há código para copiar.');
+    return;
+  }
+  navigator.clipboard.writeText(codigo).then(() => {
+    alert('✅ Código copiado para a área de transferência!');
+  }).catch(() => {
+    alert('Erro ao copiar. Selecione manualmente e copie.');
+  });
+}
+
+// ============================================================
+// 8. MODAL DE INSTRUMENTOS
 // ============================================================
 function abrirModalInstrumentos() {
   const modal = document.getElementById('modalInstrumentos');
@@ -660,10 +807,14 @@ window.onclick = function(event) {
   if (event.target === modal) {
     modal.style.display = 'none';
   }
+  const editorModal = document.getElementById('modalEditor');
+  if (event.target === editorModal) {
+    editorModal.style.display = 'none';
+  }
 }
 
 // ============================================================
-// 8. POPULAR SELECT
+// 9. POPULAR SELECT
 // ============================================================
 function popularSelect(selecionarNum = null) {
   const select = document.getElementById("listaMusicas");
@@ -695,14 +846,13 @@ function popularSelect(selecionarNum = null) {
 }
 
 // ============================================================
-// 9. CARREGAR ARQUIVO
+// 10. CARREGAR ARQUIVO
 // ============================================================
 const params = new URLSearchParams(window.location.search);
 const file = params.get("file") || "exemplo.abc";
 const numParam = params.get("num") || null;
 const categoriaParam = params.get("categoria") || "Músicas";
 
-// Armazena a categoria global
 categoriaGlobal = categoriaParam;
 
 fetch(file)
@@ -752,7 +902,7 @@ fetch(file)
   });
 
 // ============================================================
-// 10. CONTROLES DE ÁUDIO E TRANSPOSIÇÃO
+// 11. CONTROLES DE ÁUDIO E TRANSPOSIÇÃO
 // ============================================================
 function processAndRender() {
   if (musicas.length === 0) return;
